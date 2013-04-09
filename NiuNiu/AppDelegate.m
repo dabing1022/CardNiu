@@ -91,9 +91,10 @@
 }
 
 // Supported orientations: Landscape. Customize it for your own needs
+// 牛牛卡牌契约：自动旋转方向为Portrait
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
