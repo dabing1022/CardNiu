@@ -9,8 +9,11 @@
 #import "FamilyPropertyScene.h"
 #import "PawnShopScene.h"
 #import "CardPlayingScene.h"
+#import "Game.h"
 
 @implementation FamilyPropertyScene
+@synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
+@synthesize swipeRightGestureRecognizer=_swipeRightGestureRecognizer;
 
 +(CCScene *) scene
 {
@@ -50,29 +53,59 @@
     return self;
 }
 
+#pragma mark - UISwipeGesture switch-scenes
+- (void)switchSceneToPawnShop:(id)sender
+{
+    [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:1.0
+                                                                                 scene:[PawnShopScene scene]
+                                                                             withColor:ccWHITE]];
+}
+
+- (void)switchSceneToCardPlay:(id)sender
+{
+    [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:1.0
+                                                                                 scene:[CardPlayingScene scene]
+                                                                             withColor:ccWHITE]];
+}
+
 - (void)onEnter
 {
+    self.swipeLeftGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                                action:@selector(switchSceneToPawnShop:)];
+    self.swipeLeftGestureRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeLeftGestureRecognizer];
+    
+    self.swipeRightGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                                 action:@selector(switchSceneToCardPlay:)];
+    self.swipeRightGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
     [super onEnter];
+    LOG_FUN_DID;
 }
 
 - (void)onEnterTransitionDidFinish
 {
     [super onEnterTransitionDidFinish];
+    LOG_FUN_DID;
 }
 
 - (void)onExit
 {
+    [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeLeftGestureRecognizer];
+    [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeRightGestureRecognizer];
     [super onExit];
+    LOG_FUN_DID;
 }
 
 - (void) dealloc
 {
-	// in case you have something to dealloc, do it in this method
-	// in this particular example nothing needs to be released.
-	// cocos2d will automatically release all the children (Label)
-	
-	// don't forget to call "super dealloc"
+	[_swipeLeftGestureRecognizer release];
+    _swipeLeftGestureRecognizer = nil;
+    [_swipeRightGestureRecognizer release];
+    _swipeRightGestureRecognizer = nil;
+
 	[super dealloc];
+    LOG_FUN_DID;
 }
 
 

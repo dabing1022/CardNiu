@@ -7,7 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GameKit/GameKit.h>
 #import "cocos2d.h"
+#import "GCDAsyncSocketHelper.h"
+
+BOOL isGameCenterAvailable();
 
 @interface AppController : NSObject <UIApplicationDelegate, CCDirectorDelegate>
 {
@@ -15,10 +19,15 @@
 	UINavigationController *navController_;
 
 	CCDirectorIOS	*director_;							// weak ref
+    GCDAyncSocketHelper *socketHelper;
 }
 
 @property (nonatomic, retain) UIWindow *window;
 @property (readonly) UINavigationController *navController;
 @property (readonly) CCDirectorIOS *director;
+
+
+@property (readwrite, retain) NSString *currentPlayerID;
+@property (readwrite, getter = isGameCenterAuthenticationComplete) BOOL gameCenterAuthenticationComplete;
 
 @end

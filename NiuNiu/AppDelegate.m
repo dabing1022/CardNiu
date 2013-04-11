@@ -14,12 +14,14 @@
 @implementation AppController
 
 @synthesize window=window_, navController=navController_, director=director_;
+@synthesize currentPlayerID, gameCenterAuthenticationComplete;
 
+#pragma mark -
+#pragma mark Application lifecycle
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Create the main window
 	window_ = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
 
 	// Create an CCGLView with a RGB565 color buffer, and a depth buffer of 0-bits
 	CCGLView *glView = [CCGLView viewWithFrame:[window_ bounds]
@@ -29,6 +31,53 @@
 									sharegroup:nil
 								 multiSampling:NO
 							   numberOfSamples:0];
+    
+    /*---------------------------game center------------------------------*/
+    self.gameCenterAuthenticationComplete = NO;
+    
+    if (!isGameCenterAPIAvailable()) {
+        // Game Center is not available.
+        self.gameCenterAuthenticationComplete = NO;
+        CCLOG(@"GameCenter is not available!");
+    } else {
+        CCLOG(@"GameCenter is available");
+        GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
+        [[GKLocalPlayer localPlayer] authenticateWithCompletionHandler:^(NSError *error) {
+            // If there is an error, do not assume local player is not authenticated.
+            if (localPlayer.isAuthenticated) {
+                CCLOG(@"localPlayer isAuthenticated");
+                // Enable Game Center Functionality
+                self.gameCenterAuthenticationComplete = YES;
+                CCLOG(@"PlayerID-->%@", self.currentPlayerID);
+                if (! self.currentPlayerID || ! [self.currentPlayerID isEqualToString:localPlayer.playerID]) {
+                    // Current playerID has changed. Create/Load a game state around the new user.
+                    self.currentPlayerID = localPlayer.playerID;
+                    CCLOG(@"PlayerID new-->%@", self.currentPlayerID);
+                    // Load game instance for new current player, if none exists create a new.
+                }
+                
+                //init socketHelper
+                socketHelper = [[GCDAyncSocketHelper alloc]init];
+                [socketHelper connect];
+                //NSDictionary *dic = [NSDictionary dictionaryWithObject:self.currentPlayerID forKey:@"playerId"];
+                NSDictionary *dic = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"1022466", @"123456", [NSNumber numberWithInt:51], nil]
+                                                                  forKeys:[NSArray arrayWithObjects:@"username", @"password", @"pid", nil]];
+                [socketHelper writeData:[socketHelper wrapPacketWithCmd:2003 contentDic:dic] withTimeout:-1 tag:2003];
+                [socketHelper readDataWithTimeout:-1 tag:2003];
+                
+                NSDictionary *dic2 = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"1022466", @"1022466", [NSNumber numberWithInt:51], nil]
+                                                                forKeys:[NSArray arrayWithObjects:@"username", @"cardId", @"pid", nil]];
+                [socketHelper writeData:[socketHelper wrapPacketWithCmd:1003 contentDic:dic2] withTimeout:-1 tag:1003];
+                [socketHelper readDataWithTimeout:-1 tag:1003];
+            } else {
+                // No user is logged into Game Center, run without Game Center support or user interface.
+                self.gameCenterAuthenticationComplete = NO;
+                CCLOG(@"localPlayer is not authenticated");
+            }
+        }];
+    }
+    /*----------------------------------------------------------------------------*/
+
 
 	director_ = (CCDirectorIOS*) [CCDirector sharedDirector];
 
@@ -86,7 +135,21 @@
 	
 	// make main window visible
 	[window_ makeKeyAndVisible];
-	
+
+    
+//    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"didInitPlayer"];
+//    BOOL didInit = [[NSUserDefaults standardUserDefaults] boolForKey:@"didInitPlayer"];
+//    CCLOG(@"didInit %d", didInit);
+
+    BOOL didInit2 = [[NSUserDefaults standardUserDefaults] boolForKey:@"didInitPlayer"];
+    if(didInit2)
+    {
+        CCLOG(@"did init");
+    }else
+    {
+        CCLOG(@"first init");
+    }
+
 	return YES;
 }
 
@@ -110,12 +173,18 @@
 {
 	if( [navController_ visibleViewController] == director_ )
 		[director_ resume];
+    CCLOG(@"<%@>", NSStringFromSelector(_cmd));
 }
 
 -(void) applicationDidEnterBackground:(UIApplication*)application
 {
 	if( [navController_ visibleViewController] == director_ )
 		[director_ stopAnimation];
+    /*
+     Invalidate Game Center GKAuthentication and save game state, so the game doesn't start until the GKAuthentication
+     Completion Handler is run. This prevents a new user from using the old users game state.
+     */
+    self.gameCenterAuthenticationComplete = NO;   
 }
 
 -(void) applicationWillEnterForeground:(UIApplication*)application
@@ -130,6 +199,8 @@
 	CC_DIRECTOR_END();
 }
 
+#pragma mark -
+#pragma mark Memory Managerment
 // purge memory
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
@@ -142,11 +213,27 @@
 	[[CCDirector sharedDirector] setNextDeltaTimeZero:YES];
 }
 
+#pragma mark -
+#pragma mark GameCenterSupport
+BOOL isGameCenterAPIAvailable()
+{
+    // Check for presence of GKLocalPlayer API.
+    Class gcClass = (NSClassFromString(@"GKLocalPlayer"));
+    
+    // The device must be running running iOS 4.1 or later.
+    NSString *reqSysVer = @"4.1";
+    NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+    BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
+    
+    return (gcClass && osVersionSupported);
+}
+
 - (void) dealloc
 {
+    [currentPlayerID release];
 	[window_ release];
 	[navController_ release];
-
+    [socketHelper release];
 	[super dealloc];
 }
 @end
