@@ -19,7 +19,7 @@ BOOL isGameCenterAvailable();
 	UINavigationController *navController_;
 
 	CCDirectorIOS	*director_;							// weak ref
-    GCDAyncSocketHelper *socketHelper;
+    GCDAsyncSocketHelper *socketHelper;
 }
 
 @property (nonatomic, retain) UIWindow *window;

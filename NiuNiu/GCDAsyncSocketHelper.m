@@ -9,47 +9,102 @@
 #import "GCDAsyncSocketHelper.h"
 #import "CJSONSerializer.h"
 #import "CJSONDeserializer.h"
+#import "Game.h"
+#import "CmdLoginHandler.h"
 
 
 #define LOCAL_CONNECT 1
 #ifdef LOCAL_CONNECT
-#define HOST @"192.168.1.222"
-#define PORT 6666
+#define LOGIN_HOST @"192.168.1.222"
+#define LOGIN_PORT 7000
 #else
-#define GOOGLE_HOST @"www.google.com"
-#define GOOGLE_PORT 80
+#define LOGIN_HOST @"www.google.com"
+#define LOGIN_PORT 80
 #endif
 
 //packet = 描述cmd和content数据存储量之和的数据  + cmd + content
 #define LEN_SIZE 4 //描述命令长度和数据内容长度之和的数据存储量 4个字节
 #define CMD_SIZE 4 //命令长度 4个字节
 
-@interface GCDAyncSocketHelper(PrivateMethods)
-    -(NSDictionary *)analysisDataToDictionary:(NSData *)data;
-    -(NSString *)analysisDataToString:(NSData *)data;
-@end
-
-@implementation GCDAyncSocketHelper
-
+@implementation GCDAsyncSocketHelper
+@synthesize loginSocket,familySocket,cardSocket;
+static GCDAsyncSocketHelper *_instance = nil;
++ (GCDAsyncSocketHelper *)sharedHelper
+{
+    if(!_instance)
+    {
+        _instance = [[self alloc]init];
+    }
+    return _instance;
+}
 
 - (id)init
 {
     if((self = [super init]))
     {
-        _mySocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        loginSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        familySocket = nil;
+        cardSocket = nil;
     }
     return self;
 }
 
-- (void)connect
+#pragma mark - 连接服务器
+- (void)connectLoginServer
 {
     NSError *error = nil;
-    if(![_mySocket connectToHost:HOST onPort:PORT error:&error])
+    if(![loginSocket connectToHost:LOGIN_HOST onPort:LOGIN_PORT error:&error])
     {
-        CCLOG(@"连接出现问题，请检查%@", error);
+        CCLOG(@"连接登录服务器出现问题，请检查%@", error);
     }
 }
 
+- (void)connectFamilyServer
+{
+    familySocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSError *error = nil;
+    if(![loginSocket connectToHost:FAMILY_IP onPort:FAMILY_PORT error:&error])
+    {
+        CCLOG(@"连接家产服务器出现问题，请检查%@", error);
+    }
+}
+
+- (void)connectCardServer
+{
+    cardSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSError *error = nil;
+    if(![loginSocket connectToHost:CARD_IP onPort:CARD_PORT error:&error])
+    {
+        CCLOG(@"连接牌局服务器出现问题，请检查%@", error);
+    }
+}
+
+#pragma mark - 关闭socket
+- (void)disconnectLoginServer
+{
+    [loginSocket setDelegate:nil delegateQueue:NULL];
+    [loginSocket disconnect];
+    [loginSocket release];
+    loginSocket = nil;
+}
+
+- (void)disconnectFamilyServer
+{
+    [familySocket setDelegate:nil delegateQueue:NULL];
+    [familySocket disconnect];
+    [familySocket release];
+    familySocket = nil;
+}
+
+- (void)disconnectCardServer
+{
+    [cardSocket setDelegate:nil delegateQueue:NULL];
+    [cardSocket disconnect];
+    [cardSocket release];
+    cardSocket = nil;
+}
+
+#pragma mark - 读写数据
 - (NSData *) wrapPacketWithCmd:(NSUInteger)cmd contentDic:(NSDictionary *)contentDic
 {
     NSData *data = [[[NSData alloc]init] autorelease];
@@ -69,18 +124,28 @@
     return data;
 }
 
-- (void)writeData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag
+- (void)writeData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag socketType:(int)type
 {
-    [_mySocket writeData:data withTimeout:timeout tag:tag];
+    if(type == LOGIN_SOCKET)
+        [loginSocket writeData:data withTimeout:timeout tag:tag];
+    else if(type == FAMILY_SOCKET)
+        [familySocket writeData:data withTimeout:timeout tag:tag];
+    else if(type == CARD_SOCKET)
+        [cardSocket writeData:data withTimeout:timeout tag:tag];
 }
 
-- (void)readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag
+- (void)readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag socketType:(int)type
 {
-    [_mySocket readDataWithTimeout:timeout tag:tag];
+    if(type == LOGIN_SOCKET)
+        [loginSocket readDataWithTimeout:timeout tag:tag];
+    else if(type == FAMILY_SOCKET)
+        [familySocket readDataWithTimeout:timeout tag:tag];
+    else if(type == CARD_SOCKET)
+        [cardSocket readDataWithTimeout:timeout tag:tag];
 }
 
 #pragma mark - 分析包数据
-- (NSDictionary *)analysisDataToDictionary:(NSData *)data
++ (NSDictionary *)analysisDataToDictionary:(NSData *)data
 {
     //解析cmd和content数据存储之和
     NSUInteger length;
@@ -99,15 +164,15 @@
     Byte content[len-CMD_SIZE];
     [data getBytes:content range:NSMakeRange(LEN_SIZE+CMD_SIZE, len-CMD_SIZE)];
     NSData *contentData = [NSData dataWithBytes:content length:len-CMD_SIZE];
-//    NSString *contentStr = [[[NSString alloc] initWithBytes:content length:len-CMD_SIZE encoding:NSUTF8StringEncoding] autorelease];
-//    CCLOG(@"contentStr :%@", contentStr);
+    NSString *contentStr = [[[NSString alloc] initWithBytes:content length:len-CMD_SIZE encoding:NSUTF8StringEncoding] autorelease];
+    CCLOG(@"contentStr :%@", contentStr);
     NSDictionary *contentDic = [[CJSONDeserializer deserializer]deserializeAsDictionary:contentData error:&error];
     CCLOG(@"contentDic :%@", contentDic);
     
     return contentDic;
 }
 
-- (NSString *)analysisDataToString:(NSData *)data
++ (NSString *)analysisDataToString:(NSData *)data
 {
     //解析cmd和content数据存储之和
     NSUInteger length;
@@ -131,29 +196,52 @@
     CCLOG(@"connect success!");
 }
 
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)error
+{
+    CCLOG(@"连接失败！");
+}
+
 - (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
     CCLOG(@"%@, tag: %ld", NSStringFromSelector(_cmd), tag);
 }
 
-//*
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    if(tag == 2003)
-    {
-        NSDictionary *dic = [self analysisDataToDictionary:data];
-        CCLOG(@"%@", dic);
-    }else if(tag == 1003)
-    {
-        CCLOG(@"recieved 1003");
+    switch (tag) {
+        CCLOG(@"Recieved cmd %ld", tag);
+        case CMD_LOGIN:
+            [CmdLoginHandler processLoginData:data];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                CCLOG(@"dispatch_get_main_queue ui process, cmd: %ld", tag);
+                CCScene *currentScene = [[CCDirector sharedDirector]runningScene];
+                if([currentScene respondsToSelector:@selector(updateUIByLogin:)])
+                {
+                    //[currentScene updateUIByLogin:data];
+                }
+
+                
+            });
+            break;
+            
+        default:
+            CCLOG(@"PLEASE CHECK THE CMD!");
+            break;
     }
 }
-//*/
 
+#pragma mark - 返回主线程更新UI
+
+
+
+
+#pragma mark - dealloc
 - (void)dealloc
 {
-    [_mySocket release];
-    _mySocket = nil;
+    [self disconnectLoginServer];
+    [self disconnectFamilyServer];
+    [self disconnectCardServer];
     [super dealloc];
 }
 @end

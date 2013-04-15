@@ -12,19 +12,44 @@
 
 @protocol NiuNiuGCDAsyncSocketDelegate <NSObject>
 
-- (void) connect;
+- (void) connectLoginServer;
+- (void) connectFamilyServer;
+- (void) connectCardServer;
+
+- (void) disconnectLoginServer;
+- (void) disconnectFamilyServer;
+- (void) disconnectCardServer;
+
 - (NSData *) wrapPacketWithCmd:(NSUInteger)cmd contentDic:(NSDictionary *)contentDic;
-- (void)writeData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag;
-- (void)readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag;
+- (void)writeData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag socketType:(int)type;
+- (void)readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag socketType:(int)type;
+//将NSData数据解析为NSDictionary
++ (NSDictionary *)analysisDataToDictionary:(NSData *)data;
+//将NSData数据解析位NSString
++ (NSString *)analysisDataToString:(NSData *)data;
 @end
 
 
-@interface GCDAyncSocketHelper : NSObject <NiuNiuGCDAsyncSocketDelegate>
+NSString *CARD_IP;
+int CARD_PORT;
+NSString *FAMILY_IP;
+int FAMILY_PORT;
+
+#define LOGIN_SOCKET 1
+#define FAMILY_SOCKET 2
+#define CARD_SOCKET 3
+@interface GCDAsyncSocketHelper : NSObject <NiuNiuGCDAsyncSocketDelegate>
 {
-    GCDAsyncSocket *_mySocket;
+    //登录、内购
+    GCDAsyncSocket *loginSocket;
+    //家产、典当行
+    GCDAsyncSocket *familySocket;
+    //牌局
+    GCDAsyncSocket *cardSocket;
 }
-@property(nonatomic, retain) GCDAsyncSocket *socket;
 
-
-
++ (GCDAsyncSocketHelper *)sharedHelper;
+@property(nonatomic, readonly)GCDAsyncSocket *loginSocket;
+@property(nonatomic, readonly)GCDAsyncSocket *familySocket;
+@property(nonatomic, readonly)GCDAsyncSocket *cardSocket;
 @end

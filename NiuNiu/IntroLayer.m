@@ -12,6 +12,7 @@
 #import "FamilyPropertyScene.h"
 #import "CCScrollLayerTestLayer.h"
 #import "AvatarChooseScene.h"
+#import "RoleDiscriptionLayer.h"
 
 #pragma mark - IntroLayer
 
@@ -61,6 +62,6 @@
 
 -(void) makeTransition:(ccTime)dt
 {
-	[[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:1.0 scene:[AvatarChooseScene scene] withColor:ccWHITE]];
+    [[CCDirector sharedDirector] replaceScene:[FamilyPropertyScene scene]];
 }
 @end

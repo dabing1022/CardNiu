@@ -10,6 +10,8 @@
 
 #import "AppDelegate.h"
 #import "IntroLayer.h"
+#import "Game.h"
+#import "IP_AddressHelper.h"
 
 @implementation AppController
 
@@ -48,27 +50,28 @@
                 CCLOG(@"localPlayer isAuthenticated");
                 // Enable Game Center Functionality
                 self.gameCenterAuthenticationComplete = YES;
-                CCLOG(@"PlayerID-->%@", self.currentPlayerID);
+                CCLOG(@"PlayerID-->%@", localPlayer.playerID);
+                CCLOG(@"PlayerAlias--->%@", localPlayer.alias);//玩家的别名
                 if (! self.currentPlayerID || ! [self.currentPlayerID isEqualToString:localPlayer.playerID]) {
                     // Current playerID has changed. Create/Load a game state around the new user.
                     self.currentPlayerID = localPlayer.playerID;
                     CCLOG(@"PlayerID new-->%@", self.currentPlayerID);
+                    CCLOG(@"PlayerAlias--->%@", localPlayer.alias);//玩家的别名
                     // Load game instance for new current player, if none exists create a new.
                 }
                 
                 //init socketHelper
-                socketHelper = [[GCDAyncSocketHelper alloc]init];
-                [socketHelper connect];
+                socketHelper = [GCDAsyncSocketHelper sharedHelper];
+                [socketHelper connectLoginServer];
+                //获取本机IP地址
+                NSString *ipAddress = [IP_AddressHelper getIPAddress];
+                CCLOG(@"IP: %@", ipAddress);
                 //NSDictionary *dic = [NSDictionary dictionaryWithObject:self.currentPlayerID forKey:@"playerId"];
-                NSDictionary *dic = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"1022466", @"123456", [NSNumber numberWithInt:51], nil]
-                                                                  forKeys:[NSArray arrayWithObjects:@"username", @"password", @"pid", nil]];
-                [socketHelper writeData:[socketHelper wrapPacketWithCmd:2003 contentDic:dic] withTimeout:-1 tag:2003];
-                [socketHelper readDataWithTimeout:-1 tag:2003];
+                NSDictionary *dic = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:self.currentPlayerID,localPlayer.alias,ipAddress,nil]
+                                                                forKeys:[NSArray arrayWithObjects:@"centerID", @"centerName",@"ip",nil]];
+                [socketHelper writeData:[socketHelper wrapPacketWithCmd:CMD_LOGIN contentDic:dic] withTimeout:-1 tag:2003 socketType:LOGIN_SOCKET];
+                [socketHelper readDataWithTimeout:-1 tag:CMD_LOGIN socketType:LOGIN_SOCKET];
                 
-                NSDictionary *dic2 = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"1022466", @"1022466", [NSNumber numberWithInt:51], nil]
-                                                                forKeys:[NSArray arrayWithObjects:@"username", @"cardId", @"pid", nil]];
-                [socketHelper writeData:[socketHelper wrapPacketWithCmd:1003 contentDic:dic2] withTimeout:-1 tag:1003];
-                [socketHelper readDataWithTimeout:-1 tag:1003];
             } else {
                 // No user is logged into Game Center, run without Game Center support or user interface.
                 self.gameCenterAuthenticationComplete = NO;

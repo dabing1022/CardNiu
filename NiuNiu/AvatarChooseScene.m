@@ -45,7 +45,7 @@
                                                                  selector:@selector(chooseAvatar:)];
         [avatar01 setPosition:ccp(60, 300)];
         avatar01.tag = TAG_AVATAR01;
-               
+                
         CCMenuItemImage *avatar02 = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"avatar02.png"]
                                                            selectedSprite:[CCSprite spriteWithSpriteFrameName:@"avatar02.png"] target:self
                                                                  selector:@selector(chooseAvatar:)];

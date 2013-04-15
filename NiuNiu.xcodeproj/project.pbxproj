@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CE02C0DF171B996000EC6C00 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0DE171B996000EC6C00 /* User.m */; };
+		CE02C0E2171BA7C200EC6C00 /* GameData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0E1171BA7C200EC6C00 /* GameData.m */; };
+		CE02C0E5171BB7B300EC6C00 /* IP_AddressHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0E4171BB7B300EC6C00 /* IP_AddressHelper.m */; };
+		CE02C0E8171C189A00EC6C00 /* UserCard.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0E7171C189900EC6C00 /* UserCard.m */; };
 		CE11B13E17165EE6002510CC /* GCDAsyncSocketHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B13D17165EE6002510CC /* GCDAsyncSocketHelper.m */; };
 		CE11B14217165EFD002510CC /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B14117165EFD002510CC /* GCDAsyncSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		CE11B1691716645B002510CC /* CDataScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B15B1716645B002510CC /* CDataScanner.m */; };
@@ -15,6 +19,10 @@
 		CE11B16C1716645B002510CC /* CJSONDeserializer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B1631716645B002510CC /* CJSONDeserializer.m */; };
 		CE11B16D1716645B002510CC /* CJSONScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B1651716645B002510CC /* CJSONScanner.m */; };
 		CE11B16E1716645B002510CC /* CJSONSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B1671716645B002510CC /* CJSONSerializer.m */; };
+		CE11B1761716D391002510CC /* transitionDown-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1721716D391002510CC /* transitionDown-hd.png */; };
+		CE11B1771716D391002510CC /* transitionDown.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1731716D391002510CC /* transitionDown.png */; };
+		CE11B1781716D391002510CC /* transitionUp-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1741716D391002510CC /* transitionUp-hd.png */; };
+		CE11B1791716D391002510CC /* transitionUp.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1751716D391002510CC /* transitionUp.png */; };
 		CE3FDF051711A3CB002C7076 /* CCScrollLayerTestLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */; };
 		CE3FDF061711A4D9002C7076 /* CCScrollLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDD2B17119642002C7076 /* CCScrollLayer.m */; };
 		CE3FDF091711A937002C7076 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE3FDF081711A937002C7076 /* Default-568h@2x.png */; };
@@ -185,9 +193,19 @@
 		CEEBC3901714291E000A3CBD /* sketchSpriteSheet-hd.pvr.ccz in Resources */ = {isa = PBXBuildFile; fileRef = CEEBC38C1714291E000A3CBD /* sketchSpriteSheet-hd.pvr.ccz */; };
 		CEEBC3911714291E000A3CBD /* sketchSpriteSheet.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEEBC38D1714291E000A3CBD /* sketchSpriteSheet.plist */; };
 		CEEBC3921714291E000A3CBD /* sketchSpriteSheet.pvr.ccz in Resources */ = {isa = PBXBuildFile; fileRef = CEEBC38E1714291E000A3CBD /* sketchSpriteSheet.pvr.ccz */; };
+		CEF00B411717EFEC00CDC391 /* RoleDiscriptionLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF00B401717EFEC00CDC391 /* RoleDiscriptionLayer.m */; };
+		CEF00B4517181AF800CDC391 /* CmdLoginHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF00B4417181AF800CDC391 /* CmdLoginHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CE02C0DD171B996000EC6C00 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		CE02C0DE171B996000EC6C00 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
+		CE02C0E0171BA7C200EC6C00 /* GameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameData.h; sourceTree = "<group>"; };
+		CE02C0E1171BA7C200EC6C00 /* GameData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameData.m; sourceTree = "<group>"; };
+		CE02C0E3171BB7B300EC6C00 /* IP_AddressHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IP_AddressHelper.h; sourceTree = "<group>"; };
+		CE02C0E4171BB7B300EC6C00 /* IP_AddressHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IP_AddressHelper.m; sourceTree = "<group>"; };
+		CE02C0E6171C189900EC6C00 /* UserCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCard.h; sourceTree = "<group>"; };
+		CE02C0E7171C189900EC6C00 /* UserCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCard.m; sourceTree = "<group>"; };
 		CE11B13C17165EE6002510CC /* GCDAsyncSocketHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocketHelper.h; sourceTree = "<group>"; };
 		CE11B13D17165EE6002510CC /* GCDAsyncSocketHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocketHelper.m; sourceTree = "<group>"; };
 		CE11B14017165EFD002510CC /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
@@ -205,6 +223,10 @@
 		CE11B1661716645B002510CC /* CJSONSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CJSONSerializer.h; sourceTree = "<group>"; };
 		CE11B1671716645B002510CC /* CJSONSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CJSONSerializer.m; sourceTree = "<group>"; };
 		CE11B1681716645B002510CC /* JSONRepresentation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONRepresentation.h; sourceTree = "<group>"; };
+		CE11B1721716D391002510CC /* transitionDown-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "transitionDown-hd.png"; path = "Assets/transitionDown-hd.png"; sourceTree = "<group>"; };
+		CE11B1731716D391002510CC /* transitionDown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionDown.png; path = Assets/transitionDown.png; sourceTree = "<group>"; };
+		CE11B1741716D391002510CC /* transitionUp-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "transitionUp-hd.png"; path = "Assets/transitionUp-hd.png"; sourceTree = "<group>"; };
+		CE11B1751716D391002510CC /* transitionUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionUp.png; path = Assets/transitionUp.png; sourceTree = "<group>"; };
 		CE3FDD2A17119642002C7076 /* CCScrollLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCScrollLayer.h; sourceTree = "<group>"; };
 		CE3FDD2B17119642002C7076 /* CCScrollLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCScrollLayer.m; sourceTree = "<group>"; };
 		CE3FDF031711A3CA002C7076 /* CCScrollLayerTestLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCScrollLayerTestLayer.h; sourceTree = "<group>"; };
@@ -539,6 +561,11 @@
 		CEEBC38C1714291E000A3CBD /* sketchSpriteSheet-hd.pvr.ccz */ = {isa = PBXFileReference; lastKnownFileType = file; path = "sketchSpriteSheet-hd.pvr.ccz"; sourceTree = "<group>"; };
 		CEEBC38D1714291E000A3CBD /* sketchSpriteSheet.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = sketchSpriteSheet.plist; sourceTree = "<group>"; };
 		CEEBC38E1714291E000A3CBD /* sketchSpriteSheet.pvr.ccz */ = {isa = PBXFileReference; lastKnownFileType = file; path = sketchSpriteSheet.pvr.ccz; sourceTree = "<group>"; };
+		CEF00B3C1717DFF300CDC391 /* Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Text.h; sourceTree = "<group>"; };
+		CEF00B3F1717EFEC00CDC391 /* RoleDiscriptionLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoleDiscriptionLayer.h; sourceTree = "<group>"; };
+		CEF00B401717EFEC00CDC391 /* RoleDiscriptionLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoleDiscriptionLayer.m; sourceTree = "<group>"; };
+		CEF00B4317181AF800CDC391 /* CmdLoginHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CmdLoginHandler.h; sourceTree = "<group>"; };
+		CEF00B4417181AF800CDC391 /* CmdLoginHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdLoginHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -568,6 +595,8 @@
 			children = (
 				CE11B13C17165EE6002510CC /* GCDAsyncSocketHelper.h */,
 				CE11B13D17165EE6002510CC /* GCDAsyncSocketHelper.m */,
+				CE02C0E3171BB7B300EC6C00 /* IP_AddressHelper.h */,
+				CE02C0E4171BB7B300EC6C00 /* IP_AddressHelper.m */,
 			);
 			name = Helper;
 			sourceTree = "<group>";
@@ -1159,6 +1188,8 @@
 		CEE0206E1711615F00815A9D /* Class */ = {
 			isa = PBXGroup;
 			children = (
+				CEF00B42171817F100CDC391 /* Handler */,
+				CEF00B3A1717DCB600CDC391 /* Data */,
 				CE11B13817165D6F002510CC /* Helper */,
 				CEEBC37F17141B15000A3CBD /* Scenes */,
 				CE3FDD2A17119642002C7076 /* CCScrollLayer.h */,
@@ -1181,6 +1212,10 @@
 		CEEBC37617141AAD000A3CBD /* imgs */ = {
 			isa = PBXGroup;
 			children = (
+				CE11B1721716D391002510CC /* transitionDown-hd.png */,
+				CE11B1731716D391002510CC /* transitionDown.png */,
+				CE11B1741716D391002510CC /* transitionUp-hd.png */,
+				CE11B1751716D391002510CC /* transitionUp.png */,
 				CEEBC38B1714291E000A3CBD /* sketchSpriteSheet-hd.plist */,
 				CEEBC38C1714291E000A3CBD /* sketchSpriteSheet-hd.pvr.ccz */,
 				CEEBC38D1714291E000A3CBD /* sketchSpriteSheet.plist */,
@@ -1205,8 +1240,33 @@
 				CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */,
 				CEEBC38017141B77000A3CBD /* AvatarChooseScene.h */,
 				CEEBC38117141B77000A3CBD /* AvatarChooseScene.m */,
+				CEF00B3F1717EFEC00CDC391 /* RoleDiscriptionLayer.h */,
+				CEF00B401717EFEC00CDC391 /* RoleDiscriptionLayer.m */,
+				CE02C0E6171C189900EC6C00 /* UserCard.h */,
+				CE02C0E7171C189900EC6C00 /* UserCard.m */,
 			);
 			name = Scenes;
+			sourceTree = "<group>";
+		};
+		CEF00B3A1717DCB600CDC391 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				CEF00B3C1717DFF300CDC391 /* Text.h */,
+				CE02C0DD171B996000EC6C00 /* User.h */,
+				CE02C0DE171B996000EC6C00 /* User.m */,
+				CE02C0E0171BA7C200EC6C00 /* GameData.h */,
+				CE02C0E1171BA7C200EC6C00 /* GameData.m */,
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		CEF00B42171817F100CDC391 /* Handler */ = {
+			isa = PBXGroup;
+			children = (
+				CEF00B4317181AF800CDC391 /* CmdLoginHandler.h */,
+				CEF00B4417181AF800CDC391 /* CmdLoginHandler.m */,
+			);
+			name = Handler;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1284,6 +1344,10 @@
 				CEEBC3901714291E000A3CBD /* sketchSpriteSheet-hd.pvr.ccz in Resources */,
 				CEEBC3911714291E000A3CBD /* sketchSpriteSheet.plist in Resources */,
 				CEEBC3921714291E000A3CBD /* sketchSpriteSheet.pvr.ccz in Resources */,
+				CE11B1761716D391002510CC /* transitionDown-hd.png in Resources */,
+				CE11B1771716D391002510CC /* transitionDown.png in Resources */,
+				CE11B1781716D391002510CC /* transitionUp-hd.png in Resources */,
+				CE11B1791716D391002510CC /* transitionUp.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1436,6 +1500,12 @@
 				CE11B16C1716645B002510CC /* CJSONDeserializer.m in Sources */,
 				CE11B16D1716645B002510CC /* CJSONScanner.m in Sources */,
 				CE11B16E1716645B002510CC /* CJSONSerializer.m in Sources */,
+				CEF00B411717EFEC00CDC391 /* RoleDiscriptionLayer.m in Sources */,
+				CEF00B4517181AF800CDC391 /* CmdLoginHandler.m in Sources */,
+				CE02C0DF171B996000EC6C00 /* User.m in Sources */,
+				CE02C0E2171BA7C200EC6C00 /* GameData.m in Sources */,
+				CE02C0E5171BB7B300EC6C00 /* IP_AddressHelper.m in Sources */,
+				CE02C0E8171C189A00EC6C00 /* UserCard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
