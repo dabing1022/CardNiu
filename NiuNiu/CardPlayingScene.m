@@ -29,65 +29,57 @@
     if( (self=[super init]) ) {
         if(![[GCDAsyncSocketHelper sharedHelper]cardSocket])
             [[GCDAsyncSocketHelper sharedHelper]connectCardServer];
-
+        
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );
 		[self addChild: label];
-        
-        CCMenuItemImage *backImg = [CCMenuItemImage itemWithNormalImage:@"back.png"
-                                                          selectedImage:@"back.png"
-                                                                  block:^(id sender){
-                                                                      [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:1.0 scene:[FamilyPropertyScene scene] withColor:ccWHITE]];                                                                  }];
-        backImg.position = ccp(backImg.contentSize.width / 2, size.height / 2 - backImg.contentSize.height / 2);
-        CCLOG(@"backImg.contentSize / 2:%f", backImg.contentSize.width / 2);
-        CCLOG(@"backImg.postion-x:%f, y:%f", backImg.position.x,backImg.position.y);
-        backImg.scaleX = -1;
-        
-        CCMenuItemImage *preImg = [CCMenuItemImage itemWithNormalImage:@"back.png"
-                                                         selectedImage:@"back.png"
-                                                                 block:^(id sender){
-                                                                     [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:1.0 scene:[PawnShopScene scene] withColor:ccWHITE]];
-                                                                 }];
-        preImg.position = ccp(size.width - backImg.contentSize.width / 2, size.height /2 - backImg.contentSize.height / 2);
-        CCMenu *navigateMenu = [CCMenu menuWithItems:backImg,preImg, nil];
-        [navigateMenu setPosition:CGPointZero];
-        [self addChild:navigateMenu];
     }
     LOG_FUN_DID;
     return self;
 }
 
 #pragma mark - UISwipeGesture switch-scenes
+- (void)switchSceneToFamilyProperty:(id)sender
+{
+    [self closeCurtainWithSel:@selector(switchFamilyPropertyScene:)];
+}
+
+- (void)switchFamilyPropertyScene:(id)sender
+{
+    [[CCDirector sharedDirector] replaceScene:[FamilyPropertyScene scene]];
+}
+
 - (void)switchSceneToPawnShop:(id)sender
 {
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:0
-                                                                                 scene:[FamilyPropertyScene scene]]];
+    [self closeCurtainWithSel:@selector(switchPawnShopScene:)];
 }
 
-- (void)switchSceneToCardPlay:(id)sender
+- (void)switchPawnShopScene:(id)sender
 {
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:0
-                                                                                 scene:[PawnShopScene scene]]];
+    [[CCDirector sharedDirector] replaceScene:[PawnShopScene scene]];
 }
 
-- (void)onEnter
+#pragma mark - CurtainTransitionDelegateFun
+- (void)closeCurtainWithSel:(SEL)sel
 {
-    self.swipeLeftGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
-                                                                                action:@selector(switchSceneToPawnShop:)];
-    self.swipeLeftGestureRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
-    [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeLeftGestureRecognizer];
+    CGSize size = [[CCDirector sharedDirector] winSize];
+    CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
+    [self addChild:transitionUpSpr];
+    transitionUpSpr.position = ccp(size.width /2 , size.height + transitionUpSpr.contentSize.height / 2);
     
-    self.swipeRightGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
-                                                                                 action:@selector(switchSceneToCardPlay:)];
-    self.swipeRightGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
-    [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
+    CCSprite *transitionDownSpr = [CCSprite spriteWithFile:@"transitionDown.png"];
+    [self addChild:transitionDownSpr];
+    transitionDownSpr.position = ccp(size.width / 2, 0 - transitionDownSpr.contentSize.height / 2);
     
-    [super onEnter];
-    LOG_FUN_DID;
+    id moveDown = [CCMoveTo actionWithDuration:0.5 position:ccp(size.width / 2, size.height - transitionUpSpr.contentSize.height / 2)];
+    id moveUp = [CCMoveTo actionWithDuration:0.5 position:ccp(size.width / 2, 0 + transitionUpSpr.contentSize.height / 2)];
+    id switchCardPlayingScene = [CCCallFunc actionWithTarget:self selector:sel];
+    [transitionUpSpr runAction:moveDown];
+    [transitionDownSpr runAction:[CCSequence actions:moveUp,switchCardPlayingScene,nil]];
 }
 
-- (void)onEnterTransitionDidFinish
+- (void)openCurtain
 {
     CGSize size = [[CCDirector sharedDirector] winSize];
     CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
@@ -103,27 +95,36 @@
     
     [transitionUpSpr runAction:moveUp];
     [transitionDownSpr runAction:moveDown];
-    [super onEnterTransitionDidFinish];
-    LOG_FUN_DID;
 }
 
-- (void)onExitTransitionDidStart
+- (void)onEnter
 {
-    CGSize size = [[CCDirector sharedDirector] winSize];
-    CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
-    [self addChild:transitionUpSpr];
-    transitionUpSpr.position = ccp(size.width /2 , size.height + transitionUpSpr.contentSize.height / 2);
+    if([[GCDAsyncSocketHelper sharedHelper]cardSocket].isDisconnected)
+    {
+        CGSize size = [[CCDirector sharedDirector] winSize];
+        CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
+        [self addChild:transitionUpSpr];
+        transitionUpSpr.position = ccp(size.width /2 , size.height - transitionUpSpr.contentSize.height / 2);
+        
+        CCSprite *transitionDownSpr = [CCSprite spriteWithFile:@"transitionDown.png"];
+        [self addChild:transitionDownSpr];
+        transitionDownSpr.position = ccp(size.width / 2, 0 + transitionDownSpr.contentSize.height / 2);
+        CCLOG(@"showPic");
+    }else{
+        [self openCurtain];
+        CCLOG(@"openCurtain");
+    }
+    self.swipeLeftGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                                action:@selector(switchSceneToPawnShop:)];
+    self.swipeLeftGestureRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeLeftGestureRecognizer];
     
-    CCSprite *transitionDownSpr = [CCSprite spriteWithFile:@"transitionDown.png"];
-    [self addChild:transitionDownSpr];
-    transitionDownSpr.position = ccp(size.width / 2, 0 - transitionDownSpr.contentSize.height / 2);
+    self.swipeRightGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                                 action:@selector(switchSceneToFamilyProperty:)];
+    self.swipeRightGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
     
-    id moveDown = [CCMoveTo actionWithDuration:0.5 position:ccp(size.width / 2, size.height - transitionUpSpr.contentSize.height / 2)];
-    id moveUp = [CCMoveTo actionWithDuration:0.5 position:ccp(size.width / 2, 0 + transitionUpSpr.contentSize.height / 2)];
-    
-    [transitionUpSpr runAction:moveDown];
-    [transitionDownSpr runAction:moveUp];
-    [super onExitTransitionDidStart];
+    [super onEnter];
     LOG_FUN_DID;
 }
 
@@ -133,6 +134,16 @@
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeRightGestureRecognizer];
     [super onExit];
     LOG_FUN_DID;
+}
+
+#pragma mark - UIAlertViewDelegate
+- (void) alertView:(UIAlertView *)alert clickedButtonAtIndex:(NSInteger)buttonIndex{
+    NSLog(@"%d", (int) buttonIndex);
+    if (buttonIndex == 1) { // OK pushed
+        CCLOG(@"sldfjalsfjlasfadsj");
+    } else {
+        
+    }
 }
 
 - (void) dealloc

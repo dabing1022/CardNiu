@@ -6,11 +6,10 @@
 //
 //
 
-#import "CCLayer.h"
-
 #import "cocos2d.h"
+#import "CurtainTransitionDelegate.h"
 
-@interface PawnShopScene : CCLayer <UIGestureRecognizerDelegate>
+@interface PawnShopScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
     //加入手势滑动切换场景
     UISwipeGestureRecognizer *_swipeLeftGestureRecognizer;

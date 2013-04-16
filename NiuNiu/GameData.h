@@ -11,7 +11,7 @@
 @interface GameData : NSObject
 {
     //玩家本人
-    User *player;
+    User *_player;
 }
 
 @property(nonatomic, retain)User *player;

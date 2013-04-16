@@ -206,6 +206,7 @@
 		CE02C0E4171BB7B300EC6C00 /* IP_AddressHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IP_AddressHelper.m; sourceTree = "<group>"; };
 		CE02C0E6171C189900EC6C00 /* UserCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCard.h; sourceTree = "<group>"; };
 		CE02C0E7171C189900EC6C00 /* UserCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCard.m; sourceTree = "<group>"; };
+		CE0D7092171D4F85008EBDFB /* CurtainTransitionDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CurtainTransitionDelegate.h; sourceTree = "<group>"; };
 		CE11B13C17165EE6002510CC /* GCDAsyncSocketHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocketHelper.h; sourceTree = "<group>"; };
 		CE11B13D17165EE6002510CC /* GCDAsyncSocketHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocketHelper.m; sourceTree = "<group>"; };
 		CE11B14017165EFD002510CC /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
@@ -1197,6 +1198,7 @@
 				CEE0205817114ECC00815A9D /* AppDelegate.h */,
 				CEE0205917114ECC00815A9D /* AppDelegate.m */,
 				CEEBC37517140461000A3CBD /* Game.h */,
+				CE0D7092171D4F85008EBDFB /* CurtainTransitionDelegate.h */,
 			);
 			name = Class;
 			sourceTree = "<group>";

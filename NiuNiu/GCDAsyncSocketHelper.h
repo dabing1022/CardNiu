@@ -30,10 +30,6 @@
 @end
 
 
-NSString *CARD_IP;
-int CARD_PORT;
-NSString *FAMILY_IP;
-int FAMILY_PORT;
 
 #define LOGIN_SOCKET 1
 #define FAMILY_SOCKET 2
@@ -49,6 +45,11 @@ int FAMILY_PORT;
 }
 
 + (GCDAsyncSocketHelper *)sharedHelper;
+@property(nonatomic, retain)NSString *CARD_IP;
+@property(nonatomic, assign)int CARD_PORT;
+@property(nonatomic, retain)NSString *FAMILY_IP;
+@property(nonatomic, assign)int FAMILY_PORT;
+
 @property(nonatomic, readonly)GCDAsyncSocket *loginSocket;
 @property(nonatomic, readonly)GCDAsyncSocket *familySocket;
 @property(nonatomic, readonly)GCDAsyncSocket *cardSocket;

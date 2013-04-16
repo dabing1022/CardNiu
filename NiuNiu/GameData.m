@@ -7,9 +7,10 @@
 //
 
 #import "GameData.h"
+#import "User.h"
 
 @implementation GameData
-@synthesize player;
+@synthesize player=_player;
 static GameData *_instance = nil;
 
 
@@ -24,9 +25,10 @@ static GameData *_instance = nil;
 
 - (id)init
 {
-    if((self = [super init]))
+    self = [super init];
+    if(self)
     {
-        
+        self.player = nil;
     }
     return self;
 }

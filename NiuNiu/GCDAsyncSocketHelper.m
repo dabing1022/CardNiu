@@ -27,7 +27,7 @@
 #define CMD_SIZE 4 //命令长度 4个字节
 
 @implementation GCDAsyncSocketHelper
-@synthesize loginSocket,familySocket,cardSocket;
+@synthesize CARD_IP,CARD_PORT,FAMILY_IP,FAMILY_PORT,loginSocket,familySocket,cardSocket;
 static GCDAsyncSocketHelper *_instance = nil;
 + (GCDAsyncSocketHelper *)sharedHelper
 {
@@ -63,7 +63,8 @@ static GCDAsyncSocketHelper *_instance = nil;
 {
     familySocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
-    if(![loginSocket connectToHost:FAMILY_IP onPort:FAMILY_PORT error:&error])
+    if(![familySocket connectToHost:[GCDAsyncSocketHelper sharedHelper].FAMILY_IP
+                             onPort:[GCDAsyncSocketHelper sharedHelper].FAMILY_PORT error:&error])
     {
         CCLOG(@"连接家产服务器出现问题，请检查%@", error);
     }
@@ -73,7 +74,8 @@ static GCDAsyncSocketHelper *_instance = nil;
 {
     cardSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
-    if(![loginSocket connectToHost:CARD_IP onPort:CARD_PORT error:&error])
+    if(![cardSocket connectToHost:[GCDAsyncSocketHelper sharedHelper].CARD_IP
+                           onPort:[GCDAsyncSocketHelper sharedHelper].CARD_PORT error:&error])
     {
         CCLOG(@"连接牌局服务器出现问题，请检查%@", error);
     }
@@ -198,7 +200,24 @@ static GCDAsyncSocketHelper *_instance = nil;
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)error
 {
+    [self disconnectLoginServer];
+    [self disconnectFamilyServer];
+    [self disconnectCardServer];
     CCLOG(@"连接失败！");
+    
+    UIView *view = [[CCDirector sharedDirector]view];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"警告" message:@"网络连接失败!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    [view addSubview:alertView];
+    [alertView show];
+    [alertView release];
+}
+
+- (void) alertView:(UIAlertView *)alert clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (buttonIndex == 1) {
+        CCLOG(@"点击确定");
+    } else {
+        CCLOG(@"点击取消");
+    }
 }
 
 - (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
@@ -208,8 +227,8 @@ static GCDAsyncSocketHelper *_instance = nil;
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
+    CCLOG(@"Recieved cmd %ld", tag);
     switch (tag) {
-        CCLOG(@"Recieved cmd %ld", tag);
         case CMD_LOGIN:
             [CmdLoginHandler processLoginData:data];
             

@@ -18,5 +18,7 @@ static NSArray *roleName = [NSArray arrayWithObjects:@"",
                                                      @"",
                                                      @"", nil];
 
+
+static NSString *GAME_WAITING = @"info0001";
 #endif
 

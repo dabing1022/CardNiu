@@ -10,6 +10,8 @@
 
 @interface User : NSObject
 {
+    //用户主键
+    NSString *_userID;
     //头像
     NSString *_avatarID;//Server:avatarID
     //角色
@@ -22,12 +24,13 @@
     uint32_t _coinTB;//Server:coinTB
 }
 
+@property(nonatomic, retain)NSString *userID;
 @property(nonatomic, retain)NSString *avatarID;
-@property(nonatomic, assign)uint roleID;
+@property(nonatomic, assign)uint32_t roleID;
 @property(nonatomic, retain)NSString *userName;
-@property(nonatomic, assign)uint coinYL;
-@property(nonatomic, assign)uint coinTB;
+@property(nonatomic, assign)uint32_t coinYL;
+@property(nonatomic, assign)uint32_t coinTB;
 
-+ (id)userWithUserName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;
-- (id)initWithUserName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;
++ (id)userWithUserID:(NSString *)userID userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;
+- (id)initWithUserID:(NSString *)userID userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;
 @end
