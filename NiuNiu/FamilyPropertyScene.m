@@ -23,6 +23,7 @@
     CCScene *scene = [CCScene node];
 	FamilyPropertyScene *layer = [FamilyPropertyScene node];	
     [scene addChild: layer];
+    layer.tag = kTagFamilyPropertyScene;
 	return scene;
 }
 
@@ -52,14 +53,6 @@
 - (void)switchSceneToCardPlaying:(id)sender
 {
     [self closeCurtainWithSel:@selector(switchCardPlayingScene:)];
-    
-    NSString *userID = [[GameData sharedGameData] player].userID;
-    CCLOG(@"player userID:%@", userID);
-
-    NSDictionary *dic = [NSDictionary dictionaryWithObject:userID forKey:@"userID"];
-    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:ENTER_CARD_PLAYING contentDic:dic];
-    [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:ENTER_CARD_PLAYING socketType:CARD_SOCKET];
-    [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:ENTER_CARD_PLAYING socketType:CARD_SOCKET];
 }
 
 - (void)switchCardPlayingScene:(id)sender

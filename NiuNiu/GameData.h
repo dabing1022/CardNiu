@@ -12,10 +12,12 @@
 {
     //玩家本人
     User *_player;
+    //牌桌内玩家字典表，键为userID
+    NSMutableDictionary *_userDic;
 }
 
 @property(nonatomic, retain)User *player;
-
+@property(nonatomic, retain)NSMutableDictionary *userDic;
 
 + (GameData *)sharedGameData;
 

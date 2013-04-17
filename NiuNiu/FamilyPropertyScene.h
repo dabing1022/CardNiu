@@ -9,6 +9,7 @@
 #import "cocos2d.h"
 #import "CurtainTransitionDelegate.h"
 
+#define kTagFamilyPropertyScene 0
 @interface FamilyPropertyScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
     //加入手势滑动切换场景

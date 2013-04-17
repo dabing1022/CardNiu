@@ -11,16 +11,21 @@
 #import "PawnShopScene.h"
 #import "GCDAsyncSocketHelper.h"
 #import "Game.h"
+#import "GameData.h"
+#import "User.h"
+
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
 @synthesize swipeRightGestureRecognizer=_swipeRightGestureRecognizer;
+
 
 +(CCScene *) scene
 {
     CCScene *scene = [CCScene node];
 	CardPlayingScene *layer = [CardPlayingScene node];
     [scene addChild: layer];
+    layer.tag = kTagCardPlayingScene;
 	return scene;
 }
 
@@ -29,11 +34,18 @@
     if( (self=[super init]) ) {
         if(![[GCDAsyncSocketHelper sharedHelper]cardSocket])
             [[GCDAsyncSocketHelper sharedHelper]connectCardServer];
+        CCLOG(@"player userID:%@", [[GameData sharedGameData] player].userID);
+        
+        NSDictionary *dic = [NSDictionary dictionaryWithObject:[[GameData sharedGameData] player].userID forKey:@"userID"];
+        NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_ENTER_CARD_PLAYING contentDic:dic];
+        [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:CMD_ENTER_CARD_PLAYING socketType:CARD_SOCKET];
+        [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
         
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );
 		[self addChild: label];
+        label.tag = 5;
     }
     LOG_FUN_DID;
     return self;
@@ -144,6 +156,13 @@
     } else {
         
     }
+}
+
+- (void)testSelector
+{
+    CCLOG(@"testSelector");
+    CCLabelTTF *a = (CCLabelTTF *)[self getChildByTag:5];
+    [a setString:@"i love you"];
 }
 
 - (void) dealloc

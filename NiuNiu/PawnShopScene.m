@@ -21,6 +21,7 @@
     CCScene *scene = [CCScene node];
 	PawnShopScene *layer = [PawnShopScene node];
     [scene addChild: layer];
+    layer.tag = kTagPawnShopScene;
 	return scene;
 }
 

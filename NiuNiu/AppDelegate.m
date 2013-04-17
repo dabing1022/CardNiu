@@ -69,8 +69,8 @@
                 //NSDictionary *dic = [NSDictionary dictionaryWithObject:self.currentPlayerID forKey:@"playerId"];
                 NSDictionary *dic = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:self.currentPlayerID,localPlayer.alias,ipAddress,nil]
                                                                 forKeys:[NSArray arrayWithObjects:@"centerID", @"centerName",@"ip",nil]];
-                [socketHelper writeData:[socketHelper wrapPacketWithCmd:CMD_LOGIN contentDic:dic] withTimeout:-1 tag:2003 socketType:LOGIN_SOCKET];
-                [socketHelper readDataWithTimeout:-1 tag:CMD_LOGIN socketType:LOGIN_SOCKET];
+                [socketHelper writeData:[socketHelper wrapPacketWithCmd:CMD_LOGIN contentDic:dic] withTimeout:-1 tag:CMD_LOGIN socketType:LOGIN_SOCKET];
+                [socketHelper readDataWithTimeout:-1 tag:0 socketType:LOGIN_SOCKET];
                 
             } else {
                 // No user is logged into Game Center, run without Game Center support or user interface.

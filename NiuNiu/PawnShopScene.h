@@ -9,6 +9,7 @@
 #import "cocos2d.h"
 #import "CurtainTransitionDelegate.h"
 
+#define kTagPawnShopScene 0
 @interface PawnShopScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
     //加入手势滑动切换场景

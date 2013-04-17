@@ -9,19 +9,24 @@
 #import "User.h"
 //((y+6-x)+2)%6
 @implementation User
-@synthesize userID=_userID,avatarID=_avatarID,roleID=_roleID,userName=_userName,coinYL=_coinYL,coinTB=_coinTB;
+@synthesize userID=_userID,avatarID=_avatarID,roleID=_roleID,chairID=_chairID,posID=_posID,tableID=_tableID;
+@synthesize nickName=_nickName,userName=_userName;
+@synthesize coinYL=_coinYL,coinTB=_coinTB;
+@synthesize cardTitle=_cardTitle,familyPropertyTitle=_familyPropertyTitle,gamblerTitle=_gamblerTitle,roleTitle=_roleTitle;
 
-+ (id)userWithUserID:(NSString *)userID userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB
+#pragma mark - init
++ (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB
 {
-    return [[[self alloc]initWithUserID:(NSString *)userID userName:(NSString *)userName avatarID:avatarID roleID:roleID coinYL:coinYL coinTB:coinTB]autorelease];
+    return [[[self alloc]initWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:avatarID roleID:roleID coinYL:coinYL coinTB:coinTB]autorelease];
 }
 
-- (id)initWithUserID:(NSString *)userID userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB
+- (id)initWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB
 {
     self = [super init];
     if(self)
     {
         self.userID = userID;
+        self.nickName = nickName;
         self.userName = userName;
         self.avatarID = avatarID;
         self.roleID = roleID;

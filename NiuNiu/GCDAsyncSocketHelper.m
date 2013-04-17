@@ -11,6 +11,10 @@
 #import "CJSONDeserializer.h"
 #import "Game.h"
 #import "CmdLoginHandler.h"
+#import "CmdEnterDeskHandler.h"
+#import "CardPlayingScene.h"
+#import "FamilyPropertyScene.h"
+#import "PawnShopScene.h"
 
 
 #define LOCAL_CONNECT 1
@@ -147,19 +151,27 @@ static GCDAsyncSocketHelper *_instance = nil;
 }
 
 #pragma mark - 分析包数据
-+ (NSDictionary *)analysisDataToDictionary:(NSData *)data
+- (uint32_t)analysisDataLen:(NSData *)data
 {
     //解析cmd和content数据存储之和
     NSUInteger length;
     [data getBytes:&length length:LEN_SIZE];
     uint32_t len = htonl((uint32_t)length);
-//    CCLOG(@"length is : %d", len);
+    return len;
+}
 
-    //解析命令
-//    Byte cmdByte[CMD_SIZE];
-//    [data getBytes:cmdByte range:NSMakeRange(LEN_SIZE, CMD_SIZE)];
-//    NSString *cmdStr = [[[NSString alloc] initWithBytes:cmdByte length:4 encoding:NSUTF8StringEncoding] autorelease];
-//    CCLOG(@"cmd is %@", cmdStr);
+- (uint32_t)analysisDataCMD:(NSData *)data
+{
+    //解析cmd
+    NSUInteger cmd;
+    [data getBytes:&cmd range:NSMakeRange(LEN_SIZE, CMD_SIZE)];
+    uint32_t cmd32 = htonl((uint32_t)cmd);
+    return cmd32;
+}
+
+- (NSDictionary *)analysisDataToDictionary:(NSData *)data
+{
+    uint32_t len = [self analysisDataLen:data];
     
     //解析内容
     NSError *error;
@@ -174,13 +186,9 @@ static GCDAsyncSocketHelper *_instance = nil;
     return contentDic;
 }
 
-+ (NSString *)analysisDataToString:(NSData *)data
+- (NSString *)analysisDataToString:(NSData *)data
 {
-    //解析cmd和content数据存储之和
-    NSUInteger length;
-    [data getBytes:&length length:LEN_SIZE];
-    uint32_t len = htonl((uint32_t)length);
-    CCLOG(@"length is : %d", len);
+    uint32_t len = [self analysisDataLen:data];
 
     //解析内容
     Byte content[len-CMD_SIZE];
@@ -188,6 +196,23 @@ static GCDAsyncSocketHelper *_instance = nil;
     NSString *contentStr = [[[NSString alloc] initWithBytes:content length:len-CMD_SIZE encoding:NSUTF8StringEncoding] autorelease];
     CCLOG(@"contentStr :%@", contentStr);
     return contentStr;
+}
+
+- (NSArray *)analysisDataToArray:(NSData *)data
+{
+    uint32_t len = [self analysisDataLen:data];
+    
+    //解析内容
+    NSError *error;
+    Byte content[len-CMD_SIZE];
+    [data getBytes:content range:NSMakeRange(LEN_SIZE+CMD_SIZE, len-CMD_SIZE)];
+    NSData *contentData = [NSData dataWithBytes:content length:len-CMD_SIZE];
+    NSString *contentStr = [[[NSString alloc] initWithBytes:content length:len-CMD_SIZE encoding:NSUTF8StringEncoding] autorelease];
+    CCLOG(@"contentStr :%@", contentStr);
+    NSArray *contentArr = [[CJSONDeserializer deserializer]deserializeAsArray:contentData error:&error];
+    CCLOG(@"contentArr :%@", contentArr);
+    
+    return contentArr;
 }
 
 
@@ -227,33 +252,54 @@ static GCDAsyncSocketHelper *_instance = nil;
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    CCLOG(@"Recieved cmd %ld", tag);
-    switch (tag) {
+    if(tag != 0)return;
+    uint32_t cmd = [self analysisDataCMD:data];
+    CCLOG(@"cmd is %d", cmd);
+    switch (cmd) {
         case CMD_LOGIN:
+        {
             [CmdLoginHandler processLoginData:data];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                CCLOG(@"dispatch_get_main_queue ui process, cmd: %ld", tag);
-                CCScene *currentScene = [[CCDirector sharedDirector]runningScene];
-                if([currentScene respondsToSelector:@selector(updateUIByLogin:)])
-                {
-                    //[currentScene updateUIByLogin:data];
-                }
-
-                
-            });
             break;
-            
+        }
+        case CMD_INFO:
+        {
+            NSString *info = [[self analysisDataToString:data]retain];
+            if([info isEqualToString:INFO_WAITING_ASSIGN]){
+                [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(testSelector)];
+            }
+            [info release];
+            break;
+        }
+        case CMD_ENTER_DESK:{
+            CCLOG(@"CMD_ENTER_DESK");
+            [CmdEnterDeskHandler processEnterDeskData:data];
+        }
+        case CMD_OTHER_PLAYER_IN:{
+            CCLOG(@"CMD_OTHER_PLAYER_IN");
+        }
+        case CMD_ERROR:{
+            break;
+        }
         default:
             CCLOG(@"PLEASE CHECK THE CMD!");
             break;
     }
+    [self readDataWithTimeout:-1 tag:0 socketType:LOGIN_SOCKET];
+    [self readDataWithTimeout:-1 tag:0 socketType:FAMILY_SOCKET];
+    [self readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
 }
 
 #pragma mark - 返回主线程更新UI
-
-
-
+- (void)dispatchAsyncWithClass:(Class)class selector:(SEL)sel
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CCNode *currentScene = [[[CCDirector sharedDirector]runningScene] getChildByTag:0];
+        if([currentScene isKindOfClass:class] && [currentScene respondsToSelector:sel])
+        {
+            [currentScene performSelector:sel];
+        }
+    });
+}
 
 #pragma mark - dealloc
 - (void)dealloc

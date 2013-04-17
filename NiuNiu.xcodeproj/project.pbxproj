@@ -23,6 +23,8 @@
 		CE11B1771716D391002510CC /* transitionDown.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1731716D391002510CC /* transitionDown.png */; };
 		CE11B1781716D391002510CC /* transitionUp-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1741716D391002510CC /* transitionUp-hd.png */; };
 		CE11B1791716D391002510CC /* transitionUp.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1751716D391002510CC /* transitionUp.png */; };
+		CE127BF1171E87A700E9B49C /* CmdEnterDeskHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE127BF0171E87A700E9B49C /* CmdEnterDeskHandler.m */; };
+		CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */; };
 		CE3FDF051711A3CB002C7076 /* CCScrollLayerTestLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */; };
 		CE3FDF061711A4D9002C7076 /* CCScrollLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDD2B17119642002C7076 /* CCScrollLayer.m */; };
 		CE3FDF091711A937002C7076 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE3FDF081711A937002C7076 /* Default-568h@2x.png */; };
@@ -194,7 +196,6 @@
 		CEEBC3911714291E000A3CBD /* sketchSpriteSheet.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEEBC38D1714291E000A3CBD /* sketchSpriteSheet.plist */; };
 		CEEBC3921714291E000A3CBD /* sketchSpriteSheet.pvr.ccz in Resources */ = {isa = PBXBuildFile; fileRef = CEEBC38E1714291E000A3CBD /* sketchSpriteSheet.pvr.ccz */; };
 		CEF00B411717EFEC00CDC391 /* RoleDiscriptionLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF00B401717EFEC00CDC391 /* RoleDiscriptionLayer.m */; };
-		CEF00B4517181AF800CDC391 /* CmdLoginHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF00B4417181AF800CDC391 /* CmdLoginHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -228,6 +229,9 @@
 		CE11B1731716D391002510CC /* transitionDown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionDown.png; path = Assets/transitionDown.png; sourceTree = "<group>"; };
 		CE11B1741716D391002510CC /* transitionUp-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "transitionUp-hd.png"; path = "Assets/transitionUp-hd.png"; sourceTree = "<group>"; };
 		CE11B1751716D391002510CC /* transitionUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionUp.png; path = Assets/transitionUp.png; sourceTree = "<group>"; };
+		CE127BEF171E87A700E9B49C /* CmdEnterDeskHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CmdEnterDeskHandler.h; sourceTree = "<group>"; };
+		CE127BF0171E87A700E9B49C /* CmdEnterDeskHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdEnterDeskHandler.m; sourceTree = "<group>"; };
+		CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdLoginHandler.m; sourceTree = "<group>"; };
 		CE3FDD2A17119642002C7076 /* CCScrollLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCScrollLayer.h; sourceTree = "<group>"; };
 		CE3FDD2B17119642002C7076 /* CCScrollLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCScrollLayer.m; sourceTree = "<group>"; };
 		CE3FDF031711A3CA002C7076 /* CCScrollLayerTestLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCScrollLayerTestLayer.h; sourceTree = "<group>"; };
@@ -566,7 +570,6 @@
 		CEF00B3F1717EFEC00CDC391 /* RoleDiscriptionLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoleDiscriptionLayer.h; sourceTree = "<group>"; };
 		CEF00B401717EFEC00CDC391 /* RoleDiscriptionLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoleDiscriptionLayer.m; sourceTree = "<group>"; };
 		CEF00B4317181AF800CDC391 /* CmdLoginHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CmdLoginHandler.h; sourceTree = "<group>"; };
-		CEF00B4417181AF800CDC391 /* CmdLoginHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdLoginHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1266,7 +1269,9 @@
 			isa = PBXGroup;
 			children = (
 				CEF00B4317181AF800CDC391 /* CmdLoginHandler.h */,
-				CEF00B4417181AF800CDC391 /* CmdLoginHandler.m */,
+				CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */,
+				CE127BEF171E87A700E9B49C /* CmdEnterDeskHandler.h */,
+				CE127BF0171E87A700E9B49C /* CmdEnterDeskHandler.m */,
 			);
 			name = Handler;
 			sourceTree = "<group>";
@@ -1503,11 +1508,12 @@
 				CE11B16D1716645B002510CC /* CJSONScanner.m in Sources */,
 				CE11B16E1716645B002510CC /* CJSONSerializer.m in Sources */,
 				CEF00B411717EFEC00CDC391 /* RoleDiscriptionLayer.m in Sources */,
-				CEF00B4517181AF800CDC391 /* CmdLoginHandler.m in Sources */,
 				CE02C0DF171B996000EC6C00 /* User.m in Sources */,
 				CE02C0E2171BA7C200EC6C00 /* GameData.m in Sources */,
 				CE02C0E5171BB7B300EC6C00 /* IP_AddressHelper.m in Sources */,
 				CE02C0E8171C189A00EC6C00 /* UserCard.m in Sources */,
+				CE127BF1171E87A700E9B49C /* CmdEnterDeskHandler.m in Sources */,
+				CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

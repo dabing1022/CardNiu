@@ -15,15 +15,17 @@
 
 + (void)processLoginData:(NSData *)data
 {
-    NSDictionary *dic = [GCDAsyncSocketHelper analysisDataToDictionary:data];
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     
     User *player = [User userWithUserID:[dic objectForKey:@"userID"]
-                                 userName:[dic objectForKey:@"userName"]
-                                 avatarID:[dic objectForKey:@"avatarID"]
-                                   roleID:[[dic objectForKey:@"userTypeID"]intValue]
-                                   coinYL:[[dic objectForKey:@"coinYL"]intValue]
-                                   coinTB:[[dic objectForKey:@"coinTB"]intValue]];
+                               nickName:[dic objectForKey:@"nickName"]
+                               userName:[dic objectForKey:@"userName"]
+                               avatarID:[dic objectForKey:@"avatarID"]
+                                 roleID:[[dic objectForKey:@"userTypeID"]intValue]
+                                 coinYL:[[dic objectForKey:@"coinYL"]intValue]
+                                 coinTB:[[dic objectForKey:@"coinTB"]intValue]];
     [[GameData sharedGameData] setPlayer:player];
+    [[[GameData sharedGameData]userDic]setObject:player forKey:player.userID];
     CCLOG(@"player userID:%@", [[GameData sharedGameData]player].userID);
     CCLOG(@"player userName:%@", [[GameData sharedGameData]player].userName);
     CCLOG(@"player avatarID:%@", [[GameData sharedGameData]player].avatarID);

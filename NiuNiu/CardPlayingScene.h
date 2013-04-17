@@ -9,6 +9,7 @@
 #import "cocos2d.h"
 #import "CurtainTransitionDelegate.h"
 
+#define kTagCardPlayingScene 0
 @interface CardPlayingScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
     //加入手势滑动切换场景
@@ -20,4 +21,5 @@
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeRightGestureRecognizer;
 +(CCScene *) scene;
 
+-(void)testSelector;
 @end
