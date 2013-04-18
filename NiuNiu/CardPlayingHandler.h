@@ -7,7 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-
+@class User;
 @interface CardPlayingHandler : NSObject
 
++ (void)processEnterDeskData:(NSData *)data;
++ (User *)processOtherPlayerIn:(NSData *)data;
 @end
