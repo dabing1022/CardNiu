@@ -7,11 +7,13 @@
 //
 
 #import "User.h"
+#import "GameData.h"
+
 //((y+6-x)+2)%6
 @implementation User
 @synthesize userID=_userID,avatarID=_avatarID,roleID=_roleID,chairID=_chairID,posID=_posID,tableID=_tableID;
 @synthesize nickName=_nickName,userName=_userName;
-@synthesize coinYL=_coinYL,coinTB=_coinTB;
+@synthesize coinYL=_coinYL,coinTB=_coinTB,familyPropertyValue=_familyPropertyValue;
 @synthesize cardTitle=_cardTitle,familyPropertyTitle=_familyPropertyTitle,gamblerTitle=_gamblerTitle,roleTitle=_roleTitle;
 
 #pragma mark - init
@@ -34,6 +36,12 @@
         self.coinTB = coinTB;
     }
     return self;
+}
+
++ (int)chairID2posID:(int)chairID
+{
+    CCLOG(@"User.h--->player.chairID: %d", [[GameData sharedGameData]player].chairID);
+    return ((chairID+6-[[GameData sharedGameData]player].chairID)+2)%6;
 }
 
 - (void)dealloc

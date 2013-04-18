@@ -7,7 +7,8 @@
 //
 
 #import "AvatarInfoBox.h"
-
+#import "GCDAsyncSocketHelper.h"
+#import "GameData.h"
 @implementation AvatarInfoBox
 
 
@@ -20,6 +21,8 @@
 {
     if((self = [super init]))
     {
+        _user = user;
+        [_user retain];
         _avatarSpr = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"avatar%@.png",user.avatarID]];
         [self addChild:_avatarSpr z:0 tag:kTagAvatarSpr];
         _coinTB = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d",user.coinTB] fontName:@"Arial" fontSize:24];
@@ -27,5 +30,37 @@
         [self addChild:_coinTB z:1 tag:kTagCoinTB];
     }
     return self;
+}
+
+- (void)onEnter
+{
+    [[[CCDirector sharedDirector]touchDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
+    [super onEnter];
+}
+
+- (void)onExit
+{
+    [[[CCDirector sharedDirector]touchDispatcher]removeDelegate:self];
+    [super onExit];
+}
+
+#pragma mark - TouchDelegate
+- (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    return YES;
+}
+
+- (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    CCLOG(@"点击头像,向服务器请求详细数据");
+    NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:[[GameData sharedGameData]player].userID,@"userID",_user.userID,@"targetUserID",nil];
+    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_VIEW_PROFILE contentDic:dic];
+    [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
+}
+
+- (void)dealloc
+{
+    [_user release];
+    [super dealloc];
 }
 @end

@@ -12,4 +12,5 @@
 
 + (void)processEnterDeskData:(NSData *)data;
 + (User *)processOtherPlayerIn:(NSData *)data;
++ (User *)processViewProfile:(NSData *)data;
 @end

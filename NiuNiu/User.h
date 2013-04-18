@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "cocos2d.h"
 
 @interface User : NSObject
 {
@@ -30,12 +31,14 @@
     uint32_t _coinYL;
     //玩家铜币数目
     uint32_t _coinTB;
+    //家产价值
+    uint32_t _familyPropertyValue;
     //卡牌头衔
-    NSString *_cardTitle;
+    NSString *_cardTitle;//Server:cardTitle
     //家产头衔
-    NSString *_familyPropertyTitle;
+    NSString *_familyPropertyTitle;//Server:assetTitle
     //赌徒头衔
-    NSString *_gamblerTitle;
+    NSString *_gamblerTitle;//Server:gameTitle
     //角色职业头衔
     NSString *_roleTitle;//Server:userTitle
 }
@@ -50,6 +53,7 @@
 @property(nonatomic, retain)NSString *userName;
 @property(nonatomic, assign)uint32_t coinYL;
 @property(nonatomic, assign)uint32_t coinTB;
+@property(nonatomic, assign)uint32_t familyPropertyValue;
 @property(nonatomic, assign)NSString *cardTitle;
 @property(nonatomic, assign)NSString *familyPropertyTitle;
 @property(nonatomic, assign)NSString *gamblerTitle;
@@ -58,4 +62,5 @@
 
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;
 - (id)initWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;
++ (int)chairID2posID:(int)chairID;
 @end

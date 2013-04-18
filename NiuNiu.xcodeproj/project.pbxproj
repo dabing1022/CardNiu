@@ -11,6 +11,8 @@
 		CE02C0E2171BA7C200EC6C00 /* GameData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0E1171BA7C200EC6C00 /* GameData.m */; };
 		CE02C0E5171BB7B300EC6C00 /* IP_AddressHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0E4171BB7B300EC6C00 /* IP_AddressHelper.m */; };
 		CE02C0E8171C189A00EC6C00 /* UserCard.m in Sources */ = {isa = PBXBuildFile; fileRef = CE02C0E7171C189900EC6C00 /* UserCard.m */; };
+		CE0FBFD0171F8FB0003FE7BE /* AvatarInfoBox.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0FBFCF171F8FB0003FE7BE /* AvatarInfoBox.m */; };
+		CE0FBFD3171FA901003FE7BE /* CardPlayingHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0FBFD2171FA901003FE7BE /* CardPlayingHandler.m */; };
 		CE11B13E17165EE6002510CC /* GCDAsyncSocketHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B13D17165EE6002510CC /* GCDAsyncSocketHelper.m */; };
 		CE11B14217165EFD002510CC /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B14117165EFD002510CC /* GCDAsyncSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		CE11B1691716645B002510CC /* CDataScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11B15B1716645B002510CC /* CDataScanner.m */; };
@@ -23,7 +25,6 @@
 		CE11B1771716D391002510CC /* transitionDown.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1731716D391002510CC /* transitionDown.png */; };
 		CE11B1781716D391002510CC /* transitionUp-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1741716D391002510CC /* transitionUp-hd.png */; };
 		CE11B1791716D391002510CC /* transitionUp.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1751716D391002510CC /* transitionUp.png */; };
-		CE127BF1171E87A700E9B49C /* CmdEnterDeskHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE127BF0171E87A700E9B49C /* CmdEnterDeskHandler.m */; };
 		CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */; };
 		CE3FDF051711A3CB002C7076 /* CCScrollLayerTestLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */; };
 		CE3FDF061711A4D9002C7076 /* CCScrollLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDD2B17119642002C7076 /* CCScrollLayer.m */; };
@@ -133,6 +134,7 @@
 		CE66D79D1711847500EA3569 /* LICENSE_CocosDenshion.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */; };
 		CE66D79E1711847500EA3569 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */; };
 		CE66D7A71711931700EA3569 /* CCGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE66D6D71711847500EA3569 /* CCGLView.m */; };
+		CE762E1A1720053E00747848 /* ProfileScene.m in Sources */ = {isa = PBXBuildFile; fileRef = CE762E191720053D00747848 /* ProfileScene.m */; };
 		CEDE958417127B63006BDF73 /* CCBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954917127B63006BDF73 /* CCBAnimationManager.m */; };
 		CEDE958517127B63006BDF73 /* CCBKeyframe.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954B17127B63006BDF73 /* CCBKeyframe.m */; };
 		CEDE958617127B63006BDF73 /* CCBReader.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954D17127B63006BDF73 /* CCBReader.m */; };
@@ -208,6 +210,10 @@
 		CE02C0E6171C189900EC6C00 /* UserCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCard.h; sourceTree = "<group>"; };
 		CE02C0E7171C189900EC6C00 /* UserCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCard.m; sourceTree = "<group>"; };
 		CE0D7092171D4F85008EBDFB /* CurtainTransitionDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CurtainTransitionDelegate.h; sourceTree = "<group>"; };
+		CE0FBFCE171F8FB0003FE7BE /* AvatarInfoBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvatarInfoBox.h; sourceTree = "<group>"; };
+		CE0FBFCF171F8FB0003FE7BE /* AvatarInfoBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AvatarInfoBox.m; sourceTree = "<group>"; };
+		CE0FBFD1171FA901003FE7BE /* CardPlayingHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CardPlayingHandler.h; sourceTree = "<group>"; };
+		CE0FBFD2171FA901003FE7BE /* CardPlayingHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardPlayingHandler.m; sourceTree = "<group>"; };
 		CE11B13C17165EE6002510CC /* GCDAsyncSocketHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocketHelper.h; sourceTree = "<group>"; };
 		CE11B13D17165EE6002510CC /* GCDAsyncSocketHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocketHelper.m; sourceTree = "<group>"; };
 		CE11B14017165EFD002510CC /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
@@ -229,8 +235,6 @@
 		CE11B1731716D391002510CC /* transitionDown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionDown.png; path = Assets/transitionDown.png; sourceTree = "<group>"; };
 		CE11B1741716D391002510CC /* transitionUp-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "transitionUp-hd.png"; path = "Assets/transitionUp-hd.png"; sourceTree = "<group>"; };
 		CE11B1751716D391002510CC /* transitionUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionUp.png; path = Assets/transitionUp.png; sourceTree = "<group>"; };
-		CE127BEF171E87A700E9B49C /* CmdEnterDeskHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CmdEnterDeskHandler.h; sourceTree = "<group>"; };
-		CE127BF0171E87A700E9B49C /* CmdEnterDeskHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdEnterDeskHandler.m; sourceTree = "<group>"; };
 		CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdLoginHandler.m; sourceTree = "<group>"; };
 		CE3FDD2A17119642002C7076 /* CCScrollLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCScrollLayer.h; sourceTree = "<group>"; };
 		CE3FDD2B17119642002C7076 /* CCScrollLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCScrollLayer.m; sourceTree = "<group>"; };
@@ -468,6 +472,8 @@
 		CE66D7321711847500EA3569 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_cocos2d.txt; path = libs/LICENSE_cocos2d.txt; sourceTree = "<group>"; };
 		CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_CocosDenshion.txt; path = libs/LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_Kazmath.txt; path = libs/LICENSE_Kazmath.txt; sourceTree = "<group>"; };
+		CE762E181720053D00747848 /* ProfileScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileScene.h; sourceTree = "<group>"; };
+		CE762E191720053D00747848 /* ProfileScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileScene.m; sourceTree = "<group>"; };
 		CEDE954817127B63006BDF73 /* CCBAnimationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCBAnimationManager.h; sourceTree = "<group>"; };
 		CEDE954917127B63006BDF73 /* CCBAnimationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCBAnimationManager.m; sourceTree = "<group>"; };
 		CEDE954A17127B63006BDF73 /* CCBKeyframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCBKeyframe.h; sourceTree = "<group>"; };
@@ -1249,6 +1255,10 @@
 				CEF00B401717EFEC00CDC391 /* RoleDiscriptionLayer.m */,
 				CE02C0E6171C189900EC6C00 /* UserCard.h */,
 				CE02C0E7171C189900EC6C00 /* UserCard.m */,
+				CE0FBFCE171F8FB0003FE7BE /* AvatarInfoBox.h */,
+				CE0FBFCF171F8FB0003FE7BE /* AvatarInfoBox.m */,
+				CE762E181720053D00747848 /* ProfileScene.h */,
+				CE762E191720053D00747848 /* ProfileScene.m */,
 			);
 			name = Scenes;
 			sourceTree = "<group>";
@@ -1270,8 +1280,8 @@
 			children = (
 				CEF00B4317181AF800CDC391 /* CmdLoginHandler.h */,
 				CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */,
-				CE127BEF171E87A700E9B49C /* CmdEnterDeskHandler.h */,
-				CE127BF0171E87A700E9B49C /* CmdEnterDeskHandler.m */,
+				CE0FBFD1171FA901003FE7BE /* CardPlayingHandler.h */,
+				CE0FBFD2171FA901003FE7BE /* CardPlayingHandler.m */,
 			);
 			name = Handler;
 			sourceTree = "<group>";
@@ -1512,8 +1522,10 @@
 				CE02C0E2171BA7C200EC6C00 /* GameData.m in Sources */,
 				CE02C0E5171BB7B300EC6C00 /* IP_AddressHelper.m in Sources */,
 				CE02C0E8171C189A00EC6C00 /* UserCard.m in Sources */,
-				CE127BF1171E87A700E9B49C /* CmdEnterDeskHandler.m in Sources */,
 				CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */,
+				CE0FBFD0171F8FB0003FE7BE /* AvatarInfoBox.m in Sources */,
+				CE0FBFD3171FA901003FE7BE /* CardPlayingHandler.m in Sources */,
+				CE762E1A1720053E00747848 /* ProfileScene.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1528,6 +1540,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1541,6 +1554,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1554,6 +1569,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1565,6 +1581,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

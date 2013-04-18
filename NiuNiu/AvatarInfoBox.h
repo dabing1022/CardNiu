@@ -8,18 +8,20 @@
 
 #import "cocos2d.h"
 #import "User.h"
+#import "Game.h"
 
 enum{
     kTagAvatarSpr,
     kTagCoinTB
 };
 
-@interface AvatarInfoBox : CCSprite
+@interface AvatarInfoBox : CCSprite<CCTargetedTouchDelegate>
 {
     //头像
     CCSprite *_avatarSpr;
     //铜币
     CCLabelTTF *_coinTB;
+    User *_user;
 }
 
 + (id)infoBoxWithUserData:(User *)user;

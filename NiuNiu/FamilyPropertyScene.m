@@ -30,6 +30,10 @@
 -(id)init
 {
     if( (self=[super init]) ) {
+        [[CCSpriteFrameCache sharedSpriteFrameCache]addSpriteFramesWithFile:@"sketchSpriteSheet.plist"];
+        CCSpriteBatchNode *spriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"sketchSpriteSheet.pvr.ccz"];
+        [self addChild:spriteSheet];
+        
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"家产" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );

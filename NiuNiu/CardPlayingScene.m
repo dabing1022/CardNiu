@@ -13,12 +13,13 @@
 #import "Game.h"
 #import "GameData.h"
 #import "User.h"
-
+#import "AvatarInfoBox.h"
+#import "ProfileScene.h"
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
 @synthesize swipeRightGestureRecognizer=_swipeRightGestureRecognizer;
-
+static NSArray *_posArr;
 
 +(CCScene *) scene
 {
@@ -44,8 +45,17 @@
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );
+        label.opacity = 125;
 		[self addChild: label];
         label.tag = 5;
+        
+        _posArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:POS_ID0],
+                                            [NSValue valueWithCGPoint:POS_ID1],
+                                            [NSValue valueWithCGPoint:POS_ID2],
+                                            [NSValue valueWithCGPoint:POS_ID3],
+                                            [NSValue valueWithCGPoint:POS_ID4],
+                                            [NSValue valueWithCGPoint:POS_ID5], nil];
+        [_posArr retain];
     }
     LOG_FUN_DID;
     return self;
@@ -77,11 +87,11 @@
 {
     CGSize size = [[CCDirector sharedDirector] winSize];
     CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
-    [self addChild:transitionUpSpr];
+    [self addChild:transitionUpSpr z:kTagCurtain tag:kTagCurtain];
     transitionUpSpr.position = ccp(size.width /2 , size.height + transitionUpSpr.contentSize.height / 2);
     
     CCSprite *transitionDownSpr = [CCSprite spriteWithFile:@"transitionDown.png"];
-    [self addChild:transitionDownSpr];
+    [self addChild:transitionDownSpr z:kTagCurtain tag:kTagCurtain];
     transitionDownSpr.position = ccp(size.width / 2, 0 - transitionDownSpr.contentSize.height / 2);
     
     id moveDown = [CCMoveTo actionWithDuration:0.5 position:ccp(size.width / 2, size.height - transitionUpSpr.contentSize.height / 2)];
@@ -95,11 +105,11 @@
 {
     CGSize size = [[CCDirector sharedDirector] winSize];
     CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
-    [self addChild:transitionUpSpr];
+    [self addChild:transitionUpSpr z:kTagCurtain tag:kTagCurtain];
     transitionUpSpr.position = ccp(size.width /2 , size.height - transitionUpSpr.contentSize.height / 2);
     
     CCSprite *transitionDownSpr = [CCSprite spriteWithFile:@"transitionDown.png"];
-    [self addChild:transitionDownSpr];
+    [self addChild:transitionDownSpr z:kTagCurtain tag:kTagCurtain];
     transitionDownSpr.position = ccp(size.width / 2, 0 + transitionDownSpr.contentSize.height / 2);
     
     id moveDown = [CCMoveTo actionWithDuration:0.5 position:ccp(size.width / 2, 0 - transitionUpSpr.contentSize.height / 2)];
@@ -144,12 +154,15 @@
 {
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeLeftGestureRecognizer];
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeRightGestureRecognizer];
+    [_activityIndicatorView stopAnimating];
+    [_activityIndicatorView removeFromSuperview];
+    
     [super onExit];
     LOG_FUN_DID;
 }
 
 #pragma mark - UIAlertViewDelegate
-- (void) alertView:(UIAlertView *)alert clickedButtonAtIndex:(NSInteger)buttonIndex{
+- (void)alertView:(UIAlertView *)alert clickedButtonAtIndex:(NSInteger)buttonIndex{
     NSLog(@"%d", (int) buttonIndex);
     if (buttonIndex == 1) { // OK pushed
         CCLOG(@"sldfjalsfjlasfadsj");
@@ -158,19 +171,66 @@
     }
 }
 
-- (void)testSelector
+#pragma mark - SOCKET数据更新UI
+//等待分配进桌
+- (void)waitingAssign
 {
-    CCLOG(@"testSelector");
-    CCLabelTTF *a = (CCLabelTTF *)[self getChildByTag:5];
-    [a setString:@"i love you"];
+    AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:[[GameData sharedGameData]player]];
+    [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
+    [playerBox setPosition:POS_ID2];
+    _activityIndicatorView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [[[CCDirector sharedDirector] view] addSubview:_activityIndicatorView];
+    CGSize size = [[CCDirector sharedDirector] winSize];
+    _activityIndicatorView.center = ccp(size.width/2, size.height/2);
+    [_activityIndicatorView startAnimating];
+    CCLOG(@"------>正在分配玩家，请稍后...");
 }
 
+//分配进桌
+- (void)assignInDesk
+{
+    CCLOG(@"------>分配进桌");
+    [_activityIndicatorView stopAnimating];
+    NSArray *allPlayers = [[[GameData sharedGameData]userDic]allValues];
+    CCLOG(@"allplayers length:%d", [allPlayers count]);
+    for(User *user in allPlayers)
+    {
+        if(user.userID == [[GameData sharedGameData]player].userID) continue;
+        AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
+        [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
+        [playerBox setPosition:[[_posArr objectAtIndex:user.posID]CGPointValue]];
+        CCLOG(@"1111%f, %f", [[_posArr objectAtIndex:user.posID]CGPointValue].x, [[_posArr objectAtIndex:user.posID]CGPointValue].y);
+    }
+}
+
+//有其他玩家进入
+- (void)otherPlayerIn:(User *)user
+{
+    CCLOG(@"------>有其他玩家进入");
+    CCLOG(@"%@", user);
+    AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
+    [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
+    [playerBox setPosition:[[_posArr objectAtIndex:user.posID]CGPointValue]];
+    CCLOG(@"1111%f, %f", [[_posArr objectAtIndex:user.posID]CGPointValue].x, [[_posArr objectAtIndex:user.posID]CGPointValue].y);
+}
+
+- (void)viewProfile:(User *)user
+{
+    CCLOG(@"CardPlayingScnene--->viewProfile");
+    [[CCDirector sharedDirector]pushScene:[ProfileScene scene]];
+}
+
+
+#pragma mark - dealloc
 - (void) dealloc
 {
+    [_posArr release];
 	[_swipeLeftGestureRecognizer release];
     _swipeLeftGestureRecognizer = nil;
     [_swipeRightGestureRecognizer release];
     _swipeRightGestureRecognizer = nil;
+    [_activityIndicatorView release];
+    _activityIndicatorView = nil;
     
 	[super dealloc];
 }

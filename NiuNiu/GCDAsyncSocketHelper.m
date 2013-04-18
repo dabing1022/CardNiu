@@ -11,7 +11,7 @@
 #import "CJSONDeserializer.h"
 #import "Game.h"
 #import "CmdLoginHandler.h"
-#import "CmdEnterDeskHandler.h"
+#import "CardPlayingHandler.h"
 #import "CardPlayingScene.h"
 #import "FamilyPropertyScene.h"
 #import "PawnShopScene.h"
@@ -181,7 +181,6 @@ static GCDAsyncSocketHelper *_instance = nil;
     NSString *contentStr = [[[NSString alloc] initWithBytes:content length:len-CMD_SIZE encoding:NSUTF8StringEncoding] autorelease];
     CCLOG(@"contentStr :%@", contentStr);
     NSDictionary *contentDic = [[CJSONDeserializer deserializer]deserializeAsDictionary:contentData error:&error];
-    CCLOG(@"contentDic :%@", contentDic);
     
     return contentDic;
 }
@@ -265,19 +264,34 @@ static GCDAsyncSocketHelper *_instance = nil;
         {
             NSString *info = [[self analysisDataToString:data]retain];
             if([info isEqualToString:INFO_WAITING_ASSIGN]){
-                [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(testSelector)];
+                [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(waitingAssign) withObject:nil];
             }
             [info release];
             break;
         }
         case CMD_ENTER_DESK:{
             CCLOG(@"CMD_ENTER_DESK");
-            [CmdEnterDeskHandler processEnterDeskData:data];
+            [CardPlayingHandler processEnterDeskData:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(assignInDesk) withObject:nil];
+            break;
         }
         case CMD_OTHER_PLAYER_IN:{
             CCLOG(@"CMD_OTHER_PLAYER_IN");
+            User *user = [CardPlayingHandler processOtherPlayerIn:data];
+            [user retain];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerIn:) withObject:user];
+            [user release];
+            break;
+        }
+        case CMD_VIEW_PROFILE:{
+            User *user = [CardPlayingHandler processViewProfile:data];
+            [user retain];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(viewProfile:) withObject:user];
+            [user release];
+            break;
         }
         case CMD_ERROR:{
+            CCLOG(@"CMD_ERROR");
             break;
         }
         default:
@@ -290,13 +304,16 @@ static GCDAsyncSocketHelper *_instance = nil;
 }
 
 #pragma mark - 返回主线程更新UI
-- (void)dispatchAsyncWithClass:(Class)class selector:(SEL)sel
+- (void)dispatchAsyncWithClass:(Class)class selector:(SEL)sel withObject:(id)obj
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         CCNode *currentScene = [[[CCDirector sharedDirector]runningScene] getChildByTag:0];
         if([currentScene isKindOfClass:class] && [currentScene respondsToSelector:sel])
         {
-            [currentScene performSelector:sel];
+            if(!obj)
+                [currentScene performSelector:sel];
+            else
+                [currentScene performSelector:sel withObject:obj];
         }
     });
 }

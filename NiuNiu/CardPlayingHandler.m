@@ -20,6 +20,7 @@
     [[GameData sharedGameData]player].roleTitle = [dic objectForKey:@"userTitle"];
     [[GameData sharedGameData]player].tableID = [[dic objectForKey:@"tableID"]intValue];
     [[GameData sharedGameData]player].chairID = [[dic objectForKey:@"chairID"]intValue];
+    CCLOG(@"CardPlayingHandler--->23hang playerchairID: %d", [[dic objectForKey:@"chairID"]intValue]);
     [[GameData sharedGameData]player].posID = 2;
     
     NSArray *otherPlayers = (NSArray *)[dic objectForKey:@"otherPlayers"];
@@ -40,6 +41,13 @@
     return user;
 }
 
++ (User *)processViewProfile:(NSData *)data
+{
+    NSDictionary *userDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    User *user = [self user:userDic];
+    return user;
+}
+
 + (User *)user:(NSDictionary *)userDic
 {
     User *user = [User userWithUserID:[userDic objectForKey:@"userID"]
@@ -53,6 +61,7 @@
     user.tableID = [[userDic objectForKey:@"tableID"]intValue];
     user.chairID = [[userDic objectForKey:@"chairID"]intValue];
     user.posID = [User chairID2posID:user.chairID];
+    CCLOG(@"CardPlayingHandler.h-->user-->posID:%d", user.posID);
     return  user;
 }
 

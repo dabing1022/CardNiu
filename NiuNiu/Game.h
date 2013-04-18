@@ -14,6 +14,7 @@
 #define CMD_ENTER_CARD_PLAYING 2001//进入牌局场景
 #define CMD_ENTER_DESK         2002//被分配进入牌桌
 #define CMD_OTHER_PLAYER_IN    2003//其他玩家进入牌桌
+#define CMD_VIEW_PROFILE       2004//点击玩家头像查看具体信息
 
 
 
