@@ -54,10 +54,10 @@
 @property(nonatomic, assign)uint32_t coinYL;
 @property(nonatomic, assign)uint32_t coinTB;
 @property(nonatomic, assign)uint32_t familyPropertyValue;
-@property(nonatomic, assign)NSString *cardTitle;
-@property(nonatomic, assign)NSString *familyPropertyTitle;
-@property(nonatomic, assign)NSString *gamblerTitle;
-@property(nonatomic, assign)NSString *roleTitle;
+@property(nonatomic, retain)NSString *cardTitle;
+@property(nonatomic, retain)NSString *familyPropertyTitle;
+@property(nonatomic, retain)NSString *gamblerTitle;
+@property(nonatomic, retain)NSString *roleTitle;
 
 
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;

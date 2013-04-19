@@ -6,19 +6,10 @@
 //
 //
 
-#import "ProfileScene.h"
+#import "ProfilePanel.h"
 #import "User.h"
 
-@implementation ProfileScene
-
-
-+ (CCScene *)scene
-{
-	CCScene *scene = [CCScene node];	
-	ProfileScene *layer = [ProfileScene node];
-	[scene addChild: layer];
-	return scene;
-}
+@implementation ProfilePanel
 
 + (id)profileWithUser:(User *)user
 {
@@ -27,41 +18,44 @@
 
 - (id)initWithUserData:(User *)user
 {
-    if((self=[super initWithColor:ccc4(0, 0, 0, 64)]))
+    if((self=[super init]))
     {
+        _user = [user retain];
+        CCLayerColor *bg = [CCLayerColor layerWithColor:ccc4(255, 0, 0, 64)];
         CCSprite *avatar = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"avatar%@.png",user.avatarID]];
         CCLabelTTF *userName = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"userName:%@",user.userName]
                                                   fontName:@"Arial"
-                                                  fontSize:24];
+                                                  fontSize:12];
         CCLabelTTF *nickName = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"nickName:%@",user.nickName]
                                                   fontName:@"Arial"
-                                                  fontSize:24];
+                                                  fontSize:12];
         CCLabelTTF *coinYL = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"coinYL:%u",user.coinYL]
-                                                  fontName:@"Arial"
-                                                  fontSize:24];
+                                                fontName:@"Arial"
+                                                fontSize:12];
         CCLabelTTF *coinTB = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"coinTB:%u",user.coinTB]
-                                                  fontName:@"Arial"
-                                                  fontSize:24];
+                                                fontName:@"Arial"
+                                                fontSize:12];
         CCLabelTTF *roleID = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"roleID:%u",user.roleID]
                                                 fontName:@"Arial"
-                                                fontSize:24];
+                                                fontSize:12];
         CCLabelTTF *roleTitle = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"roleTitle:%@",user.roleTitle]
-                                                fontName:@"Arial"
-                                                fontSize:24];
+                                                   fontName:@"Arial"
+                                                   fontSize:12];
         CCLabelTTF *gamblerTitle = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"gamblerTitle:%@",user.gamblerTitle]
-                                                fontName:@"Arial"
-                                                fontSize:24];
+                                                      fontName:@"Arial"
+                                                      fontSize:12];
         CCLabelTTF *familyPropertyTitle = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"familyPropertyTitle:%@",user.familyPropertyTitle]
-                                                fontName:@"Arial"
-                                                fontSize:24];
+                                                             fontName:@"Arial"
+                                                             fontSize:12];
         CCLabelTTF *cardTitle = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"cardTitle:%@",user.cardTitle]
-                                                fontName:@"Arial"
-                                                fontSize:24];
+                                                   fontName:@"Arial"
+                                                   fontSize:12];
         CCLabelTTF *familyPropertyValue = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"familyPropertyValue:%u",user.familyPropertyValue]
-                                                fontName:@"Arial"
-                                                fontSize:24];
+                                                             fontName:@"Arial"
+                                                             fontSize:12];
         
         CGSize size = [[CCDirector sharedDirector]winSize];
+        [self addChild:bg];
         [self addChild:avatar];
         [self addChild:userName];
         [self addChild:nickName];
@@ -84,14 +78,40 @@
         familyPropertyTitle.position = ccp(size.width/2, 210);
         cardTitle.position = ccp(size.width/2, 180);
         familyPropertyValue.position = ccp(size.width/2, 150);
-        
-        self.isTouchEnabled = YES;
     }
     return self;
 }
 
-- (void)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)onEnter
 {
-    CCLOG(@"ProfileScene.h-->ccTouchesBegan");
+    [[[CCDirector sharedDirector]touchDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
+    [super onEnter];
+    CCLOG(@"ProfilePanel onEnter");
+}
+
+- (void)onExit
+{
+    [[[CCDirector sharedDirector]touchDispatcher]removeDelegate:self];
+    [super onExit];
+    CCLOG(@"ProfilePanel onExit");
+}
+
+#pragma mark - TouchDelegate
+- (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    return YES;
+}
+
+- (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    CCLOG(@"关闭玩家详细信息面板");
+    [self removeFromParentAndCleanup:YES];
+}
+
+
+- (void)dealloc
+{
+    [_user release];
+    [super dealloc];
 }
 @end

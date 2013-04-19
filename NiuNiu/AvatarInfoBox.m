@@ -45,8 +45,23 @@
 }
 
 #pragma mark - TouchDelegate
+- (BOOL)containsTouchLocation:(UITouch *)touch
+{
+    return CGRectContainsPoint([self rect], [self convertTouchToNodeSpaceAR:touch]);
+}
+
+- (CGRect)rect
+{
+    CGSize size = _avatarSpr.contentSize;
+    CCLOG(@"rect %f, %f",size.width,size.height);
+    CGRect rect = CGRectMake(-size.width/2, -size.height/2, size.width, size.height);
+    return rect;
+}
+
 - (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    if(![self containsTouchLocation:touch])
+        return NO;
     return YES;
 }
 

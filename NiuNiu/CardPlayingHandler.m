@@ -44,7 +44,12 @@
 + (User *)processViewProfile:(NSData *)data
 {
     NSDictionary *userDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
-    User *user = [self user:userDic];
+    User *user = [[[self user:userDic]retain]autorelease];
+    user.gamblerTitle = [userDic objectForKey:@"gameTitle"];
+    user.familyPropertyTitle = [userDic objectForKey:@"assetTitle"];
+    user.cardTitle = [userDic objectForKey:@"cardTitle"];
+    user.familyPropertyValue = [[userDic objectForKey:@"jiaChan"]intValue];
+
     return user;
 }
 
@@ -62,6 +67,7 @@
     user.chairID = [[userDic objectForKey:@"chairID"]intValue];
     user.posID = [User chairID2posID:user.chairID];
     CCLOG(@"CardPlayingHandler.h-->user-->posID:%d", user.posID);
+    CCLOG(@"CardPlayingHandler.h-->user-->roleTitle:%@", user.roleTitle);
     return  user;
 }
 

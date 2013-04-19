@@ -22,12 +22,14 @@ enum{
 #define POS_ID4 CGPointMake(55, 310)
 #define POS_ID5 CGPointMake(170, 432)
 
+@class ProfilePanel;
 @interface CardPlayingScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
     //加入手势滑动切换场景
     UISwipeGestureRecognizer *_swipeLeftGestureRecognizer;
     UISwipeGestureRecognizer *_swipeRightGestureRecognizer;
     UIActivityIndicatorView *_activityIndicatorView;
+
 }
 
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeLeftGestureRecognizer;

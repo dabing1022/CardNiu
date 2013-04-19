@@ -134,7 +134,7 @@
 		CE66D79D1711847500EA3569 /* LICENSE_CocosDenshion.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */; };
 		CE66D79E1711847500EA3569 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */; };
 		CE66D7A71711931700EA3569 /* CCGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE66D6D71711847500EA3569 /* CCGLView.m */; };
-		CE762E1A1720053E00747848 /* ProfileScene.m in Sources */ = {isa = PBXBuildFile; fileRef = CE762E191720053D00747848 /* ProfileScene.m */; };
+		CED386EF1720F4FC001CE11C /* ProfilePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = CED386EE1720F4FB001CE11C /* ProfilePanel.m */; };
 		CEDE958417127B63006BDF73 /* CCBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954917127B63006BDF73 /* CCBAnimationManager.m */; };
 		CEDE958517127B63006BDF73 /* CCBKeyframe.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954B17127B63006BDF73 /* CCBKeyframe.m */; };
 		CEDE958617127B63006BDF73 /* CCBReader.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954D17127B63006BDF73 /* CCBReader.m */; };
@@ -472,8 +472,8 @@
 		CE66D7321711847500EA3569 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_cocos2d.txt; path = libs/LICENSE_cocos2d.txt; sourceTree = "<group>"; };
 		CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_CocosDenshion.txt; path = libs/LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_Kazmath.txt; path = libs/LICENSE_Kazmath.txt; sourceTree = "<group>"; };
-		CE762E181720053D00747848 /* ProfileScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileScene.h; sourceTree = "<group>"; };
-		CE762E191720053D00747848 /* ProfileScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileScene.m; sourceTree = "<group>"; };
+		CED386ED1720F4FB001CE11C /* ProfilePanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfilePanel.h; sourceTree = "<group>"; };
+		CED386EE1720F4FB001CE11C /* ProfilePanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfilePanel.m; sourceTree = "<group>"; };
 		CEDE954817127B63006BDF73 /* CCBAnimationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCBAnimationManager.h; sourceTree = "<group>"; };
 		CEDE954917127B63006BDF73 /* CCBAnimationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCBAnimationManager.m; sourceTree = "<group>"; };
 		CEDE954A17127B63006BDF73 /* CCBKeyframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCBKeyframe.h; sourceTree = "<group>"; };
@@ -1239,6 +1239,8 @@
 		CEEBC37F17141B15000A3CBD /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				CED386ED1720F4FB001CE11C /* ProfilePanel.h */,
+				CED386EE1720F4FB001CE11C /* ProfilePanel.m */,
 				CEE0205E17114ECC00815A9D /* IntroLayer.h */,
 				CEE0205F17114ECC00815A9D /* IntroLayer.m */,
 				CEE0206F1711679D00815A9D /* FamilyPropertyScene.h */,
@@ -1257,8 +1259,6 @@
 				CE02C0E7171C189900EC6C00 /* UserCard.m */,
 				CE0FBFCE171F8FB0003FE7BE /* AvatarInfoBox.h */,
 				CE0FBFCF171F8FB0003FE7BE /* AvatarInfoBox.m */,
-				CE762E181720053D00747848 /* ProfileScene.h */,
-				CE762E191720053D00747848 /* ProfileScene.m */,
 			);
 			name = Scenes;
 			sourceTree = "<group>";
@@ -1525,7 +1525,7 @@
 				CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */,
 				CE0FBFD0171F8FB0003FE7BE /* AvatarInfoBox.m in Sources */,
 				CE0FBFD3171FA901003FE7BE /* CardPlayingHandler.m in Sources */,
-				CE762E1A1720053E00747848 /* ProfileScene.m in Sources */,
+				CED386EF1720F4FC001CE11C /* ProfilePanel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

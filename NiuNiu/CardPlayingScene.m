@@ -14,7 +14,7 @@
 #import "GameData.h"
 #import "User.h"
 #import "AvatarInfoBox.h"
-#import "ProfileScene.h"
+#import "ProfilePanel.h"
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
@@ -35,7 +35,6 @@ static NSArray *_posArr;
     if( (self=[super init]) ) {
         if(![[GCDAsyncSocketHelper sharedHelper]cardSocket])
             [[GCDAsyncSocketHelper sharedHelper]connectCardServer];
-        CCLOG(@"player userID:%@", [[GameData sharedGameData] player].userID);
         
         NSDictionary *dic = [NSDictionary dictionaryWithObject:[[GameData sharedGameData] player].userID forKey:@"userID"];
         NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_ENTER_CARD_PLAYING contentDic:dic];
@@ -207,17 +206,17 @@ static NSArray *_posArr;
 - (void)otherPlayerIn:(User *)user
 {
     CCLOG(@"------>有其他玩家进入");
-    CCLOG(@"%@", user);
     AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
     [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
     [playerBox setPosition:[[_posArr objectAtIndex:user.posID]CGPointValue]];
-    CCLOG(@"1111%f, %f", [[_posArr objectAtIndex:user.posID]CGPointValue].x, [[_posArr objectAtIndex:user.posID]CGPointValue].y);
+    
 }
 
 - (void)viewProfile:(User *)user
 {
     CCLOG(@"CardPlayingScnene--->viewProfile");
-    [[CCDirector sharedDirector]pushScene:[ProfileScene scene]];
+    ProfilePanel *profilePanel = [ProfilePanel profileWithUser:user];
+    [self addChild:profilePanel];
 }
 
 

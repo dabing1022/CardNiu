@@ -8,8 +8,11 @@
 
 #import "cocos2d.h"
 @class User;
-@interface ProfileScene : CCLayerColor
+@interface ProfilePanel : CCSprite<CCTargetedTouchDelegate>
+{
+    User *_user;
+}
 
-+ (id)scene;
 + (id)profileWithUser:(User *)user;
+
 @end
