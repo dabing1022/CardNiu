@@ -9,19 +9,14 @@
 #import "UserCard.h"
 
 @implementation UserCard
-@synthesize isFront=_isFront,texture=_texture,isPopup=_isPopup;
+@synthesize isFront=_isFront,isPopup=_isPopup;
 
 #pragma mark - init
 - (id)initWithCardData:(CardData)cardData
 {
     if((self=[super init]))
     {
-        int type = cardData.type;
-        int value = cardData.value;
-        
-        _texture = [[CCTextureCache sharedTextureCache] addPVRImage:[NSString stringWithFormat:@"Card%d_%d.png",type,value]];
-        [self setTexture:_texture];
-        _isFront = YES;
+        [self setFrontFace:cardData];
     }
     return self;
 }
@@ -35,9 +30,7 @@
 {
     if((self=[super init]))
     {
-        _texture = [[CCTextureCache sharedTextureCache] addPVRImage:@"CardBack.png"];
-        [self setTexture:_texture];
-        _isFront = NO;
+        [self setBackFace];
     }
     return self;
 }
@@ -45,6 +38,21 @@
 + (id)cardWithBack
 {
     return [[[self alloc]initWithBack]autorelease];
+}
+
+- (void)setFrontFace:(CardData)cardData
+{
+    int type = cardData.type;
+    int value = cardData.value;
+    
+    [self setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache]spriteFrameByName:[NSString stringWithFormat:@"Card%d_%d.png",type,value]]];
+    _isFront = YES;
+}
+
+- (void)setBackFace
+{
+    [self setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache]spriteFrameByName:@"CardBack.png"]];
+    _isFront = NO;
 }
 
 #pragma mark - popUp and pullDown
@@ -62,8 +70,6 @@
 
 - (void)dealloc
 {
-    [_texture release];
-    _texture = nil;
     [super dealloc];
 }
 

@@ -286,6 +286,12 @@ static GCDAsyncSocketHelper *_instance = nil;
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(viewProfile:) withObject:user];
             break;
         }
+        case CMD_GRAB_Z:{
+            CCLOG(@"CMD_GRAB_Z");
+            NSString *zUserID = [CardPlayingHandler processGrabZ:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(grabZ:) withObject:zUserID];
+            break;
+        }
         case CMD_ERROR:{
             CCLOG(@"CMD_ERROR");
             break;

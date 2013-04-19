@@ -43,12 +43,10 @@ typedef enum
 
 @interface UserCard : CCSprite
 {
-    CCTexture2D *_texture;
     BOOL _isFront;
     BOOL _isPopup;
 }
 
-@property(nonatomic, retain)CCTexture2D *texture;
 @property(nonatomic, assign)BOOL isFront;
 @property(nonatomic, assign)BOOL isPopup;
 

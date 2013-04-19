@@ -15,12 +15,13 @@
 #import "User.h"
 #import "AvatarInfoBox.h"
 #import "ProfilePanel.h"
+#import "UserCard.h"
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
 @synthesize swipeRightGestureRecognizer=_swipeRightGestureRecognizer;
-static NSArray *_posArr;
-
+static NSArray *_avatarPosArr;
+static NSArray *_cardPosArr;
 +(CCScene *) scene
 {
     CCScene *scene = [CCScene node];
@@ -41,6 +42,8 @@ static NSArray *_posArr;
         [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:CMD_ENTER_CARD_PLAYING socketType:CARD_SOCKET];
         [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
         
+        _allUserCards = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
+        
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );
@@ -48,16 +51,54 @@ static NSArray *_posArr;
 		[self addChild: label];
         label.tag = 5;
         
-        _posArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:POS_ID0],
-                                            [NSValue valueWithCGPoint:POS_ID1],
-                                            [NSValue valueWithCGPoint:POS_ID2],
-                                            [NSValue valueWithCGPoint:POS_ID3],
-                                            [NSValue valueWithCGPoint:POS_ID4],
-                                            [NSValue valueWithCGPoint:POS_ID5], nil];
-        [_posArr retain];
+        [self drawGrabZ];
+        
+        
+        
+        _avatarPosArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:AVARTAR_POS_ID0],
+                                                  [NSValue valueWithCGPoint:AVARTAR_POS_ID1],
+                                                  [NSValue valueWithCGPoint:AVARTAR_POS_ID2],
+                                                  [NSValue valueWithCGPoint:AVARTAR_POS_ID3],
+                                                  [NSValue valueWithCGPoint:AVARTAR_POS_ID4],
+                                                  [NSValue valueWithCGPoint:AVARTAR_POS_ID5], nil];
+        [_avatarPosArr retain];
+        
+        _cardPosArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:CARD_POS_ID2],
+                                                [NSValue valueWithCGPoint:CARD_POS_ID3],
+                                                [NSValue valueWithCGPoint:CARD_POS_ID4],
+                                                [NSValue valueWithCGPoint:CARD_POS_ID5],
+                                                [NSValue valueWithCGPoint:CARD_POS_ID0],
+                                                [NSValue valueWithCGPoint:CARD_POS_ID1], nil];
+        [_cardPosArr retain];
     }
     LOG_FUN_DID;
     return self;
+}
+
+- (void)drawGrabZ
+{
+    _menuItemGrabZ = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"grabZ.png"]
+                                            selectedSprite:[CCSprite spriteWithSpriteFrameName:@"grabZ.png"]
+                                                     block:^(id sender){
+                                                         NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"grab"];
+                                                         NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
+                                                         [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
+                                                         [_menuGrabZ setVisible:NO];
+                                                     }];
+    _menuItemNotGrabZ = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"notGrabZ.png"]
+                                               selectedSprite:[CCSprite spriteWithSpriteFrameName:@"notGrabZ.png"]
+                                                        block:^(id sender){
+                                                            NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:@"grab"];
+                                                            NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
+                                                            [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
+                                                            [_menuGrabZ setVisible:NO];
+                                                        }];
+
+    _menuGrabZ = [CCMenu menuWithItems:_menuItemGrabZ,_menuItemNotGrabZ, nil];
+    [_menuGrabZ alignItemsHorizontallyWithPadding:20];
+    [self addChild:_menuGrabZ z:kTagMenuGrab tag:kTagMenuGrab];
+    _menuGrabZ.position = ccp(252, 92);
+    [_menuGrabZ setVisible:NO];
 }
 
 #pragma mark - UISwipeGesture switch-scenes
@@ -176,7 +217,7 @@ static NSArray *_posArr;
 {
     AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:[[GameData sharedGameData]player]];
     [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
-    [playerBox setPosition:POS_ID2];
+    [playerBox setPosition:AVARTAR_POS_ID2];
     _activityIndicatorView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     [[[CCDirector sharedDirector] view] addSubview:_activityIndicatorView];
     CGSize size = [[CCDirector sharedDirector] winSize];
@@ -197,8 +238,7 @@ static NSArray *_posArr;
         if(user.userID == [[GameData sharedGameData]player].userID) continue;
         AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
         [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
-        [playerBox setPosition:[[_posArr objectAtIndex:user.posID]CGPointValue]];
-        CCLOG(@"1111%f, %f", [[_posArr objectAtIndex:user.posID]CGPointValue].x, [[_posArr objectAtIndex:user.posID]CGPointValue].y);
+        [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
     }
 }
 
@@ -208,10 +248,11 @@ static NSArray *_posArr;
     CCLOG(@"------>有其他玩家进入");
     AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
     [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
-    [playerBox setPosition:[[_posArr objectAtIndex:user.posID]CGPointValue]];
+    [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
     
 }
 
+//查看玩家具体信息
 - (void)viewProfile:(User *)user
 {
     CCLOG(@"CardPlayingScnene--->viewProfile");
@@ -219,11 +260,56 @@ static NSArray *_posArr;
     [self addChild:profilePanel];
 }
 
+//抢庄和发牌
+- (void)grabZ:(NSString *)zUserID
+{
+    //NSString为nil或者@""的时候length为0
+    if([zUserID length] == 0){//没有庄家
+        CCLOG(@"没有庄家，进行抢庄");
+        [_menuGrabZ setVisible:YES];
+        [self playSendCardsAnimation];
+    }else{//庄家已经存在
+        CCLOG(@"庄家已经存在，不用抢庄");
+    }
+}
+
+//播放发牌动画
+- (void)playSendCardsAnimation
+{
+    CGSize size = [[CCDirector sharedDirector]winSize];
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    for (int i = 0; i < TOTAL_CARD_NUM; i++) {
+        UserCard *card = [UserCard cardWithBack];
+        [self addChild:card];
+        [card setPosition:CGPointMake([card boundingBox].size.width/2, size.height-[card boundingBox].size.height/2)];
+        [_allUserCards addObject:card];
+    }
+    [self sendCards];
+    [pool release];
+}
+
+- (void)sendCards
+{
+    for(int i = 0; i < TOTAL_CARD_NUM; i++)
+    {
+        UserCard *card = (UserCard *)[_allUserCards objectAtIndex:i];
+        int index = i / MAX_PLAYERS_NUM;
+        int index2 = i % MAX_PLAYERS_NUM;
+        CGPoint firstCardPos = [[_cardPosArr objectAtIndex:index]CGPointValue];
+        CGPoint targetCardPos = CGPointMake(firstCardPos.x+index2*CARD_SPACE0, firstCardPos.y);
+        id delayAction = [CCDelayTime actionWithDuration:0.8*i];
+        id flyToCardArea = [CCMoveTo actionWithDuration:0.5 position:targetCardPos];
+        [card runAction:[CCSequence actions:delayAction,flyToCardArea,nil]];
+    }
+}
+
 
 #pragma mark - dealloc
 - (void) dealloc
 {
-    [_posArr release];
+    [_allUserCards release];
+    [_avatarPosArr release];
+    [_cardPosArr release];
 	[_swipeLeftGestureRecognizer release];
     _swipeLeftGestureRecognizer = nil;
     [_swipeRightGestureRecognizer release];

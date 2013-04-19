@@ -13,6 +13,7 @@
 
 @implementation CardPlayingHandler
 
+//处理玩家本人进入牌桌
 + (void)processEnterDeskData:(NSData *)data
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
@@ -33,6 +34,7 @@
     }
 }
 
+//处理有玩家进入
 + (User *)processOtherPlayerIn:(NSData *)data
 {
     NSDictionary *userDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
@@ -41,6 +43,7 @@
     return user;
 }
 
+//处理查看玩家头像具体信息
 + (User *)processViewProfile:(NSData *)data
 {
     NSDictionary *userDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
@@ -51,6 +54,14 @@
     user.familyPropertyValue = [[userDic objectForKey:@"jiaChan"]intValue];
 
     return user;
+}
+
+//处理抢庄
++ (NSString *)processGrabZ:(NSData *)data
+{
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    NSString *zUserID = [dic objectForKey:@"zUserID"];
+    return zUserID;
 }
 
 + (User *)user:(NSDictionary *)userDic

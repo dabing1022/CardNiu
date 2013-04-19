@@ -15,6 +15,9 @@
 #define CMD_ENTER_DESK         2002//被分配进入牌桌
 #define CMD_OTHER_PLAYER_IN    2003//其他玩家进入牌桌
 #define CMD_VIEW_PROFILE       2004//点击玩家头像查看具体信息
+#define CMD_GRAB_Z             2005//抢庄+发牌
+#define CMD_GRAB_RESULT        2006//发送抢庄结果
+
 
 
 
