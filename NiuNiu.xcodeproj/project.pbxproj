@@ -134,6 +134,11 @@
 		CE66D79D1711847500EA3569 /* LICENSE_CocosDenshion.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */; };
 		CE66D79E1711847500EA3569 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */; };
 		CE66D7A71711931700EA3569 /* CCGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE66D6D71711847500EA3569 /* CCGLView.m */; };
+		CE6CE1551722856E0076473D /* betBoxBg.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE1541722856E0076473D /* betBoxBg.png */; };
+		CE6CE158172285E90076473D /* BetBox.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6CE157172285E90076473D /* BetBox.m */; };
+		CE6CE15A17229D7D0076473D /* betBoxBgDisabled.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE15917229D7D0076473D /* betBoxBgDisabled.png */; };
+		CE6CE15D17229E190076473D /* betBoxBg-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE15B17229E190076473D /* betBoxBg-hd.png */; };
+		CE6CE15E17229E190076473D /* betBoxBgDisabled-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE15C17229E190076473D /* betBoxBgDisabled-hd.png */; };
 		CED386EF1720F4FC001CE11C /* ProfilePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = CED386EE1720F4FB001CE11C /* ProfilePanel.m */; };
 		CEDE958417127B63006BDF73 /* CCBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954917127B63006BDF73 /* CCBAnimationManager.m */; };
 		CEDE958517127B63006BDF73 /* CCBKeyframe.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDE954B17127B63006BDF73 /* CCBKeyframe.m */; };
@@ -472,6 +477,12 @@
 		CE66D7321711847500EA3569 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_cocos2d.txt; path = libs/LICENSE_cocos2d.txt; sourceTree = "<group>"; };
 		CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_CocosDenshion.txt; path = libs/LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_Kazmath.txt; path = libs/LICENSE_Kazmath.txt; sourceTree = "<group>"; };
+		CE6CE1541722856E0076473D /* betBoxBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = betBoxBg.png; path = Assets/betBoxBg.png; sourceTree = "<group>"; };
+		CE6CE156172285E90076473D /* BetBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BetBox.h; sourceTree = "<group>"; };
+		CE6CE157172285E90076473D /* BetBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BetBox.m; sourceTree = "<group>"; };
+		CE6CE15917229D7D0076473D /* betBoxBgDisabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = betBoxBgDisabled.png; path = Assets/betBoxBgDisabled.png; sourceTree = "<group>"; };
+		CE6CE15B17229E190076473D /* betBoxBg-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "betBoxBg-hd.png"; path = "Assets/betBoxBg-hd.png"; sourceTree = "<group>"; };
+		CE6CE15C17229E190076473D /* betBoxBgDisabled-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "betBoxBgDisabled-hd.png"; path = "Assets/betBoxBgDisabled-hd.png"; sourceTree = "<group>"; };
 		CED386ED1720F4FB001CE11C /* ProfilePanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfilePanel.h; sourceTree = "<group>"; };
 		CED386EE1720F4FB001CE11C /* ProfilePanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfilePanel.m; sourceTree = "<group>"; };
 		CEDE954817127B63006BDF73 /* CCBAnimationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCBAnimationManager.h; sourceTree = "<group>"; };
@@ -1223,6 +1234,10 @@
 		CEEBC37617141AAD000A3CBD /* imgs */ = {
 			isa = PBXGroup;
 			children = (
+				CE6CE15B17229E190076473D /* betBoxBg-hd.png */,
+				CE6CE15C17229E190076473D /* betBoxBgDisabled-hd.png */,
+				CE6CE15917229D7D0076473D /* betBoxBgDisabled.png */,
+				CE6CE1541722856E0076473D /* betBoxBg.png */,
 				CE11B1721716D391002510CC /* transitionDown-hd.png */,
 				CE11B1731716D391002510CC /* transitionDown.png */,
 				CE11B1741716D391002510CC /* transitionUp-hd.png */,
@@ -1259,6 +1274,8 @@
 				CE02C0E7171C189900EC6C00 /* UserCard.m */,
 				CE0FBFCE171F8FB0003FE7BE /* AvatarInfoBox.h */,
 				CE0FBFCF171F8FB0003FE7BE /* AvatarInfoBox.m */,
+				CE6CE156172285E90076473D /* BetBox.h */,
+				CE6CE157172285E90076473D /* BetBox.m */,
 			);
 			name = Scenes;
 			sourceTree = "<group>";
@@ -1365,6 +1382,10 @@
 				CE11B1771716D391002510CC /* transitionDown.png in Resources */,
 				CE11B1781716D391002510CC /* transitionUp-hd.png in Resources */,
 				CE11B1791716D391002510CC /* transitionUp.png in Resources */,
+				CE6CE1551722856E0076473D /* betBoxBg.png in Resources */,
+				CE6CE15A17229D7D0076473D /* betBoxBgDisabled.png in Resources */,
+				CE6CE15D17229E190076473D /* betBoxBg-hd.png in Resources */,
+				CE6CE15E17229E190076473D /* betBoxBgDisabled-hd.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1526,6 +1547,7 @@
 				CE0FBFD0171F8FB0003FE7BE /* AvatarInfoBox.m in Sources */,
 				CE0FBFD3171FA901003FE7BE /* CardPlayingHandler.m in Sources */,
 				CED386EF1720F4FC001CE11C /* ProfilePanel.m in Sources */,
+				CE6CE158172285E90076473D /* BetBox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -16,12 +16,17 @@
 #import "AvatarInfoBox.h"
 #import "ProfilePanel.h"
 #import "UserCard.h"
+#import "BetBox.h"
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
 @synthesize swipeRightGestureRecognizer=_swipeRightGestureRecognizer;
+
 static NSArray *_avatarPosArr;
 static NSArray *_cardPosArr;
+static NSArray *_betBoxesPosArr;//下注前的位置
+static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
+
 +(CCScene *) scene
 {
     CCScene *scene = [CCScene node];
@@ -42,7 +47,8 @@ static NSArray *_cardPosArr;
         [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:CMD_ENTER_CARD_PLAYING socketType:CARD_SOCKET];
         [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
         
-        _allUserCards = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
+        _allUserCardsArr = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
+        _allBetBoxesArr = [[NSMutableArray alloc]initWithCapacity:4];
                 
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
@@ -69,6 +75,21 @@ static NSArray *_cardPosArr;
                                                 [NSValue valueWithCGPoint:CARD_POS_ID0],
                                                 [NSValue valueWithCGPoint:CARD_POS_ID1], nil];
         [_cardPosArr retain];
+        
+        _betBoxesPosArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:BET_BOX_POS_ID0],
+                                                    [NSValue valueWithCGPoint:BET_BOX_POS_ID1],
+                                                    [NSValue valueWithCGPoint:BET_BOX_POS_ID2],
+                                                    [NSValue valueWithCGPoint:BET_BOX_POS_ID3], nil];
+        [_betBoxesPosArr retain];
+        
+        _betBoxesFlyToPosArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID0],
+                                                         [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID1],
+                                                         [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID2],
+                                                         [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID3],
+                                                         [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID4],
+                                                         [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID5], nil];
+        [_betBoxesFlyToPosArr retain];
+
     }
     LOG_FUN_DID;
     return self;
@@ -197,6 +218,9 @@ static NSArray *_cardPosArr;
     self.swipeRightGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
     
+    //接收来自BetBox选择下注的通知
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(removeAllBetBoxesExcept:) name:@"didChooseRatio" object:nil];
+  
     [super onEnter];
     LOG_FUN_DID;
 }
@@ -207,6 +231,9 @@ static NSArray *_cardPosArr;
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeRightGestureRecognizer];
     [_activityIndicatorView stopAnimating];
     [_activityIndicatorView removeFromSuperview];
+    
+    //移除来自BetBox选择下注的通知
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
     
     [super onExit];
     LOG_FUN_DID;
@@ -325,7 +352,7 @@ static NSArray *_cardPosArr;
 
 - (void)countDownWithBetType:(ccTime)dt
 {
-    [_countDownLabelTTF setString:[NSString stringWithFormat:@"%d",_timeLeft]];
+    [_countDownLabelTTF setString:[NSString stringWithFormat:@"0%d",_timeLeft]];
     CCLOG(@"Time left %d", _timeLeft);
     _timeLeft --;
     if(_timeLeft < 0){
@@ -357,7 +384,7 @@ static NSArray *_cardPosArr;
         UserCard *card = [UserCard cardWithBack];
         [self addChild:card];
         [card setPosition:CGPointMake([card boundingBox].size.width/2, size.height-[card boundingBox].size.height/2)];
-        [_allUserCards addObject:card];
+        [_allUserCardsArr addObject:card];
     }
     [self sendCards];
     [pool release];
@@ -367,7 +394,7 @@ static NSArray *_cardPosArr;
 {
     for(int i = 0; i < TOTAL_CARD_NUM; i++)
     {
-        UserCard *card = (UserCard *)[_allUserCards objectAtIndex:i];
+        UserCard *card = (UserCard *)[_allUserCardsArr objectAtIndex:i];
         int index = i % MAX_PLAYERS_NUM;
         int turn = i / MAX_PLAYERS_NUM;
         CGPoint firstCardPos = [[_cardPosArr objectAtIndex:index]CGPointValue];
@@ -380,7 +407,7 @@ static NSArray *_cardPosArr;
     }
 }
 
-
+//抢庄结果
 - (void)grabResult:(NSString *)zUserID
 {
     _zSymbol = [CCSprite spriteWithSpriteFrameName:@"ZSymbol.png"];
@@ -394,12 +421,51 @@ static NSArray *_cardPosArr;
     [_zSymbol runAction:flyTo];
 }
 
+//开始下注
+- (void)startBet:(NSArray *)betArr
+{
+    //停止抢庄倒计时
+    [self unscheduleAllSelectors];
+
+    for(int i = 0;i < 4;i++)
+    {
+        NSDictionary *aBetBoxInfoDic = (NSDictionary *)[betArr objectAtIndex:i];
+        BetBox *betBox = [BetBox betBoxWithRatio:[[aBetBoxInfoDic objectForKey:@"ratio"]intValue]
+                                          status:[[aBetBoxInfoDic objectForKey:@"status"]boolValue]];
+        [self addChild:betBox z:kTagBetBoxes tag:kTagBetBoxes];
+        [betBox setPosition:[[_betBoxesPosArr objectAtIndex:i] CGPointValue]];
+        [_allBetBoxesArr addObject:betBox];
+    }
+    [self countDownBeginWith:kCDTimeBet];
+}
+
+- (void)removeAllBetBoxesExcept:(NSNotification *)notification
+{
+    BetBox *betBoxHitted = (BetBox *)[notification.userInfo objectForKey:@"betBox"];
+    for(BetBox *betBox in _allBetBoxesArr)
+    {
+        if(betBox == betBoxHitted) continue;
+        [self removeChild:betBox cleanup:YES];
+        [_allBetBoxesArr removeObject:betBox];
+    }
+    
+    id moveTo = [CCMoveTo actionWithDuration:0.5 position:[[_betBoxesFlyToPosArr objectAtIndex:2]CGPointValue]];
+    id easeIn = [CCEaseIn actionWithAction:moveTo rate:2];
+    [betBoxHitted runAction:easeIn];
+}
+
+
 #pragma mark - dealloc
 - (void) dealloc
 {
-    [_allUserCards release];
+    [_allUserCardsArr release];
+    [_allBetBoxesArr release];
+    
     [_avatarPosArr release];
     [_cardPosArr release];
+    [_betBoxesPosArr release];
+    [_betBoxesFlyToPosArr release];
+    
 	[_swipeLeftGestureRecognizer release];
     _swipeLeftGestureRecognizer = nil;
     [_swipeRightGestureRecognizer release];

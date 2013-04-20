@@ -15,7 +15,8 @@ enum{
     kTagCurtain,
     kTagMenuGrab,
     kTagZSymbol,
-    kTagCountDownLabelTTF
+    kTagCountDownLabelTTF,
+    kTagBetBoxes
 };
 
 //倒计时时间长度
@@ -43,6 +44,21 @@ typedef enum
 #define CARD_POS_ID4 CGPointMake(256, 244)
 #define CARD_POS_ID5 CGPointMake(160, 368)
 
+//下注前注币数据盒子坐标位置(玩家本人)
+#define BET_BOX_POS_ID0 CGPointMake(122, 84)
+#define BET_BOX_POS_ID1 CGPointMake(222, 84)
+#define BET_BOX_POS_ID2 CGPointMake(322, 84)
+#define BET_BOX_POS_ID3 CGPointMake(422, 84)
+
+//下注后注币数据盒子飞向玩家最后的坐标位置(6个玩家)
+#define BET_BOX_FLYTO_POS_ID0 CGPointMake(55, 370)
+#define BET_BOX_FLYTO_POS_ID1 CGPointMake(55, 220)
+#define BET_BOX_FLYTO_POS_ID2 CGPointMake(55, 86)
+#define BET_BOX_FLYTO_POS_ID3 CGPointMake(264, 170)
+#define BET_BOX_FLYTO_POS_ID4 CGPointMake(55, 310)
+#define BET_BOX_FLYTO_POS_ID5 CGPointMake(170, 432)
+
+
 //牌间距
 #define CARD_SPACE0 3
 #define CARD_SPACE1 5
@@ -52,7 +68,7 @@ typedef enum
 //最多玩家数
 #define MAX_PLAYERS_NUM 6
 //卡牌飞行速度
-#define CARD_SPEED 50
+#define CARD_SPEED 600
 
 @class ProfilePanel;
 @interface CardPlayingScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
@@ -65,7 +81,10 @@ typedef enum
     CCMenuItemImage *_menuItemGrabZ;
     CCMenuItemImage *_menuItemNotGrabZ;
     CCMenu *_menuGrabZ;
-    NSMutableArray *_allUserCards;
+    
+    NSMutableArray *_allUserCardsArr;
+    NSMutableArray *_allBetBoxesArr;
+    
     CCSprite *_zSymbol;
     CCSprite *_countDown;
     //COUNT DOWN

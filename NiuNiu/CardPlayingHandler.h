@@ -16,4 +16,5 @@
 + (User *)processViewProfile:(NSData *)data;
 + (NSString *)processGrabZ:(NSData *)data;
 + (NSString *)ProcessGrabResult:(NSData *)data;
++ (NSArray *)processStartBet:(NSData *)data;
 @end

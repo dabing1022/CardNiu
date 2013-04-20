@@ -53,7 +53,6 @@
 - (CGRect)rect
 {
     CGSize size = _avatarSpr.contentSize;
-    CCLOG(@"rect %f, %f",size.width,size.height);
     CGRect rect = CGRectMake(-size.width/2, -size.height/2, size.width, size.height);
     return rect;
 }

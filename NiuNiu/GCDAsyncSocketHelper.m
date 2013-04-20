@@ -246,7 +246,7 @@ static GCDAsyncSocketHelper *_instance = nil;
 
 - (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
-    CCLOG(@"%@, tag: %ld", NSStringFromSelector(_cmd), tag);
+    CCLOG(@"%@, tag: %ld", NSStringFromSelector(_cmd), tag);    
 }
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
@@ -298,8 +298,17 @@ static GCDAsyncSocketHelper *_instance = nil;
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(grabResult:) withObject:zUserID];
             break;
         }
+        case CMD_START_BET:{
+            CCLOG(@"CMD_START_BET");
+            NSArray *arr = [CardPlayingHandler processStartBet:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(startBet:) withObject:arr];
+            break;
+        }
         case CMD_ERROR:{
             CCLOG(@"CMD_ERROR");
+            break;
+        }
+        case CMD_OTHER_PLAYER_BET_RESULT:{
             break;
         }
         default:

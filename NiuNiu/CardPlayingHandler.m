@@ -65,11 +65,19 @@
 }
 
 //抢庄结果
-+ (NSString *)ProcessGrabResult:(NSData *)data
+//包括庄家的userID和下注倍率数组
++ (NSString *)processGrabResult:(NSData *)data
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSString *zUserID = [dic objectForKey:@"zUserID"];
     return zUserID;
+}
+
+//开始下注
++ (NSArray *)processStartBet:(NSData *)data
+{
+    NSArray *betArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
+    return betArr;
 }
 
 + (User *)user:(NSDictionary *)userDic

@@ -11,14 +11,14 @@
 
 
 /*--------------------CARD_SERVER通讯命令--------------------------------------*/
-#define CMD_ENTER_CARD_PLAYING 2001//进入牌局场景
-#define CMD_ENTER_DESK         2002//被分配进入牌桌
-#define CMD_OTHER_PLAYER_IN    2003//其他玩家进入牌桌
-#define CMD_VIEW_PROFILE       2004//点击玩家头像查看具体信息
-#define CMD_GRAB_Z             2005//抢庄+发牌
-#define CMD_GRAB_RESULT        2006//发送抢庄结果
-
-
+#define CMD_ENTER_CARD_PLAYING      2001//进入牌局场景
+#define CMD_ENTER_DESK              2002//被分配进入牌桌
+#define CMD_OTHER_PLAYER_IN         2003//其他玩家进入牌桌
+#define CMD_VIEW_PROFILE            2004//点击玩家头像查看具体信息
+#define CMD_GRAB_Z                  2005//抢庄+发牌
+#define CMD_GRAB_RESULT             2006//发送抢庄结果
+#define CMD_START_BET               2007//开始下注（贤家收到，庄家不会收到)
+#define CMD_OTHER_PLAYER_BET_RESULT 2008//其他玩家下注结果
 
 
 #define CMD_INFO  9998//服务器给客户端发送的提示
