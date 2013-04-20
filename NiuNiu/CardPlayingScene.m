@@ -43,7 +43,7 @@ static NSArray *_cardPosArr;
         [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
         
         _allUserCards = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
-        
+                
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );
@@ -52,8 +52,7 @@ static NSArray *_cardPosArr;
         label.tag = 5;
         
         [self drawGrabZ];
-        
-        
+        [self drawCountDownLabelTTF];        
         
         _avatarPosArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:AVARTAR_POS_ID0],
                                                   [NSValue valueWithCGPoint:AVARTAR_POS_ID1],
@@ -75,29 +74,41 @@ static NSArray *_cardPosArr;
     return self;
 }
 
+#pragma mark - drawStuff
+- (void)drawCountDownLabelTTF
+{
+    _countDownLabelTTF = [CCLabelTTF labelWithString:@"00" fontName:@"Arial" fontSize:24];
+    CGSize size = [[CCDirector sharedDirector]winSize];
+    [_countDownLabelTTF setPosition:CGPointMake(size.width/2, size.height/2)];
+    [self addChild:_countDownLabelTTF z:kTagCountDownLabelTTF tag:kTagCountDownLabelTTF];
+    [_countDownLabelTTF setVisible:NO];
+}
+
 - (void)drawGrabZ
 {
     _menuItemGrabZ = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"grabZ.png"]
                                             selectedSprite:[CCSprite spriteWithSpriteFrameName:@"grabZ.png"]
                                                      block:^(id sender){
-                                                         NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"grab"];
-                                                         NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
-                                                         [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
-                                                         [_menuGrabZ setVisible:NO];
+                                                         [self sendServerWithGrab:YES];
                                                      }];
     _menuItemNotGrabZ = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"notGrabZ.png"]
                                                selectedSprite:[CCSprite spriteWithSpriteFrameName:@"notGrabZ.png"]
                                                         block:^(id sender){
-                                                            NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:@"grab"];
-                                                            NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
-                                                            [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
-                                                            [_menuGrabZ setVisible:NO];
+                                                            [self sendServerWithGrab:NO];
                                                         }];
 
     _menuGrabZ = [CCMenu menuWithItems:_menuItemGrabZ,_menuItemNotGrabZ, nil];
     [_menuGrabZ alignItemsHorizontallyWithPadding:20];
     [self addChild:_menuGrabZ z:kTagMenuGrab tag:kTagMenuGrab];
     _menuGrabZ.position = ccp(252, 92);
+    [_menuGrabZ setVisible:NO];
+}
+
+- (void)sendServerWithGrab:(BOOL)choice
+{
+    NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:choice] forKey:@"grab"];
+    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
+    [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
     [_menuGrabZ setVisible:NO];
 }
 
@@ -268,11 +279,75 @@ static NSArray *_cardPosArr;
         CCLOG(@"没有庄家，进行抢庄");
         [_menuGrabZ setVisible:YES];
         [self playSendCardsAnimation];
+        //抢庄倒计时
+        [self countDownBeginWith:kCDTimeGrabZ];
     }else{//庄家已经存在
         CCLOG(@"庄家已经存在，不用抢庄");
     }
 }
 
+
+#pragma mark - CountDown
+- (void)countDownBeginWith:(int)countDownTime
+{
+    _timeLeft = countDownTime;
+    [_countDownLabelTTF setVisible:YES];
+    switch (countDownTime) {
+        case kCDTimeGrabZ:
+            [self schedule:@selector(countDownWithGrabZType:) interval:1.0];
+            break;
+        case kCDTimeBet:
+            [self schedule:@selector(countDownWithBetType:) interval:1.0];
+            break;
+        case kCDTimeReadCards:
+            [self schedule:@selector(countDownWithReadCardsType:) interval:1.0];
+            break;
+        default:
+            NSAssert(NO, @"无效倒计时类型");
+            break;
+    }
+}
+
+- (void)countDownWithGrabZType:(ccTime)dt
+{
+    [_countDownLabelTTF setString:[NSString stringWithFormat:@"0%d",_timeLeft]];
+    CCLOG(@"Time left %d", _timeLeft);
+    _timeLeft --;
+    if(_timeLeft < 0){
+        [_countDownLabelTTF setVisible:NO];
+        [self unschedule:@selector(countDownWithGrabZType:)];
+        CCLOG(@"GrabZ TIME UP!");
+        if(_menuGrabZ.visible){
+            [self sendServerWithGrab:NO];
+        }
+    }
+}
+
+- (void)countDownWithBetType:(ccTime)dt
+{
+    [_countDownLabelTTF setString:[NSString stringWithFormat:@"%d",_timeLeft]];
+    CCLOG(@"Time left %d", _timeLeft);
+    _timeLeft --;
+    if(_timeLeft < 0){
+        [_countDownLabelTTF setVisible:NO];
+        [self unschedule:@selector(countDownWithBetType:)];
+        CCLOG(@"Bet TIME UP!");
+    }
+}
+
+- (void)countDownWithReadCardsType:(ccTime)dt
+{
+    [_countDownLabelTTF setString:[NSString stringWithFormat:@"%d",_timeLeft]];
+    CCLOG(@"Time left %d", _timeLeft);
+    _timeLeft --;
+    if(_timeLeft < 0){
+        [_countDownLabelTTF setVisible:NO];
+        [self unschedule:@selector(countDownWithReadCardsType:)];
+        CCLOG(@"ReadCards TIME UP!");
+    }
+}
+
+#pragma mark - sendCards
 //播放发牌动画
 - (void)playSendCardsAnimation
 {
@@ -293,16 +368,31 @@ static NSArray *_cardPosArr;
     for(int i = 0; i < TOTAL_CARD_NUM; i++)
     {
         UserCard *card = (UserCard *)[_allUserCards objectAtIndex:i];
-        int index = i / MAX_PLAYERS_NUM;
-        int index2 = i % MAX_PLAYERS_NUM;
+        int index = i % MAX_PLAYERS_NUM;
+        int turn = i / MAX_PLAYERS_NUM;
         CGPoint firstCardPos = [[_cardPosArr objectAtIndex:index]CGPointValue];
-        CGPoint targetCardPos = CGPointMake(firstCardPos.x+index2*CARD_SPACE0, firstCardPos.y);
-        id delayAction = [CCDelayTime actionWithDuration:0.8*i];
-        id flyToCardArea = [CCMoveTo actionWithDuration:0.5 position:targetCardPos];
+        CGPoint targetCardPos = CGPointMake(firstCardPos.x+turn*CARD_SPACE0, firstCardPos.y);
+        id delayAction = [CCDelayTime actionWithDuration:0.2*i];
+        
+        CGFloat duration = ccpDistance(card.position, targetCardPos) / CARD_SPEED;
+        id flyToCardArea = [CCMoveTo actionWithDuration:duration position:targetCardPos];
         [card runAction:[CCSequence actions:delayAction,flyToCardArea,nil]];
     }
 }
 
+
+- (void)grabResult:(NSString *)zUserID
+{
+    _zSymbol = [CCSprite spriteWithSpriteFrameName:@"ZSymbol.png"];
+    [self addChild:_zSymbol z:kTagZSymbol tag:kTagZSymbol];
+    CGSize size = [[CCDirector sharedDirector]winSize];
+    [_zSymbol setPosition:CGPointMake(size.width/2, size.height/2)];
+    
+    User *zUser = [[[GameData sharedGameData]userDic]objectForKey:zUserID];
+    CGPoint targetPos = [[_avatarPosArr objectAtIndex:zUser.posID]CGPointValue];
+    id flyTo = [CCMoveTo actionWithDuration:0.5 position:targetPos];
+    [_zSymbol runAction:flyTo];
+}
 
 #pragma mark - dealloc
 - (void) dealloc

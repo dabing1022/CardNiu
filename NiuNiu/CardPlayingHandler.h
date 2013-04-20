@@ -15,4 +15,5 @@
 + (User *)processOtherPlayerIn:(NSData *)data;
 + (User *)processViewProfile:(NSData *)data;
 + (NSString *)processGrabZ:(NSData *)data;
++ (NSString *)ProcessGrabResult:(NSData *)data;
 @end

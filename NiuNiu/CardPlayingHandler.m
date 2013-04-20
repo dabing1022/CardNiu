@@ -64,6 +64,14 @@
     return zUserID;
 }
 
+//抢庄结果
++ (NSString *)ProcessGrabResult:(NSData *)data
+{
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    NSString *zUserID = [dic objectForKey:@"zUserID"];
+    return zUserID;
+}
+
 + (User *)user:(NSDictionary *)userDic
 {
     User *user = [User userWithUserID:[userDic objectForKey:@"userID"]

@@ -13,8 +13,19 @@ enum{
     kTagCardPlayingScene,
     kTagAvatarInfoBox,
     kTagCurtain,
-    kTagMenuGrab
+    kTagMenuGrab,
+    kTagZSymbol,
+    kTagCountDownLabelTTF
 };
+
+//倒计时时间长度
+typedef enum
+{
+    kCDTimeGrabZ=8,
+    kCDTimeBet=5,
+    kCDTimeReadCards=25
+}countDownTime;
+
 
 //头像坐标位置
 #define AVARTAR_POS_ID0 CGPointMake(55, 370)
@@ -40,6 +51,8 @@ enum{
 #define TOTAL_CARD_NUM 30
 //最多玩家数
 #define MAX_PLAYERS_NUM 6
+//卡牌飞行速度
+#define CARD_SPEED 50
 
 @class ProfilePanel;
 @interface CardPlayingScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
@@ -53,6 +66,13 @@ enum{
     CCMenuItemImage *_menuItemNotGrabZ;
     CCMenu *_menuGrabZ;
     NSMutableArray *_allUserCards;
+    CCSprite *_zSymbol;
+    CCSprite *_countDown;
+    //COUNT DOWN
+
+    int _timeLeft;
+    int _countDownType;
+    CCLabelTTF *_countDownLabelTTF;
 }
 
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeLeftGestureRecognizer;
