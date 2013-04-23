@@ -11,6 +11,7 @@
 #import "GameData.h"
 #import "User.h"
 #import "UserCard.h"
+#import "CardsHelper.h"
 
 @implementation CardPlayingHandler
 //处理玩家本人进入牌桌
@@ -91,6 +92,7 @@
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSArray *cardArr = (NSArray *)[dic objectForKey:@"cards"];
+    [[GameData sharedGameData]player].cardsDataArr = cardArr;
     return cardArr;
 }
 

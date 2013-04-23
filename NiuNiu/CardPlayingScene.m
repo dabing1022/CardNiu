@@ -50,6 +50,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         
         _allUserCardsArr = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
         _betResultDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
+        _playerCardsArr = [[NSMutableArray alloc]initWithCapacity:5];
                 
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
@@ -505,11 +506,64 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     CCLOG(@"startReadingCards");
     [self countDownBeginWith:kCDTimeReadCards];
+    //test
+    CGPoint firstCardPos = [[_cardPosArr objectAtIndex:0]CGPointValue];
+    CGPoint targetCarPos;
+    for(int i = 0; i < 5; i++)
+    {
+        UserCard *card = [UserCard cardWithBack];
+        [self addChild:card];
+        targetCarPos = CGPointMake(firstCardPos.x+i*10, firstCardPos.y);
+        [card setPosition:targetCarPos];
+        [_playerCardsArr addObject:card];
+    }
+     
+    [self closeThenOpenCards:cardArray];
     
+}
+
+//进入看牌阶段后，先收拢牌然后展开牌的动画效果
+//收拢的时候5张牌为背面牌，展开的时候前4张为正面牌，第5张牌为背面牌，需要玩家去点击
+- (void)closeThenOpenCards:(NSArray *)cardArray
+{
+    CCLOG(@"closeThenOpenCards");
+    CGPoint closePos = [[_cardPosArr objectAtIndex:0]CGPointValue];
+    for(UserCard *card in _playerCardsArr){
+        id moveToClosePos = [CCMoveTo actionWithDuration:0.5 position:closePos];
+        id easeOut = [CCEaseInOut  actionWithAction:moveToClosePos rate:2];
+        [card runAction:easeOut];
+    }
+    [self scheduleOnce:@selector(open5cards) delay:0.8];
+}
+
+- (void)open5cards
+{
+    [self unschedule:@selector(open5cards)];
+    NSArray *cardDataArr = [[GameData sharedGameData]player].cardsDataArr;
+    CGPoint openPos = [[_cardPosArr objectAtIndex:0]CGPointValue];
+    for(int i = 0; i < 5; i++)
+    {
+        UserCard *card = (UserCard *)[_playerCardsArr objectAtIndex:i];
+        NSDictionary *singleCardData = (NSDictionary *)[cardDataArr objectAtIndex:i];
+        CardData cardData;
+        id moveToOpenPos = [CCMoveTo actionWithDuration:0.5 position:CGPointMake(openPos.x + i * 50, openPos.y)];
+        id easeOut = [CCEaseOut actionWithAction:moveToOpenPos rate:2];
+        if(i != 4){
+            cardData.color = [[singleCardData objectForKey:@"color"]intValue];
+            cardData.value = [[singleCardData objectForKey:@"value"]intValue];
+            [card setFrontFace:cardData];
+        }
+        [card runAction:easeOut];
+    }
     
-    
-    _readingCardsLayer = [ReadingCardsLayer layerWithCardsArray:cardArray];
-    [self addChild:_readingCardsLayer z:kTagReadingCardsLayer tag:kTagReadingCardsLayer];
+    [self scheduleOnce:@selector(addReadingCardsLayer) delay:3];
+}
+
+- (void)addReadingCardsLayer
+{
+    [self unschedule:@selector(addReadingCardsLayer)];
+    _readingCardsLayer = [ReadingCardsLayer layerWithCardsArray:[[GameData sharedGameData]player].cardsDataArr];
+    [self addChild:_readingCardsLayer z:kTagReadingCardsLayer tag:kTagReadingCardsLayer];    
 }
 
 #pragma mark - dealloc

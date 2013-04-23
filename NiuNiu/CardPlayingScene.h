@@ -90,6 +90,7 @@ typedef enum
     CCMenu *_betRatioMenu;
     
     NSMutableArray *_allUserCardsArr;
+    NSMutableArray *_playerCardsArr;
     
     CCSprite *_zSymbol;
     CCSprite *_countDown;

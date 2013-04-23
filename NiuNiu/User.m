@@ -15,6 +15,7 @@
 @synthesize nickName=_nickName,userName=_userName;
 @synthesize coinYL=_coinYL,coinTB=_coinTB,familyPropertyValue=_familyPropertyValue;
 @synthesize cardTitle=_cardTitle,familyPropertyTitle=_familyPropertyTitle,gamblerTitle=_gamblerTitle,roleTitle=_roleTitle;
+@synthesize cardsDataArr=_cardsDataArr;
 
 #pragma mark - init
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB

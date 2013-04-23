@@ -42,10 +42,10 @@
 
 - (void)setFrontFace:(CardData)cardData
 {
-    int type = cardData.type;
+    int color = cardData.color;
     int value = cardData.value;
     
-    [self setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache]spriteFrameByName:[NSString stringWithFormat:@"Card%d_%d.png",type,value]]];
+    [self setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache]spriteFrameByName:[NSString stringWithFormat:@"Card%d_%d.png",color,value]]];
     _isFront = YES;
 }
 
@@ -56,16 +56,29 @@
 }
 
 #pragma mark - popUp and pullDown
-- (void)popUpWithHeight:(int)height
+- (void)popUp
 {
     if(self.isPopup)    return;
-    [self setPosition:CGPointMake(self.position.x, self.position.y+height)];
+    id popUp = [CCMoveTo actionWithDuration:0.1 position:CGPointMake(self.position.x, self.position.y + CARD_POP_DOWN_HEIGHT)];
+    [self runAction:popUp];
+    self.isPopup = YES;
 }
 
-- (void)pullDownWithHeight:(int)height
+- (void)pullDown
 {
-    if(self.isPopup)
-        [self setPosition:CGPointMake(self.position.x, self.position.y-height)];
+    if(!(self.isPopup))return;
+    id pullDown = [CCMoveTo actionWithDuration:0.1 position:CGPointMake(self.position.x, self.position.y - CARD_POP_DOWN_HEIGHT)];
+    [self runAction:pullDown];
+    self.isPopup = NO;
+}
+
+- (void)handlePopAndDown
+{
+    if(self.isPopup){
+        [self pullDown];
+    }else{
+        [self popUp];
+    }
 }
 
 #pragma mark - TouchDelegate
