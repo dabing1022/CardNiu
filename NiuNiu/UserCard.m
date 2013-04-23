@@ -68,6 +68,31 @@
         [self setPosition:CGPointMake(self.position.x, self.position.y-height)];
 }
 
+#pragma mark - TouchDelegate
+- (BOOL)containsTouchLocation:(UITouch *)touch
+{
+    return CGRectContainsPoint([self rect], [self convertTouchToNodeSpaceAR:touch]);
+}
+
+- (CGRect)rect
+{
+    CGSize size = self.contentSize;
+    CGRect rect = CGRectMake(-size.width/2, -size.height/2, size.width, size.height);
+    return rect;
+}
+
+- (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    if(![self containsTouchLocation:touch] || _isFront)
+        return NO;
+    return YES;
+}
+
+- (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
+{
+}
+
+
 - (void)dealloc
 {
     [super dealloc];

@@ -294,7 +294,7 @@ static GCDAsyncSocketHelper *_instance = nil;
         }
         case CMD_GRAB_RESULT:{
             CCLOG(@"CMD_GRAB_RESULT");
-            NSString *zUserID = [CardPlayingHandler processGrabZ:data];
+            NSString *zUserID = [CardPlayingHandler processGrabResult:data];
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(grabResult:) withObject:zUserID];
             break;
         }
@@ -304,11 +304,20 @@ static GCDAsyncSocketHelper *_instance = nil;
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(startBet:) withObject:arr];
             break;
         }
-        case CMD_ERROR:{
-            CCLOG(@"CMD_ERROR");
+        case CMD_OTHER_PLAYER_BET_RESULT:{
+            CCLOG(@"CMD_OTHER_PLAYER_BET_RESULT");
+            NSDictionary *dic = [CardPlayingHandler processOtherPlayerBetResult:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(showPlayerBetResult:) withObject:dic];
             break;
         }
-        case CMD_OTHER_PLAYER_BET_RESULT:{
+        case CMD_START_READING_CARDS:{
+            CCLOG(@"CMD_START_READING_CARDS");
+            NSArray *cardArr = [CardPlayingHandler processCardData:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(startReadingCards:) withObject:cardArr];
+            break;
+        }
+        case CMD_ERROR:{
+            CCLOG(@"CMD_ERROR");
             break;
         }
         default:

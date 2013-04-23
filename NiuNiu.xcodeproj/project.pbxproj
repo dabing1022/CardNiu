@@ -26,6 +26,7 @@
 		CE11B1781716D391002510CC /* transitionUp-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1741716D391002510CC /* transitionUp-hd.png */; };
 		CE11B1791716D391002510CC /* transitionUp.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1751716D391002510CC /* transitionUp.png */; };
 		CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */; };
+		CE21CBCF17253B50005B1606 /* ReadingCardsLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE21CBCE17253B50005B1606 /* ReadingCardsLayer.m */; };
 		CE3FDF051711A3CB002C7076 /* CCScrollLayerTestLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */; };
 		CE3FDF061711A4D9002C7076 /* CCScrollLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDD2B17119642002C7076 /* CCScrollLayer.m */; };
 		CE3FDF091711A937002C7076 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE3FDF081711A937002C7076 /* Default-568h@2x.png */; };
@@ -135,7 +136,6 @@
 		CE66D79E1711847500EA3569 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */; };
 		CE66D7A71711931700EA3569 /* CCGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE66D6D71711847500EA3569 /* CCGLView.m */; };
 		CE6CE1551722856E0076473D /* betBoxBg.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE1541722856E0076473D /* betBoxBg.png */; };
-		CE6CE158172285E90076473D /* BetBox.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6CE157172285E90076473D /* BetBox.m */; };
 		CE6CE15A17229D7D0076473D /* betBoxBgDisabled.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE15917229D7D0076473D /* betBoxBgDisabled.png */; };
 		CE6CE15D17229E190076473D /* betBoxBg-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE15B17229E190076473D /* betBoxBg-hd.png */; };
 		CE6CE15E17229E190076473D /* betBoxBgDisabled-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6CE15C17229E190076473D /* betBoxBgDisabled-hd.png */; };
@@ -241,6 +241,8 @@
 		CE11B1741716D391002510CC /* transitionUp-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "transitionUp-hd.png"; path = "Assets/transitionUp-hd.png"; sourceTree = "<group>"; };
 		CE11B1751716D391002510CC /* transitionUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = transitionUp.png; path = Assets/transitionUp.png; sourceTree = "<group>"; };
 		CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdLoginHandler.m; sourceTree = "<group>"; };
+		CE21CBCD17253B50005B1606 /* ReadingCardsLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadingCardsLayer.h; sourceTree = "<group>"; };
+		CE21CBCE17253B50005B1606 /* ReadingCardsLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReadingCardsLayer.m; sourceTree = "<group>"; };
 		CE3FDD2A17119642002C7076 /* CCScrollLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCScrollLayer.h; sourceTree = "<group>"; };
 		CE3FDD2B17119642002C7076 /* CCScrollLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCScrollLayer.m; sourceTree = "<group>"; };
 		CE3FDF031711A3CA002C7076 /* CCScrollLayerTestLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCScrollLayerTestLayer.h; sourceTree = "<group>"; };
@@ -478,8 +480,6 @@
 		CE66D7331711847500EA3569 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_CocosDenshion.txt; path = libs/LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		CE66D7341711847500EA3569 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE_Kazmath.txt; path = libs/LICENSE_Kazmath.txt; sourceTree = "<group>"; };
 		CE6CE1541722856E0076473D /* betBoxBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = betBoxBg.png; path = Assets/betBoxBg.png; sourceTree = "<group>"; };
-		CE6CE156172285E90076473D /* BetBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BetBox.h; sourceTree = "<group>"; };
-		CE6CE157172285E90076473D /* BetBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BetBox.m; sourceTree = "<group>"; };
 		CE6CE15917229D7D0076473D /* betBoxBgDisabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = betBoxBgDisabled.png; path = Assets/betBoxBgDisabled.png; sourceTree = "<group>"; };
 		CE6CE15B17229E190076473D /* betBoxBg-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "betBoxBg-hd.png"; path = "Assets/betBoxBg-hd.png"; sourceTree = "<group>"; };
 		CE6CE15C17229E190076473D /* betBoxBgDisabled-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "betBoxBgDisabled-hd.png"; path = "Assets/betBoxBgDisabled-hd.png"; sourceTree = "<group>"; };
@@ -1274,8 +1274,8 @@
 				CE02C0E7171C189900EC6C00 /* UserCard.m */,
 				CE0FBFCE171F8FB0003FE7BE /* AvatarInfoBox.h */,
 				CE0FBFCF171F8FB0003FE7BE /* AvatarInfoBox.m */,
-				CE6CE156172285E90076473D /* BetBox.h */,
-				CE6CE157172285E90076473D /* BetBox.m */,
+				CE21CBCD17253B50005B1606 /* ReadingCardsLayer.h */,
+				CE21CBCE17253B50005B1606 /* ReadingCardsLayer.m */,
 			);
 			name = Scenes;
 			sourceTree = "<group>";
@@ -1547,7 +1547,7 @@
 				CE0FBFD0171F8FB0003FE7BE /* AvatarInfoBox.m in Sources */,
 				CE0FBFD3171FA901003FE7BE /* CardPlayingHandler.m in Sources */,
 				CED386EF1720F4FC001CE11C /* ProfilePanel.m in Sources */,
-				CE6CE158172285E90076473D /* BetBox.m in Sources */,
+				CE21CBCF17253B50005B1606 /* ReadingCardsLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

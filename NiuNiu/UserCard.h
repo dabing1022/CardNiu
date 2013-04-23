@@ -41,7 +41,7 @@ typedef enum
     FANG = 1
 }CardType;
 
-@interface UserCard : CCSprite
+@interface UserCard : CCSprite<CCTargetedTouchDelegate>
 {
     BOOL _isFront;
     BOOL _isPopup;

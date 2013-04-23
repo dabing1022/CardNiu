@@ -10,9 +10,9 @@
 #import "GCDAsyncSocketHelper.h"
 #import "GameData.h"
 #import "User.h"
+#import "UserCard.h"
 
 @implementation CardPlayingHandler
-
 //处理玩家本人进入牌桌
 + (void)processEnterDeskData:(NSData *)data
 {
@@ -21,7 +21,6 @@
     [[GameData sharedGameData]player].roleTitle = [dic objectForKey:@"userTitle"];
     [[GameData sharedGameData]player].tableID = [[dic objectForKey:@"tableID"]intValue];
     [[GameData sharedGameData]player].chairID = [[dic objectForKey:@"chairID"]intValue];
-    CCLOG(@"CardPlayingHandler--->23hang playerchairID: %d", [[dic objectForKey:@"chairID"]intValue]);
     [[GameData sharedGameData]player].posID = 2;
     
     NSArray *otherPlayers = (NSArray *)[dic objectForKey:@"otherPlayers"];
@@ -80,6 +79,21 @@
     return betArr;
 }
 
+//处理其他玩家下注结果
++ (NSDictionary *)processOtherPlayerBetResult:(NSData *)data
+{
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    return dic;
+}
+
+//进入看牌阶段，处理5张牌具体数据
++ (NSArray *)processCardData:(NSData *)data
+{
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    NSArray *cardArr = (NSArray *)[dic objectForKey:@"cards"];
+    return cardArr;
+}
+
 + (User *)user:(NSDictionary *)userDic
 {
     User *user = [User userWithUserID:[userDic objectForKey:@"userID"]
@@ -93,8 +107,6 @@
     user.tableID = [[userDic objectForKey:@"tableID"]intValue];
     user.chairID = [[userDic objectForKey:@"chairID"]intValue];
     user.posID = [User chairID2posID:user.chairID];
-    CCLOG(@"CardPlayingHandler.h-->user-->posID:%d", user.posID);
-    CCLOG(@"CardPlayingHandler.h-->user-->roleTitle:%@", user.roleTitle);
     return  user;
 }
 

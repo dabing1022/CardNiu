@@ -16,7 +16,8 @@ enum{
     kTagMenuGrab,
     kTagZSymbol,
     kTagCountDownLabelTTF,
-    kTagBetBoxes
+    kTagBetRatioMenu,
+    kTagReadingCardsLayer
 };
 
 //倒计时时间长度
@@ -46,9 +47,9 @@ typedef enum
 
 //下注前注币数据盒子坐标位置(玩家本人)
 #define BET_BOX_POS_ID0 CGPointMake(122, 84)
-#define BET_BOX_POS_ID1 CGPointMake(222, 84)
-#define BET_BOX_POS_ID2 CGPointMake(322, 84)
-#define BET_BOX_POS_ID3 CGPointMake(422, 84)
+#define BET_BOX_POS_ID1 CGPointMake(182, 84)
+#define BET_BOX_POS_ID2 CGPointMake(242, 84)
+#define BET_BOX_POS_ID3 CGPointMake(302, 84)
 
 //下注后注币数据盒子飞向玩家最后的坐标位置(6个玩家)
 #define BET_BOX_FLYTO_POS_ID0 CGPointMake(55, 370)
@@ -82,8 +83,13 @@ typedef enum
     CCMenuItemImage *_menuItemNotGrabZ;
     CCMenu *_menuGrabZ;
     
+    CCMenuItemImage *_betRatioItem1;
+    CCMenuItemImage *_betRatioItem2;
+    CCMenuItemImage *_betRatioItem3;
+    CCMenuItemImage *_betRatioItem4;
+    CCMenu *_betRatioMenu;
+    
     NSMutableArray *_allUserCardsArr;
-    NSMutableArray *_allBetBoxesArr;
     
     CCSprite *_zSymbol;
     CCSprite *_countDown;
@@ -92,6 +98,11 @@ typedef enum
     int _timeLeft;
     int _countDownType;
     CCLabelTTF *_countDownLabelTTF;
+    
+    //玩家下注结果显示字典表，键为userID
+    NSMutableDictionary *_betResultDic;
+    
+    CCLayer *_readingCardsLayer;
 }
 
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeLeftGestureRecognizer;

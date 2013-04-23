@@ -15,6 +15,8 @@
 + (User *)processOtherPlayerIn:(NSData *)data;
 + (User *)processViewProfile:(NSData *)data;
 + (NSString *)processGrabZ:(NSData *)data;
-+ (NSString *)ProcessGrabResult:(NSData *)data;
++ (NSString *)processGrabResult:(NSData *)data;
 + (NSArray *)processStartBet:(NSData *)data;
++ (NSDictionary *)processOtherPlayerBetResult:(NSData *)data;
++ (NSArray *)processCardData:(NSData *)data;
 @end

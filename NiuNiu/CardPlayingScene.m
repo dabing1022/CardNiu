@@ -16,7 +16,8 @@
 #import "AvatarInfoBox.h"
 #import "ProfilePanel.h"
 #import "UserCard.h"
-#import "BetBox.h"
+#import "ReadingCardsLayer.h"
+
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
@@ -48,7 +49,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
         
         _allUserCardsArr = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
-        _allBetBoxesArr = [[NSMutableArray alloc]initWithCapacity:4];
+        _betResultDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
                 
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
@@ -58,7 +59,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         label.tag = 5;
         
         [self drawGrabZ];
-        [self drawCountDownLabelTTF];        
+        [self drawCountDownLabelTTF];
         
         _avatarPosArr = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:AVARTAR_POS_ID0],
                                                   [NSValue valueWithCGPoint:AVARTAR_POS_ID1],
@@ -98,7 +99,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 #pragma mark - drawStuff
 - (void)drawCountDownLabelTTF
 {
-    _countDownLabelTTF = [CCLabelTTF labelWithString:@"00" fontName:@"Arial" fontSize:24];
+    _countDownLabelTTF = [CCLabelTTF labelWithString:@"" fontName:@"Arial" fontSize:24];
     CGSize size = [[CCDirector sharedDirector]winSize];
     [_countDownLabelTTF setPosition:CGPointMake(size.width/2, size.height/2)];
     [self addChild:_countDownLabelTTF z:kTagCountDownLabelTTF tag:kTagCountDownLabelTTF];
@@ -122,14 +123,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [_menuGrabZ alignItemsHorizontallyWithPadding:20];
     [self addChild:_menuGrabZ z:kTagMenuGrab tag:kTagMenuGrab];
     _menuGrabZ.position = ccp(252, 92);
-    [_menuGrabZ setVisible:NO];
-}
-
-- (void)sendServerWithGrab:(BOOL)choice
-{
-    NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:choice] forKey:@"grab"];
-    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
-    [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
     [_menuGrabZ setVisible:NO];
 }
 
@@ -191,6 +184,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [transitionDownSpr runAction:moveDown];
 }
 
+#pragma mark - onEnter onExit
 - (void)onEnter
 {
     if([[GCDAsyncSocketHelper sharedHelper]cardSocket].isDisconnected)
@@ -218,9 +212,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     self.swipeRightGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
     
-    //接收来自BetBox选择下注的通知
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(removeAllBetBoxesExcept:) name:@"didChooseRatio" object:nil];
-  
     [super onEnter];
     LOG_FUN_DID;
 }
@@ -231,9 +222,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeRightGestureRecognizer];
     [_activityIndicatorView stopAnimating];
     [_activityIndicatorView removeFromSuperview];
-    
-    //移除来自BetBox选择下注的通知
-    [[NSNotificationCenter defaultCenter]removeObserver:self];
     
     [super onExit];
     LOG_FUN_DID;
@@ -306,7 +294,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         CCLOG(@"没有庄家，进行抢庄");
         [_menuGrabZ setVisible:YES];
         [self playSendCardsAnimation];
-        //抢庄倒计时
         [self countDownBeginWith:kCDTimeGrabZ];
     }else{//庄家已经存在
         CCLOG(@"庄家已经存在，不用抢庄");
@@ -318,7 +305,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)countDownBeginWith:(int)countDownTime
 {
     _timeLeft = countDownTime;
-    [_countDownLabelTTF setVisible:YES];
     switch (countDownTime) {
         case kCDTimeGrabZ:
             [self schedule:@selector(countDownWithGrabZType:) interval:1.0];
@@ -333,6 +319,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
             NSAssert(NO, @"无效倒计时类型");
             break;
     }
+    [_countDownLabelTTF setVisible:YES];
 }
 
 - (void)countDownWithGrabZType:(ccTime)dt
@@ -345,7 +332,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self unschedule:@selector(countDownWithGrabZType:)];
         CCLOG(@"GrabZ TIME UP!");
         if(_menuGrabZ.visible){
-            [self sendServerWithGrab:NO];
+            [_menuGrabZ setVisible:NO];    
         }
     }
 }
@@ -419,6 +406,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     CGPoint targetPos = [[_avatarPosArr objectAtIndex:zUser.posID]CGPointValue];
     id flyTo = [CCMoveTo actionWithDuration:0.5 position:targetPos];
     [_zSymbol runAction:flyTo];
+    
+    [self countDownBeginWith:kCDTimeBet];
 }
 
 //开始下注
@@ -430,36 +419,103 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     for(int i = 0;i < 4;i++)
     {
         NSDictionary *aBetBoxInfoDic = (NSDictionary *)[betArr objectAtIndex:i];
-        BetBox *betBox = [BetBox betBoxWithRatio:[[aBetBoxInfoDic objectForKey:@"ratio"]intValue]
-                                          status:[[aBetBoxInfoDic objectForKey:@"status"]boolValue]];
-        [self addChild:betBox z:kTagBetBoxes tag:kTagBetBoxes];
-        [betBox setPosition:[[_betBoxesPosArr objectAtIndex:i] CGPointValue]];
-        [_allBetBoxesArr addObject:betBox];
+        int ratio = [[aBetBoxInfoDic objectForKey:@"ratio"]intValue];
+        BOOL state = [[aBetBoxInfoDic objectForKey:@"status"]boolValue];
+        CCSprite *nomal = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioNomal%d.png",ratio]];
+        CCSprite *disabled = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioDisabled%d.png",ratio]];
+        if(i == 0){
+            _betRatioItem1 = [CCMenuItemImage itemWithNormalSprite:nomal selectedSprite:nil disabledSprite:disabled
+                                                             block:^(id sender){
+                                                                 [self sendServerWithBetRatio:ratio];
+                                                             }];
+            state?(_betRatioItem1.isEnabled=YES):(_betRatioItem1.isEnabled=NO);
+            [_betRatioItem1 setPosition:[[_betBoxesPosArr objectAtIndex:i] CGPointValue]];
+        }else if(i == 1){
+            _betRatioItem2 = [CCMenuItemImage itemWithNormalSprite:nomal selectedSprite:nil disabledSprite:disabled
+                                                             block:^(id sender){
+                                                                 [self sendServerWithBetRatio:ratio];
+                                                             }];
+            state?(_betRatioItem2.isEnabled=YES):(_betRatioItem2.isEnabled=NO);
+            [_betRatioItem2 setPosition:[[_betBoxesPosArr objectAtIndex:i] CGPointValue]];
+        }else if(i == 2){
+            _betRatioItem3 = [CCMenuItemImage itemWithNormalSprite:nomal selectedSprite:nil disabledSprite:disabled
+                                                             block:^(id sender){
+                                                                 [self sendServerWithBetRatio:ratio];
+                                                             }];
+            state?(_betRatioItem3.isEnabled=YES):(_betRatioItem3.isEnabled=NO);
+            [_betRatioItem3 setPosition:[[_betBoxesPosArr objectAtIndex:i] CGPointValue]];
+        }else if(i == 3){
+            _betRatioItem4 = [CCMenuItemImage itemWithNormalSprite:nomal selectedSprite:nil disabledSprite:disabled
+                                                             block:^(id sender){
+                                                                 [self sendServerWithBetRatio:ratio];
+                                                             }];
+            state?(_betRatioItem4.isEnabled=YES):(_betRatioItem4.isEnabled=NO);
+            [_betRatioItem4 setPosition:[[_betBoxesPosArr objectAtIndex:i] CGPointValue]];
+        }
     }
-    [self countDownBeginWith:kCDTimeBet];
+    _betRatioMenu = [CCMenu menuWithItems:_betRatioItem1,_betRatioItem2,_betRatioItem3,_betRatioItem4, nil];
+    [_betRatioMenu setPosition:CGPointZero];
+    [_betRatioMenu setScale:0.8];
+    [self addChild:_betRatioMenu z:kTagBetRatioMenu tag:kTagBetRatioMenu];
 }
 
-- (void)removeAllBetBoxesExcept:(NSNotification *)notification
+- (void)sendServerWithGrab:(BOOL)choice
 {
-    BetBox *betBoxHitted = (BetBox *)[notification.userInfo objectForKey:@"betBox"];
-    for(BetBox *betBox in _allBetBoxesArr)
-    {
-        if(betBox == betBoxHitted) continue;
-        [self removeChild:betBox cleanup:YES];
-        [_allBetBoxesArr removeObject:betBox];
-    }
-    
-    id moveTo = [CCMoveTo actionWithDuration:0.5 position:[[_betBoxesFlyToPosArr objectAtIndex:2]CGPointValue]];
-    id easeIn = [CCEaseIn actionWithAction:moveTo rate:2];
-    [betBoxHitted runAction:easeIn];
+    NSDictionary *dic = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:choice] forKey:@"grab"];
+    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
+    [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
+    [_menuGrabZ setVisible:NO];
 }
 
+- (void)sendServerWithBetRatio:(int)ratio
+{
+    [_betRatioMenu removeFromParentAndCleanup:YES];
+    
+    CCSprite *betBox = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioNomal%d.png",ratio]];
+    [self addChild:betBox z:kTagBetRatioMenu];
+    CGPoint targetPos = [[_betBoxesFlyToPosArr objectAtIndex:2]CGPointValue];
+    CCLOG(@"tagetPos :%f, %f", targetPos.x, targetPos.y);
+    [betBox setPosition:targetPos];
+    
+    NSDictionary *betChoice = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:ratio] forKey:@"ratio"];
+    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_START_BET contentDic:betChoice];
+    [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:CMD_START_BET socketType:CARD_SOCKET];
+}
+
+//处理其他玩家下注结果
+- (void)showPlayerBetResult:(NSDictionary *)betResult
+{
+    [_betRatioMenu removeFromParentAndCleanup:YES];
+    
+    int ratio = [[betResult objectForKey:@"ratio"]intValue];
+    NSString *userID = [betResult objectForKey:@"userID"];
+    CCSprite *betBox = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioNomal%d.png",ratio]];
+    [self addChild:betBox z:kTagBetRatioMenu];
+    
+    User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
+    CGPoint targetPos = [[_betBoxesFlyToPosArr objectAtIndex:user.posID]CGPointValue];
+    CCLOG(@"tagetPos :%f, %f", targetPos.x, targetPos.y);
+    [betBox setPosition:targetPos];
+    
+    [_betResultDic setObject:betBox forKey:userID];
+}
+
+//进入看牌阶段
+- (void)startReadingCards:(NSArray *)cardArray
+{
+    CCLOG(@"startReadingCards");
+    [self countDownBeginWith:kCDTimeReadCards];
+    
+    
+    
+    _readingCardsLayer = [ReadingCardsLayer layerWithCardsArray:cardArray];
+    [self addChild:_readingCardsLayer z:kTagReadingCardsLayer tag:kTagReadingCardsLayer];
+}
 
 #pragma mark - dealloc
 - (void) dealloc
 {
     [_allUserCardsArr release];
-    [_allBetBoxesArr release];
     
     [_avatarPosArr release];
     [_cardPosArr release];
