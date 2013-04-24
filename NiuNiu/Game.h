@@ -20,6 +20,7 @@
 #define CMD_START_BET               2007//开始下注（贤家收到，庄家不会收到)
 #define CMD_OTHER_PLAYER_BET_RESULT 2008//其他玩家下注结果
 #define CMD_START_READING_CARDS     2009//进入看牌阶段，接收5张牌具体数据
+#define CMD_START_SHOW_CARDS        2010//玩家确定显示亮牌
 
 
 

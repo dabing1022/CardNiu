@@ -45,6 +45,9 @@
     NSMutableArray *_cardsDataArr;
     //每一局中用户选择的牌
     NSMutableArray *_selectedCardsDataArr;
+    //每一局中玩家确认发送给服务器的牌
+    //如牌数值数组为[2, 3, 4, 8, 10],玩家选择的为[4, 8, 3, 10],则发送给服务端的manualLength == 4, 数组为[4, 8, 3, 10, 2]
+    NSMutableArray *_sendToServerArr;
 }
 
 @property(nonatomic, retain)NSString *userID;
@@ -64,6 +67,7 @@
 @property(nonatomic, retain)NSString *roleTitle;
 @property(nonatomic, retain)NSMutableArray *cardsDataArr;
 @property(nonatomic, retain)NSMutableArray *selectedCardsDataArr;
+@property(nonatomic, retain)NSMutableArray *sendToServerArr;
 
 
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;

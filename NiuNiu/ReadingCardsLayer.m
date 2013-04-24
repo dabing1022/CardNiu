@@ -11,6 +11,8 @@
 #import "CardsHelper.h"
 #import "GameData.h"
 #import "User.h"
+#import "Game.h"
+#import "GCDAsyncSocketHelper.h"
 
 @implementation ReadingCardsLayer
 
@@ -35,6 +37,8 @@
         [self drawUserCards];
         [self drawResultNiu:0];
         [self drawConfirmMenu];
+
+        _cardsIndex = [[NSMutableArray alloc]init];
     }
     return self;
 }
@@ -64,7 +68,33 @@
                                               selectedSprite:[CCSprite spriteWithSpriteFrameName:@"confirmSelected.png"]
                                                        block:^(id sender){
                                                            CCLOG(@"确认牌型选择");
+                                                           [self sendUserDecision];
                                                        }];
+    [_confirmMenuItem setPosition:CGPointMake(size.width / 2, 100)];
+    _confirmMenu = [CCMenu menuWithItems:_confirmMenuItem, nil];
+    [_confirmMenu setPosition:CGPointZero];
+    [self addChild:_confirmMenu];
+}
+
+- (void)sendUserDecision
+{
+    NSNumber *manualLength = [NSNumber numberWithInt:[[[[GameData sharedGameData]player]selectedCardsDataArr]count]];
+    NSMutableArray *sendToServer = [[[GameData sharedGameData]player]sendToServerArr];
+    
+    
+    NSMutableArray *cardsArray = [[[NSMutableArray alloc]init]autorelease];
+    for(int i = 0; i < [sendToServer count]; i++){
+        CardData *cardData = [sendToServer objectAtIndex:i];
+        NSMutableDictionary *singleCardDataDic = [[[NSMutableDictionary alloc]init]autorelease];
+        [singleCardDataDic setObject:[NSNumber numberWithInt:cardData.color] forKey:@"color"];
+        [singleCardDataDic setObject:[NSNumber numberWithInt:cardData.value] forKey:@"value"];
+        [cardsArray addObject:singleCardDataDic];
+    }    
+    
+    NSDictionary *dic = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:manualLength,cardsArray,nil]
+                                                    forKeys:[NSArray arrayWithObjects:@"manualLength",@"cards",nil]];
+    NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_START_SHOW_CARDS contentDic:dic];
+    [[GCDAsyncSocketHelper sharedHelper] writeData:data withTimeout:-1 tag:CMD_START_SHOW_CARDS socketType:CARD_SOCKET];
 }
 
 //绘制下方的5张牌
@@ -139,15 +169,19 @@
     [self scheduleOnce:@selector(analysisWholeCards) delay:1];
 }
 
+//先对5张牌进行分析 
 - (void)analysisWholeCards
 {
     [self unschedule:@selector(analysisWholeCards)];
     NSDictionary *resultDic = [[CardsHelper sharedHelper]analysisWholeCards:_cardsDataArray];
     int cardType = [[resultDic objectForKey:@"cardType"]intValue];
+    NSArray *cardsIndex = [resultDic objectForKey:@"cardsIndex"];
     CCLOG(@"cardType is %d", cardType);
     if(cardType == ZHA_DAN || cardType == WU_HUA){
         [self showResultNiu:cardType];
         _isZhaDanOrWuHua = YES;
+        NSMutableArray *sendToServer = [[CardsHelper sharedHelper]sortCardsDataByCardsIndex:cardsIndex cardsDataArray:_cardsDataArray];
+        [[[GameData sharedGameData]player]setSendToServerArr:sendToServer];
     }else{
         _isZhaDanOrWuHua = NO;
     }
@@ -167,14 +201,20 @@
 - (void)handleCalCard:(UITouch *)touch
 {
     NSMutableArray *selectedArr = [[[GameData sharedGameData]player]selectedCardsDataArr];
-    for(UserCard *card in _userCardsArray){
+    
+    for(int i = 0; i < [_userCardsArray count]; i++){
+        UserCard *card = [_userCardsArray objectAtIndex:i];
         if([self containsTouchLocation:touch node:card]){
             [card handlePopAndDown];
             if(card.isPopup){
                 [selectedArr addObject:card.cardData];
+                [_cardsIndex addObject:[NSNumber numberWithInt:i]];
                 CCLOG(@"selectedCardsDataArr length %d",[selectedArr count]);
             }else{
                 [selectedArr removeObject:card.cardData];
+                int m = [[CardsHelper sharedHelper]findIndexValueEqualsTo:i inArray:_cardsIndex];
+                CCLOG(@"handleCalCard m: %d", m);
+                [_cardsIndex removeObjectAtIndex:m];
                 CCLOG(@"selectedCardsDataArr length %d",[selectedArr count]);
             }
         }
@@ -189,7 +229,14 @@
     }else{
         [_resultNiu setVisible:NO];
     }
+    
+    NSMutableArray *senderToServerArray = [[CardsHelper sharedHelper]sortCardsDataByCardsIndex:_cardsIndex
+                                                                                cardsDataArray:_cardsDataArray];
+    
+    [[[GameData sharedGameData]player] setSendToServerArr:senderToServerArray];
 }
+
+
 
 #pragma mark - touch delegate
 - (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
@@ -247,6 +294,7 @@
     [_userCardsArray release];
     [_fifthCard release];
     [_resultNiu release];
+    [_cardsIndex release];
     [super dealloc];
 }
 @end

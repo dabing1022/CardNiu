@@ -28,4 +28,6 @@
 - (NSDictionary *)analysisWholeCards:(NSMutableArray *)cardsDataArr;
 //分析玩家本人所选的张数所形成的牌型
 - (NSDictionary *)analysisSelectedCards:(NSMutableArray *)selectedCardsDataArr wholeCardsDataArr:(NSMutableArray *)wholeCardsDataArr;
+- (int)findIndexValueEqualsTo:(int)value inArray:(NSArray *)array;
+- (NSMutableArray *)sortCardsDataByCardsIndex:(NSArray *)cardsIndex cardsDataArray:(NSMutableArray *)cardsDataArray;
 @end

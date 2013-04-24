@@ -221,6 +221,31 @@ static CardsHelper *_instance = nil;
     return nil;
 }
 
+//cardsDataArray [ 3CardData, 4CardData, 8CardData, 9CardData, 10CardData ]
+//cardsIndex    [ 1, 3, 4 ]  --> 1，3，4作为cardsDataArray的索引去取其中的值
+//返回 [ 4CardData, 9CardData, 10CardData, 3CardData, 8CardData ]
+- (NSMutableArray *)sortCardsDataByCardsIndex:(NSArray *)cardsIndex cardsDataArray:(NSMutableArray *)cardsDataArray
+{
+    for(int i = 0; i < [cardsIndex count]; i++){
+        int index = [[cardsIndex objectAtIndex:i]intValue];
+        id data = [cardsDataArray objectAtIndex:index];
+        [cardsDataArray removeObjectAtIndex:index];
+        [cardsDataArray insertObject:data atIndex:i];
+    }
+    return cardsDataArray;
+}
+
+//找到数组中和给定值相等的值所在的索引
+- (int)findIndexValueEqualsTo:(int)value inArray:(NSArray *)array
+{
+    for(int i = 0; i < [array count]; i++)
+    {
+        if([[array objectAtIndex:i]intValue] == value)
+            return i;
+    }
+    return -1;
+}
+
 - (BOOL)isHuaSe:(int)value
 {
     return (value >= 11 && value <= 13);

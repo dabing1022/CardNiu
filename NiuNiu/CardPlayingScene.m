@@ -96,6 +96,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         //清空玩家本人上把的牌数据
         [[[[GameData sharedGameData]player]cardsDataArr]removeAllObjects];
         [[[[GameData sharedGameData]player]selectedCardsDataArr]removeAllObjects];
+        [[[[GameData sharedGameData]player]sendToServerArr]removeAllObjects];
     }
     LOG_FUN_DID;
     return self;
