@@ -35,16 +35,64 @@ static CardsHelper *_instance = nil;
     return self;
 }
 
-//分析牌数据
-
-
-- (CardData)getCardDataFromCardDic:(NSDictionary *)cardDic
+//分析5张牌数据
+- (NSDictionary *)analysisWholeCards:(NSMutableArray *)cardsDataArr
 {
-    CardData cardData;
-    cardData.color = [[cardDic objectForKey:@"color"]intValue];
-    cardData.value = [[cardDic objectForKey:@"value"]intValue];
-    return cardData;
+    if([self judgeBomb:cardsDataArr]){
+        return [self judgeBomb:cardsDataArr];
+    }
+    if([self judgeWuHua:cardsDataArr]){
+        return [self judgeWuHua:cardsDataArr];
+    }
+    if([self judgeNomalNiu:cardsDataArr]){
+        return [self judgeNomalNiu:cardsDataArr];
+    }
+    
+    NSNumber *cardType = [NSNumber numberWithInt:NIU_0];
+    NSDictionary *index = nil;
+    NSDictionary *resultWuNiuDic = [[NSDictionary alloc]initWithObjectsAndKeys:cardType, @"cardType", index, @"cardsIndex", nil];
+    return resultWuNiuDic;
 }
+
+- (NSDictionary *)analysisSelectedCards:(NSMutableArray *)selectedCardsDataArr wholeCardsDataArr:(NSMutableArray *)wholeCardsDataArr
+{
+    NSUInteger selectedLength = [selectedCardsDataArr count];
+    int selectedSum = [self getCardsSum:selectedCardsDataArr];
+    int wholeSum = [self getCardsSum:wholeCardsDataArr];
+    int leftValue = (wholeSum - selectedSum) % 10;
+    CCLOG(@"selectedSum: %d",selectedSum);
+    CCLOG(@"wholeSum: %d", wholeSum);
+    CCLOG(@"leftValue: %d", leftValue);
+    NSNumber *cardType;
+    NSArray *index;
+    NSDictionary *resultDic;
+    if(selectedLength == 3 && selectedSum % 10 == 0){
+        cardType = [NSNumber numberWithInt:leftValue];
+        index = [self getOneArrIndexInAnotherArr:selectedCardsDataArr wholeArr:wholeCardsDataArr];
+    }else{
+        cardType = [NSNumber numberWithInt:NIU_0];
+        index = nil;        
+    }
+    resultDic = [[NSDictionary alloc]initWithObjectsAndKeys:cardType, @"cardType", index, @"cardsIndex", nil];
+    return resultDic;
+}
+
+- (NSArray *)getOneArrIndexInAnotherArr:(NSArray *)subArr wholeArr:(NSArray *)wholeArr
+{
+    int subArrLen = [subArr count];
+    int wholeArrLen = [wholeArr count];
+    NSMutableArray *index = [NSMutableArray arrayWithCapacity:subArrLen];
+    for(int i = 0; i < subArrLen; i++){
+        for(int j = 0; j < wholeArrLen; j++){
+            if([subArr objectAtIndex:i] == [wholeArr objectAtIndex:j]){
+                [index addObject:[NSNumber numberWithInt:j]];
+            }
+        }
+    }
+    NSArray *indexSorted = [index sortedArrayUsingSelector:@selector(compare:)];
+    return indexSorted;
+}
+
 
 //得到牌值的真实值
 //1-->10为1-->10,而11、12、13为10
@@ -58,13 +106,12 @@ static CardsHelper *_instance = nil;
     return -1;
 }
 
-//得到5张牌的真实值总和
-- (int)getCardsSum:(NSArray *)cardsDataArr
+//得到若干牌的真实值总和
+- (int)getCardsSum:(NSMutableArray *)cardsDataArr
 {
     int sum = 0;
     for(int i = 0; i < [cardsDataArr count]; i++){
-        NSDictionary *singleCardData = [cardsDataArr objectAtIndex:i];
-        CardData cardData = [self getCardDataFromCardDic:singleCardData];
+        CardData *cardData = [cardsDataArr objectAtIndex:i];
         sum += [self getNiuRealValue:cardData.value];
     }
     return sum;
@@ -72,7 +119,7 @@ static CardsHelper *_instance = nil;
 
 //判断是否是4炸，返回一个字典
 //字典内：bomb = YES/NO, cardIndex = [0, 2, 3, 4]
-- (NSDictionary *)judgeBomb:(NSArray *)cardsDataArr
+- (NSDictionary *)judgeBomb:(NSMutableArray *)cardsDataArr
 {
     NSMutableArray *valueArr = [self getValueArrayBy:cardsDataArr];
         
@@ -88,12 +135,13 @@ static CardsHelper *_instance = nil;
                        && [[valueArr objectAtIndex:m]intValue] == k
                        && [[valueArr objectAtIndex:n]intValue] == k)
                     {
-                        NSNumber *bomb = [NSNumber numberWithBool:YES];
+                        NSNumber *cardType = [NSNumber numberWithInt:ZHA_DAN];
                         NSArray *index = [NSArray arrayWithObjects:[NSNumber numberWithInt:i],
                                                                    [NSNumber numberWithInt:j],
                                                                    [NSNumber numberWithInt:m],
                                                                    [NSNumber numberWithInt:n], nil];
-                        dic = [[NSDictionary alloc]initWithObjectsAndKeys:bomb,@"bomb",index,@"cardsIndex", nil];
+                        dic = [[NSDictionary alloc]initWithObjectsAndKeys:cardType,@"cardType",index,@"cardsIndex", nil];
+                        CCLOG(@"炸弹！");
                         return dic;
                     }
                 }
@@ -103,53 +151,51 @@ static CardsHelper *_instance = nil;
     return nil;
 }
 
-- (NSMutableArray *)getValueArrayBy:(NSArray *)cardsDataArr
+- (NSMutableArray *)getValueArrayBy:(NSMutableArray *)cardsDataArr
 {
     NSMutableArray *valueArr = [NSMutableArray arrayWithCapacity:[cardsDataArr count]];
     for(int i = 0; i < [cardsDataArr count]; i++){
-        NSDictionary *singleCardData = [cardsDataArr objectAtIndex:i];
-        CardData cardData = [self getCardDataFromCardDic:singleCardData];
+        CardData *cardData = [cardsDataArr objectAtIndex:i];
         [valueArr addObject:[NSNumber numberWithInt:cardData.value]];
     }
     return valueArr;
 }
 
-- (NSMutableArray *)getRealValueArrayBy:(NSArray *)cardsDataArr
+- (NSMutableArray *)getRealValueArrayBy:(NSMutableArray *)cardsDataArr
 {
     NSMutableArray *realValueArr = [NSMutableArray arrayWithCapacity:[cardsDataArr count]];
     for(int i = 0; i < [cardsDataArr count]; i++){
-        NSDictionary *singleCardData = [cardsDataArr objectAtIndex:i];
-        CardData cardData = [self getCardDataFromCardDic:singleCardData];
+        CardData *cardData = [cardsDataArr objectAtIndex:i];
         [realValueArr addObject:[NSNumber numberWithInt:[self getNiuRealValue:cardData.value]]];
     }
     return realValueArr;
 }
 
 //判断5花牛
-- (NSDictionary *)judgeWuHua:(NSArray *)cardsDataArr
+- (NSDictionary *)judgeWuHua:(NSMutableArray *)cardsDataArr
 {
-    NSMutableArray *valueArr = [self getValueArrayBy:cardsDataArr];
-    for(int i = 0; i < [valueArr count]; i++){
-        int value = [[valueArr objectAtIndex:i]intValue];
-        if(![self isHuaSe:value]){
+    for(int i = 0; i < [cardsDataArr count]; i++){
+        CardData *cardData =  [cardsDataArr objectAtIndex:i];
+        if(![self isHuaSe:cardData.value]){
             return nil;
         }
     }
-    NSNumber *wuhua = [NSNumber numberWithBool:YES];
+    NSNumber *cardType = [NSNumber numberWithInt:WU_HUA];
     NSArray *index = [NSArray arrayWithObjects:[NSNumber numberWithInt:0],
                                                [NSNumber numberWithInt:1],
                                                [NSNumber numberWithInt:2],
                                                [NSNumber numberWithInt:3],
                                                [NSNumber numberWithInt:4], nil];
 
-    NSDictionary *dic = [[NSDictionary alloc]initWithObjectsAndKeys:wuhua,@"wuhua",index,@"cardsIndex", nil];
+    NSDictionary *dic = [[NSDictionary alloc]initWithObjectsAndKeys:cardType,@"cardType",index,@"cardsIndex", nil];
+    CCLOG(@"五花牛!");
     return dic;
 }
 
 //判断一般牌型（无牛、牛一、牛二、、、牛牛）
-- (NSDictionary *)judgeNomalNiu:(NSArray *)cardsDataArr
+- (NSDictionary *)judgeNomalNiu:(NSMutableArray *)cardsDataArr
 {
-    NSMutableArray *realValueArr = [self getValueArrayBy:cardsDataArr];
+    NSMutableArray *realValueArr = [self getRealValueArrayBy:cardsDataArr];
     int sum = [self getCardsSum:cardsDataArr];
     int i, j, k, tempSum;
     NSNumber *cardType;
@@ -166,6 +212,7 @@ static CardsHelper *_instance = nil;
                                                       [NSNumber numberWithInt:k], nil];
 
                     dic = [[NSDictionary alloc]initWithObjectsAndKeys:cardType,@"cardType",index,@"cardsIndex", nil];
+                    CCLOG(@"牛%@!",cardType);
                     return dic;
                 }
             }

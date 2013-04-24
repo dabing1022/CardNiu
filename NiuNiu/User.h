@@ -42,7 +42,9 @@
     //角色职业头衔
     NSString *_roleTitle;//Server:userTitle
     //每一局的牌数据数组
-    NSArray *_cardsDataArr;
+    NSMutableArray *_cardsDataArr;
+    //每一局中用户选择的牌
+    NSMutableArray *_selectedCardsDataArr;
 }
 
 @property(nonatomic, retain)NSString *userID;
@@ -60,7 +62,8 @@
 @property(nonatomic, retain)NSString *familyPropertyTitle;
 @property(nonatomic, retain)NSString *gamblerTitle;
 @property(nonatomic, retain)NSString *roleTitle;
-@property(nonatomic, retain)NSArray *cardsDataArr;
+@property(nonatomic, retain)NSMutableArray *cardsDataArr;
+@property(nonatomic, retain)NSMutableArray *selectedCardsDataArr;
 
 
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;

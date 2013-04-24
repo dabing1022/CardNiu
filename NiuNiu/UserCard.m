@@ -8,20 +8,26 @@
 
 #import "UserCard.h"
 
+@implementation CardData
+@synthesize color,value;
+@end
+
+
 @implementation UserCard
 @synthesize isFront=_isFront,isPopup=_isPopup;
 
 #pragma mark - init
-- (id)initWithCardData:(CardData)cardData
+- (id)initWithCardData:(CardData *)cardData
 {
     if((self=[super init]))
     {
+        self.cardData = cardData;
         [self setFrontFace:cardData];
     }
     return self;
 }
 
-+ (id)cardWithCardData:(CardData)cardData
++ (id)cardWithCardData:(CardData *)cardData
 {
     return [[[self alloc]initWithCardData:cardData]autorelease];
 }
@@ -40,12 +46,11 @@
     return [[[self alloc]initWithBack]autorelease];
 }
 
-- (void)setFrontFace:(CardData)cardData
+- (void)setFrontFace:(CardData *)cardData
 {
-    int color = cardData.color;
-    int value = cardData.value;
+    self.cardData = cardData;
     
-    [self setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache]spriteFrameByName:[NSString stringWithFormat:@"Card%d_%d.png",color,value]]];
+    [self setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache]spriteFrameByName:[NSString stringWithFormat:@"Card%d_%d.png",_cardData.color, _cardData.value]]];
     _isFront = YES;
 }
 
@@ -108,6 +113,7 @@
 
 - (void)dealloc
 {
+    [_cardData release];
     [super dealloc];
 }
 

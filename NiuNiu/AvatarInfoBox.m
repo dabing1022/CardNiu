@@ -21,8 +21,7 @@
 {
     if((self = [super init]))
     {
-        _user = user;
-        [_user retain];
+        _user = [user retain];
         _avatarSpr = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"avatar%@.png",user.avatarID]];
         [self addChild:_avatarSpr z:0 tag:kTagAvatarSpr];
         _coinTB = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d",user.coinTB] fontName:@"Arial" fontSize:24];

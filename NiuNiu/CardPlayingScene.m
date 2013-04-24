@@ -92,6 +92,10 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
                                                          [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID5], nil];
         [_betBoxesFlyToPosArr retain];
 
+        
+        //清空玩家本人上把的牌数据
+        [[[[GameData sharedGameData]player]cardsDataArr]removeAllObjects];
+        [[[[GameData sharedGameData]player]selectedCardsDataArr]removeAllObjects];
     }
     LOG_FUN_DID;
     return self;
@@ -539,18 +543,15 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)open5cards
 {
     [self unschedule:@selector(open5cards)];
-    NSArray *cardDataArr = [[GameData sharedGameData]player].cardsDataArr;
+    NSMutableArray *cardDataArr = [[GameData sharedGameData]player].cardsDataArr;
     CGPoint openPos = [[_cardPosArr objectAtIndex:0]CGPointValue];
     for(int i = 0; i < 5; i++)
     {
         UserCard *card = (UserCard *)[_playerCardsArr objectAtIndex:i];
-        NSDictionary *singleCardData = (NSDictionary *)[cardDataArr objectAtIndex:i];
-        CardData cardData;
+        CardData *cardData = [cardDataArr objectAtIndex:i];
         id moveToOpenPos = [CCMoveTo actionWithDuration:0.5 position:CGPointMake(openPos.x + i * 50, openPos.y)];
         id easeOut = [CCEaseOut actionWithAction:moveToOpenPos rate:2];
         if(i != 4){
-            cardData.color = [[singleCardData objectForKey:@"color"]intValue];
-            cardData.value = [[singleCardData objectForKey:@"value"]intValue];
             [card setFrontFace:cardData];
         }
         [card runAction:easeOut];

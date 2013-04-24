@@ -16,13 +16,16 @@
 
 @property(nonatomic, retain) NSMutableArray *cardResultForResource;
 + (CardsHelper *)sharedHelper;
-- (CardData)getCardDataFromCardDic:(NSDictionary *)cardDic;
 - (int)getNiuRealValue:(int)value;
 - (int)getCardsSum:(NSArray *)cardsDataArr;
 //判断4炸
-- (NSDictionary *)judgeBomb:(NSArray *)cardsDataArr;
+- (NSDictionary *)judgeBomb:(NSMutableArray *)cardsDataArr;
 //判断5花牛
-- (NSDictionary *)judgeWuHua:(NSArray *)cardsDataArr;
+- (NSDictionary *)judgeWuHua:(NSMutableArray *)cardsDataArr;
 //判断一般牛
-- (NSDictionary *)judgeNomalNiu:(NSArray *)cardsDataArr;
+- (NSDictionary *)judgeNomalNiu:(NSMutableArray *)cardsDataArr;
+//分析牌型(包括4炸、5花牛、一般牛)
+- (NSDictionary *)analysisWholeCards:(NSMutableArray *)cardsDataArr;
+//分析玩家本人所选的张数所形成的牌型
+- (NSDictionary *)analysisSelectedCards:(NSMutableArray *)selectedCardsDataArr wholeCardsDataArr:(NSMutableArray *)wholeCardsDataArr;
 @end

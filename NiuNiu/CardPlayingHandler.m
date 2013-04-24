@@ -88,10 +88,19 @@
 }
 
 //进入看牌阶段，处理5张牌具体数据
-+ (NSArray *)processCardData:(NSData *)data
++ (NSMutableArray *)processCardData:(NSData *)data
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
-    NSArray *cardArr = (NSArray *)[dic objectForKey:@"cards"];
+    NSArray *cardDataDicArr = (NSArray *)[dic objectForKey:@"cards"];
+    NSMutableArray *cardArr = [NSMutableArray arrayWithCapacity:[cardDataDicArr count]];
+    for(int i = 0; i < [cardDataDicArr count]; i++){
+        NSDictionary *singleCardDataDic = [cardDataDicArr objectAtIndex:i];
+        CardData *cardData = [[CardData alloc]init];
+        cardData.color = [[singleCardDataDic objectForKey:@"color"]intValue];
+        cardData.value = [[singleCardDataDic objectForKey:@"value"]intValue];
+        [cardArr addObject:cardData];
+        [cardData release];
+    }
     [[GameData sharedGameData]player].cardsDataArr = cardArr;
     return cardArr;
 }

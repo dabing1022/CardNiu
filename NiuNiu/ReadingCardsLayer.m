@@ -1,7 +1,7 @@
 //
 //  ReadingCardsLayer.m
 //  NiuNiu
-//
+// 
 //  Created by childhood on 13-4-22.
 //
 //
@@ -9,29 +9,30 @@
 #import "ReadingCardsLayer.h"
 #import "UserCard.h"
 #import "CardsHelper.h"
+#import "GameData.h"
+#import "User.h"
 
 @implementation ReadingCardsLayer
 
 
-+ (id)layerWithCardsArray:(NSArray *)cardsArray
++ (id)layerWithCardsArray:(NSMutableArray *)cardsArray
 {
     return [[[self alloc]initWithCardsArray:cardsArray]autorelease];
 }
 
-- (id)initWithCardsArray:(NSArray *)cardsArray
+- (id)initWithCardsArray:(NSMutableArray *)cardsArray
 {
     if((self=[super initWithColor:ccc4(0, 0, 0, 128)]))
     {
         _state = kState_TheFifthCard;
         size = [[CCDirector sharedDirector]winSize];
         
-        _cardsDataArray = cardsArray;
-        [_cardsDataArray retain];
+        _cardsDataArray = [cardsArray retain];
         
         _userCardsArray = [NSMutableArray arrayWithCapacity:5];
         [_userCardsArray retain];
-        [self drawUserCards];
         
+        [self drawUserCards];
         [self drawResultNiu:0];
         [self drawConfirmMenu];
     }
@@ -42,7 +43,7 @@
 - (void)drawResultNiu:(int)result
 {
     NSString *resName = [[[CardsHelper sharedHelper]cardResultForResource]objectAtIndex:result];
-    _resultNiu = [CCSprite spriteWithSpriteFrameName:resName];
+    _resultNiu = [[CCSprite spriteWithSpriteFrameName:resName]retain];
     [self addChild:_resultNiu];
     [_resultNiu setPosition:ccp(size.width / 2, size.height / 2 + 30)];
     [_resultNiu setVisible:NO];
@@ -72,13 +73,12 @@
     UserCard *card;
     for(int i = 0;i < 5;i++)
     {
-        NSDictionary *singleCardData = (NSDictionary *)[_cardsDataArray objectAtIndex:i];
-        CardData cardData = [[CardsHelper sharedHelper]getCardDataFromCardDic:singleCardData];
+        CardData *cardData = [_cardsDataArray objectAtIndex:i];
         if(i != 4){//前4张牌显示正面
             card = [UserCard cardWithCardData:cardData];
         }else{//第5张牌显示背面
             card = [UserCard cardWithBack];
-            _fifthCard = card;
+            _fifthCard = [card retain];
         }
         [self addChild:card];
         CGPoint pos = CGPointMake(FIRST_CARD_BELOW_POS.x + CARDS_SPACING * i, FIRST_CARD_BELOW_POS.y);
@@ -136,15 +136,59 @@
         id ease = [CCEaseInOut actionWithAction:moveTo rate:2];
         [card runAction:ease];
     }
+    [self scheduleOnce:@selector(analysisWholeCards) delay:1];
+}
+
+- (void)analysisWholeCards
+{
+    [self unschedule:@selector(analysisWholeCards)];
+    NSDictionary *resultDic = [[CardsHelper sharedHelper]analysisWholeCards:_cardsDataArray];
+    int cardType = [[resultDic objectForKey:@"cardType"]intValue];
+    CCLOG(@"cardType is %d", cardType);
+    if(cardType == ZHA_DAN || cardType == WU_HUA){
+        [self showResultNiu:cardType];
+        _isZhaDanOrWuHua = YES;
+    }else{
+        _isZhaDanOrWuHua = NO;
+    }
+    //进入玩家手动凑牛阶段
+    _state = kState_CalCard;
 }
 
 - (void)openTheFifthCard
 {
-    NSDictionary *singleCardData = (NSDictionary *)[_cardsDataArray objectAtIndex:4];
-    CardData cardData = [[CardsHelper sharedHelper]getCardDataFromCardDic:singleCardData];
+    CardData *cardData = [_cardsDataArray objectAtIndex:4];
     [_fifthCard setFrontFace:cardData];
     
     [self fifthCardScaleToUpLine];
+}
+
+//点击触摸牌（凑牛操作)
+- (void)handleCalCard:(UITouch *)touch
+{
+    NSMutableArray *selectedArr = [[[GameData sharedGameData]player]selectedCardsDataArr];
+    for(UserCard *card in _userCardsArray){
+        if([self containsTouchLocation:touch node:card]){
+            [card handlePopAndDown];
+            if(card.isPopup){
+                [selectedArr addObject:card.cardData];
+                CCLOG(@"selectedCardsDataArr length %d",[selectedArr count]);
+            }else{
+                [selectedArr removeObject:card.cardData];
+                CCLOG(@"selectedCardsDataArr length %d",[selectedArr count]);
+            }
+        }
+    }
+    
+    if([selectedArr count] >= 3){
+        NSDictionary *resultDic = [[CardsHelper sharedHelper]analysisSelectedCards:selectedArr
+                                                                 wholeCardsDataArr:_cardsDataArray];
+        int cardType = [[resultDic objectForKey:@"cardType"]intValue];
+        CCLOG(@"handlerCalCard cardType %d", cardType);
+        [self showResultNiu:cardType];
+    }else{
+        [_resultNiu setVisible:NO];
+    }
 }
 
 #pragma mark - touch delegate
@@ -160,17 +204,13 @@
     if(_state == kState_TheFifthCard){
         if([self containsTouchLocation:touch node:_fifthCard]){
             [self openTheFifthCard];
-            _state = kState_CalCard;
         }
-        
-    }else if(_state == kState_CalCard){
-        for(UserCard *card in _userCardsArray){
-            if([self containsTouchLocation:touch node:card]){
-                [card handlePopAndDown];
-            }
-        }
+    }else if(_state == kState_CalCard && !_isZhaDanOrWuHua){
+        //进入凑牛阶段并且不是炸弹或者五花牛(因为炸弹和五花牛自动显示牌型结果)
+        [self handleCalCard:touch];
     }
 }
+
 - (void)ccTouchCancelled:(UITouch *)touch withEvent:(UIEvent *)event
 {
     CCLOG(@"ccTouchCancelled");
@@ -205,6 +245,8 @@
 {
     [_cardsDataArray release];
     [_userCardsArray release];
+    [_fifthCard release];
+    [_resultNiu release];
     [super dealloc];
 }
 @end

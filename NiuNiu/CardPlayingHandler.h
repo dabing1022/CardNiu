@@ -18,5 +18,5 @@
 + (NSString *)processGrabResult:(NSData *)data;
 + (NSArray *)processStartBet:(NSData *)data;
 + (NSDictionary *)processOtherPlayerBetResult:(NSData *)data;
-+ (NSArray *)processCardData:(NSData *)data;
++ (NSMutableArray *)processCardData:(NSData *)data;
 @end
