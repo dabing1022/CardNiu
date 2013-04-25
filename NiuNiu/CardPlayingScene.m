@@ -17,6 +17,8 @@
 #import "ProfilePanel.h"
 #import "UserCard.h"
 #import "ReadingCardsLayer.h"
+#import "CardsHelper.h"
+#import "CardPlayingHandler.h"
 
 
 @implementation CardPlayingScene
@@ -97,6 +99,9 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [[[[GameData sharedGameData]player]cardsDataArr]removeAllObjects];
         [[[[GameData sharedGameData]player]selectedCardsDataArr]removeAllObjects];
         [[[[GameData sharedGameData]player]sendToServerArr]removeAllObjects];
+        
+        //添加观察者-亮牌
+        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(finalShowCards:) name:@"startShowCardsResult" object:nil];
     }
     LOG_FUN_DID;
     return self;
@@ -229,6 +234,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [_activityIndicatorView stopAnimating];
     [_activityIndicatorView removeFromSuperview];
     
+    //移除观察者
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"startShowCardsResult" object:nil];
     [super onExit];
     LOG_FUN_DID;
 }
@@ -311,6 +318,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)countDownBeginWith:(int)countDownTime
 {
     _timeLeft = countDownTime;
+    [_countDownLabelTTF setVisible:YES];
+    [_countDownLabelTTF setString:@""];
+    [self unschedule:@selector(countDownWithGrabZType:)];
+    [self unschedule:@selector(countDownWithBetType:)];
+    [self unschedule:@selector(countDownWithReadCardsType:)];
     switch (countDownTime) {
         case kCDTimeGrabZ:
             [self schedule:@selector(countDownWithGrabZType:) interval:1.0];
@@ -325,7 +337,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
             NSAssert(NO, @"无效倒计时类型");
             break;
     }
-    [_countDownLabelTTF setVisible:YES];
 }
 
 - (void)countDownWithGrabZType:(ccTime)dt
@@ -364,6 +375,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [_countDownLabelTTF setVisible:NO];
         [self unschedule:@selector(countDownWithReadCardsType:)];
         CCLOG(@"ReadCards TIME UP!");
+        if([self getChildByTag:kTagReadingCardsLayer]){
+            CCLOG(@"CardPlayingScene removeChildByTag");
+            [self removeChildByTag:kTagReadingCardsLayer cleanup:YES];
+            [self showResultNiuWithType:NIU_0 cardsDataSendToServer:[[[GameData sharedGameData]player]cardsDataArr] point:CARD_POS_ID2];
+        }
     }
 }
 
@@ -511,16 +527,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     CCLOG(@"startReadingCards");
     [self countDownBeginWith:kCDTimeReadCards];
-    //test
-    CGPoint firstCardPos = [[_cardPosArr objectAtIndex:0]CGPointValue];
-    CGPoint targetCarPos;
-    for(int i = 0; i < 5; i++)
-    {
-        UserCard *card = [UserCard cardWithBack];
-        [self addChild:card];
-        targetCarPos = CGPointMake(firstCardPos.x+i*10, firstCardPos.y);
-        [card setPosition:targetCarPos];
-        [_playerCardsArr addObject:card];
+    
+    for(int i = 0; i < [_allUserCardsArr count]; i++){
+        if(i % MAX_PLAYERS_NUM == 0){//将第0、6、12、18、24张牌放入_playerCardsArr数组
+            [_playerCardsArr addObject:[_allUserCardsArr objectAtIndex:i]];
+        }
     }
      
     [self closeThenOpenCards:cardArray];
@@ -533,11 +544,13 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     CCLOG(@"closeThenOpenCards");
     CGPoint closePos = [[_cardPosArr objectAtIndex:0]CGPointValue];
+    //收拢牌
     for(UserCard *card in _playerCardsArr){
         id moveToClosePos = [CCMoveTo actionWithDuration:0.5 position:closePos];
         id easeOut = [CCEaseInOut  actionWithAction:moveToClosePos rate:2];
         [card runAction:easeOut];
     }
+    //打开牌
     [self scheduleOnce:@selector(open5cards) delay:0.8];
 }
 
@@ -561,11 +574,104 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [self scheduleOnce:@selector(addReadingCardsLayer) delay:3];
 }
 
+//读牌层
 - (void)addReadingCardsLayer
 {
     [self unschedule:@selector(addReadingCardsLayer)];
+    [self removePlayerCards];
+    
     _readingCardsLayer = [ReadingCardsLayer layerWithCardsArray:[[GameData sharedGameData]player].cardsDataArr];
     [self addChild:_readingCardsLayer z:kTagReadingCardsLayer tag:kTagReadingCardsLayer];    
+}
+
+- (void)removePlayerCards
+{
+    for(int i = 0; i < 5; i++){
+        UserCard *card = (UserCard *)[_playerCardsArr objectAtIndex:i];
+        [self removeChild:card cleanup:YES];
+    }
+    [_playerCardsArr removeAllObjects];
+    CCLOG(@"_playerCardsArr length:%d",[_playerCardsArr count]);
+}
+
+//玩家自己亮牌
+- (void)finalShowCards:(NSNotification *)note
+{
+    CCLOG(@"finalShowCards");
+    int type = [[[GameData sharedGameData]player]cardType];
+    NSMutableArray *sendToServerArray = [[[GameData sharedGameData]player]sendToServerArr];
+    [self showResultNiuWithType:type cardsDataSendToServer:sendToServerArray point:CARD_POS_ID2];
+}
+
+- (void)showResultNiuWithDic:(NSDictionary *)dic
+{
+    NSString *userID = [dic objectForKey:@"userID"];
+    int posID = [[[[GameData sharedGameData]userDic]objectForKey:userID] posID];
+    CGPoint firstCardPos = [[_cardPosArr objectAtIndex:((posID+6-2)%6)]CGPointValue];
+    
+    int type = [[dic objectForKey:@"cardSize"]intValue];
+    
+    NSArray *cardDataDicArr = [dic objectForKey:@"cards"];
+    NSMutableArray *cardsDataArray = [CardPlayingHandler cardDataDicArr2cardsDataArr:cardDataDicArr];
+    [self showResultNiuWithType:type cardsDataSendToServer:cardsDataArray point:firstCardPos];
+}
+
+- (void)showResultNiuWithType:(int)type cardsDataSendToServer:(NSMutableArray *)sendToServerArray point:(CGPoint)point
+{
+    CGPoint cardPos;
+    switch (type) {
+        case NIU_0:
+        case WU_HUA:{
+            for(int i = 0; i < 5; i++){
+                cardPos = CGPointMake(point.x + CARD_SPACE2 * i, point.y);
+                UserCard *card = [UserCard cardWithCardData:[sendToServerArray objectAtIndex:i]];
+                [card setPosition:cardPos];
+                [self addChild:card z:kTagAllCards tag:kTagAllCards];
+            }
+            break;
+        }
+        case NIU_1:
+        case NIU_2:
+        case NIU_3:
+        case NIU_4:
+        case NIU_5:
+        case NIU_6:
+        case NIU_7:
+        case NIU_8:
+        case NIU_9:
+        case NIU_NIU:{
+            for(int i = 0; i < 5; i++){  
+                if(i < 3)
+                    cardPos = CGPointMake(point.x + CARD_SPACE2 * i, point.y);
+                else
+                    cardPos = CGPointMake(point.x + CARD_SPACE2 * i + CARD_SPACE2, point.y);
+                UserCard *card = [UserCard cardWithCardData:[sendToServerArray objectAtIndex:i]];
+                [card setPosition:cardPos];
+                [self addChild:card z:kTagAllCards tag:kTagAllCards];
+            }
+            break;
+        }
+        case ZHA_DAN:{
+            for(int i = 0; i < 5; i++){
+                if(i == 4)
+                    cardPos = CGPointMake(point.x + CARD_SPACE2 * i + CARD_SPACE2, point.y);
+                else
+                    cardPos = CGPointMake(point.x + CARD_SPACE2 * i, point.y);
+                UserCard *card = [UserCard cardWithCardData:[sendToServerArray objectAtIndex:i]];
+                [card setPosition:cardPos];
+                [self addChild:card z:kTagAllCards tag:kTagAllCards];
+            }
+            break;
+        }
+        default:
+            CCLOG(@"牌型数据错误!");
+            break;
+    }
+    
+    NSString *resName = [[[CardsHelper sharedHelper]cardResultForResource]objectAtIndex:type];
+    CCSprite *resultNiu = [CCSprite spriteWithSpriteFrameName:resName];
+    [self addChild:resultNiu z:kTagResultNiuSymbol tag:kTagResultNiuSymbol];
+    [resultNiu setPosition:CGPointMake(point.x + CARD_SPACE2, point.y + CARD_SPACE2 * 2)];
 }
 
 #pragma mark - dealloc

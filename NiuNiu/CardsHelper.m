@@ -68,11 +68,10 @@ static CardsHelper *_instance = nil;
     NSDictionary *resultDic;
     if(selectedLength == 3 && selectedSum % 10 == 0){
         cardType = [NSNumber numberWithInt:leftValue];
-        index = [self getOneArrIndexInAnotherArr:selectedCardsDataArr wholeArr:wholeCardsDataArr];
     }else{
         cardType = [NSNumber numberWithInt:NIU_0];
-        index = nil;        
     }
+    index = [self getOneArrIndexInAnotherArr:selectedCardsDataArr wholeArr:wholeCardsDataArr];
     resultDic = [[NSDictionary alloc]initWithObjectsAndKeys:cardType, @"cardType", index, @"cardsIndex", nil];
     return resultDic;
 }
@@ -80,6 +79,7 @@ static CardsHelper *_instance = nil;
 - (NSArray *)getOneArrIndexInAnotherArr:(NSArray *)subArr wholeArr:(NSArray *)wholeArr
 {
     int subArrLen = [subArr count];
+    if(subArrLen == 0)return nil;
     int wholeArrLen = [wholeArr count];
     NSMutableArray *index = [NSMutableArray arrayWithCapacity:subArrLen];
     for(int i = 0; i < subArrLen; i++){

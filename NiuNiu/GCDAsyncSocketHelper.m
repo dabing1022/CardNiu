@@ -316,6 +316,12 @@ static GCDAsyncSocketHelper *_instance = nil;
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(startReadingCards:) withObject:cardArr];
             break;
         }
+        case CMD_START_SHOW_CARDS:{
+            CCLOG(@"CMD_START_SHOW_CARDS");
+            NSDictionary *dic = [CardPlayingHandler processStartShowCards:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(showResultNiuWithDic:) withObject:dic];
+            break;
+        }
         case CMD_ERROR:{
             CCLOG(@"CMD_ERROR");
             break;

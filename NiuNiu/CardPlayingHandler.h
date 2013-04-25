@@ -19,4 +19,6 @@
 + (NSArray *)processStartBet:(NSData *)data;
 + (NSDictionary *)processOtherPlayerBetResult:(NSData *)data;
 + (NSMutableArray *)processCardData:(NSData *)data;
++ (NSMutableArray *)cardDataDicArr2cardsDataArr:(NSArray *)cardDataDicArr;
++ (NSDictionary *)processStartShowCards:(NSData *)data;
 @end

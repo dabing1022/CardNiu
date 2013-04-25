@@ -37,8 +37,6 @@
         [self drawUserCards];
         [self drawResultNiu:0];
         [self drawConfirmMenu];
-
-        _cardsIndex = [[NSMutableArray alloc]init];
     }
     return self;
 }
@@ -95,6 +93,11 @@
                                                     forKeys:[NSArray arrayWithObjects:@"manualLength",@"cards",nil]];
     NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_START_SHOW_CARDS contentDic:dic];
     [[GCDAsyncSocketHelper sharedHelper] writeData:data withTimeout:-1 tag:CMD_START_SHOW_CARDS socketType:CARD_SOCKET];
+    
+    [self removeFromParentAndCleanup:YES];
+    
+    //通知CardPlayingScene开始亮牌
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"startShowCardsResult" object:nil];
 }
 
 //绘制下方的5张牌
@@ -182,6 +185,7 @@
         _isZhaDanOrWuHua = YES;
         NSMutableArray *sendToServer = [[CardsHelper sharedHelper]sortCardsDataByCardsIndex:cardsIndex cardsDataArray:_cardsDataArray];
         [[[GameData sharedGameData]player]setSendToServerArr:sendToServer];
+        [[[GameData sharedGameData]player]setCardType:cardType];
     }else{
         _isZhaDanOrWuHua = NO;
     }
@@ -208,29 +212,32 @@
             [card handlePopAndDown];
             if(card.isPopup){
                 [selectedArr addObject:card.cardData];
-                [_cardsIndex addObject:[NSNumber numberWithInt:i]];
+                CCLOG(@"玩家点选了第%d张牌",i+1);
                 CCLOG(@"selectedCardsDataArr length %d",[selectedArr count]);
             }else{
                 [selectedArr removeObject:card.cardData];
-                int m = [[CardsHelper sharedHelper]findIndexValueEqualsTo:i inArray:_cardsIndex];
-                CCLOG(@"handleCalCard m: %d", m);
-                [_cardsIndex removeObjectAtIndex:m];
+                CCLOG(@"玩家放弃了第%d张牌",i+1);
                 CCLOG(@"selectedCardsDataArr length %d",[selectedArr count]);
             }
         }
     }
     
+    //分析所选择的牌凑成的牌型
+    NSDictionary *resultDic = [[CardsHelper sharedHelper]analysisSelectedCards:selectedArr
+                                                             wholeCardsDataArr:_cardsDataArray];
+    NSArray *cardsIndex = [resultDic objectForKey:@"cardsIndex"];
     if([selectedArr count] >= 3){
-        NSDictionary *resultDic = [[CardsHelper sharedHelper]analysisSelectedCards:selectedArr
-                                                                 wholeCardsDataArr:_cardsDataArray];
         int cardType = [[resultDic objectForKey:@"cardType"]intValue];
         CCLOG(@"handlerCalCard cardType %d", cardType);
         [self showResultNiu:cardType];
+        [[[GameData sharedGameData]player]setCardType:cardType];
     }else{
         [_resultNiu setVisible:NO];
+        [[[GameData sharedGameData]player]setCardType:NIU_0];
     }
     
-    NSMutableArray *senderToServerArray = [[CardsHelper sharedHelper]sortCardsDataByCardsIndex:_cardsIndex
+    
+    NSMutableArray *senderToServerArray = [[CardsHelper sharedHelper]sortCardsDataByCardsIndex:cardsIndex
                                                                                 cardsDataArray:_cardsDataArray];
     
     [[[GameData sharedGameData]player] setSendToServerArr:senderToServerArray];
@@ -294,7 +301,6 @@
     [_userCardsArray release];
     [_fifthCard release];
     [_resultNiu release];
-    [_cardsIndex release];
     [super dealloc];
 }
 @end

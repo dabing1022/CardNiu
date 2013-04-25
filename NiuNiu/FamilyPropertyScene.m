@@ -38,6 +38,11 @@
 		CGSize size = [[CCDirector sharedDirector] winSize];
 		label.position =  ccp( size.width /2 , size.height/2 );
 		[self addChild: label];
+        
+        _familyPropertyMenuItem = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"familyPropertyItemNomal.png"]
+                                                         selectedSprite:[CCSprite spriteWithSpriteFrameName:@"familyPropertyItemSelected.png"]
+                                                                 target:self
+                                                               selector:@selector(navigateToFamilyProperty:)];
     }
     LOG_FUN_DID;
     return self;

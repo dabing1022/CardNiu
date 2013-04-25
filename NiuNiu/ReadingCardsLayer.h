@@ -36,7 +36,6 @@ typedef enum
     //分析牌是否是炸弹或者五花牛
     //如果是，直接显示牌的牌型结果，不用玩家手动选牌凑炸弹或者五花牛
     BOOL _isZhaDanOrWuHua;
-    NSMutableArray *_cardsIndex;
 }
 
 

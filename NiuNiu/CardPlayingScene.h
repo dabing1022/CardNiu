@@ -12,12 +12,14 @@
 enum{
     kTagCardPlayingScene,
     kTagAvatarInfoBox,
-    kTagCurtain,
     kTagMenuGrab,
     kTagZSymbol,
-    kTagCountDownLabelTTF,
     kTagBetRatioMenu,
-    kTagReadingCardsLayer
+    kTagAllCards,
+    kTagResultNiuSymbol,
+    kTagReadingCardsLayer,
+    kTagCountDownLabelTTF,
+    kTagCurtain
 };
 
 //倒计时时间长度
@@ -63,6 +65,7 @@ typedef enum
 //牌间距
 #define CARD_SPACE0 3
 #define CARD_SPACE1 5
+#define CARD_SPACE2 20
 
 //牌的总张数
 #define TOTAL_CARD_NUM 30

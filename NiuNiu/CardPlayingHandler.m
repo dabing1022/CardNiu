@@ -87,22 +87,39 @@
     return dic;
 }
 
-//进入看牌阶段，处理5张牌具体数据
+//处理5张牌具体数据,转化为cardData数组
 + (NSMutableArray *)processCardData:(NSData *)data
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSArray *cardDataDicArr = (NSArray *)[dic objectForKey:@"cards"];
-    NSMutableArray *cardArr = [NSMutableArray arrayWithCapacity:[cardDataDicArr count]];
+    NSMutableArray *cardsDataArr = [self cardDataDicArr2cardsDataArr:cardDataDicArr];
+    [[GameData sharedGameData]player].cardsDataArr = cardsDataArr;
+    return cardsDataArr;
+}
+
+
+//[{"color":1,"value":7},{"color":3,"value":10},{"color":2,"value":3},{"color":4,"value":3},{"color":4,"value":7}]
+//--->[cardData1,cardData2,cardData3,cardData4,cardData5]
+//cardData1.color=1,cardData1.value=7...
++ (NSMutableArray *)cardDataDicArr2cardsDataArr:(NSArray *)cardDataDicArr
+{
+    NSMutableArray *cardsDataArr = [NSMutableArray arrayWithCapacity:[cardDataDicArr count]];
     for(int i = 0; i < [cardDataDicArr count]; i++){
         NSDictionary *singleCardDataDic = [cardDataDicArr objectAtIndex:i];
         CardData *cardData = [[CardData alloc]init];
         cardData.color = [[singleCardDataDic objectForKey:@"color"]intValue];
         cardData.value = [[singleCardDataDic objectForKey:@"value"]intValue];
-        [cardArr addObject:cardData];
+        [cardsDataArr addObject:cardData];
         [cardData release];
     }
-    [[GameData sharedGameData]player].cardsDataArr = cardArr;
-    return cardArr;
+    return cardsDataArr;
+}
+
+//处理亮牌数据(userID/cardSize/cards)
++ (NSDictionary *)processStartShowCards:(NSData *)data
+{
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    return dic;
 }
 
 + (User *)user:(NSDictionary *)userDic
