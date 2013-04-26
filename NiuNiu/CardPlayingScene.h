@@ -94,6 +94,8 @@ typedef enum
     
     NSMutableArray *_allUserCardsArr;
     NSMutableArray *_playerCardsArr;
+    NSMutableArray *_playerResultNiuSymbolArr;
+    NSMutableArray *_playerWinLoseCoinTBArr;
     
     CCSprite *_zSymbol;
     CCSprite *_countDown;

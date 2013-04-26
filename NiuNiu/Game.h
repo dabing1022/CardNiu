@@ -21,7 +21,8 @@
 #define CMD_OTHER_PLAYER_BET_RESULT 2008//其他玩家下注结果
 #define CMD_START_READING_CARDS     2009//进入看牌阶段，接收5张牌具体数据
 #define CMD_START_SHOW_CARDS        2010//玩家确定显示亮牌
-
+#define CMD_FINAL_RESULT            2011//本轮玩家输赢情况
+#define CMD_UPDATE_USERS_INFO        2012//更新玩家信息(包括铜币等信息)
 
 
 #define CMD_INFO  9998//服务器给客户端发送的提示

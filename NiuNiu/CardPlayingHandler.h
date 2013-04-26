@@ -21,4 +21,6 @@
 + (NSMutableArray *)processCardData:(NSData *)data;
 + (NSMutableArray *)cardDataDicArr2cardsDataArr:(NSArray *)cardDataDicArr;
 + (NSDictionary *)processStartShowCards:(NSData *)data;
++ (void)processFinalWinLoseResult:(NSData *)data;
++ (void)processUpdateUsersInfo:(NSData *)data;
 @end

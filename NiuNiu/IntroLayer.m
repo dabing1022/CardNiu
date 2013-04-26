@@ -10,7 +10,6 @@
 // Import the interfaces
 #import "IntroLayer.h"
 #import "FamilyPropertyScene.h"
-#import "CCScrollLayerTestLayer.h"
 #import "AvatarChooseScene.h"
 #import "RoleDiscriptionLayer.h"
 

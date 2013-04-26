@@ -257,11 +257,13 @@ static GCDAsyncSocketHelper *_instance = nil;
     switch (cmd) {
         case CMD_LOGIN:
         {
+            CCLOG(@"CMD_LOGIN");
             [CmdLoginHandler processLoginData:data];
             break;
         }
         case CMD_INFO:
         {
+            CCLOG(@"CMD_INFO");
             NSString *info = [[self analysisDataToString:data]retain];
             if([info isEqualToString:INFO_WAITING_ASSIGN]){
                 [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(waitingAssign) withObject:nil];
@@ -320,6 +322,17 @@ static GCDAsyncSocketHelper *_instance = nil;
             CCLOG(@"CMD_START_SHOW_CARDS");
             NSDictionary *dic = [CardPlayingHandler processStartShowCards:data];
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(showResultNiuWithDic:) withObject:dic];
+            break;
+        }
+        case CMD_FINAL_RESULT:{
+            CCLOG(@"CMD_FINAL_RESULT");
+            [CardPlayingHandler processFinalWinLoseResult:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(showFinalWinLoseResult) withObject:nil];
+            break;
+        }
+        case CMD_UPDATE_USERS_INFO:{
+            CCLOG(@"CMD_UPDATE_USER_INFO");
+            [CardPlayingHandler processUpdateUsersInfo:data];
             break;
         }
         case CMD_ERROR:{

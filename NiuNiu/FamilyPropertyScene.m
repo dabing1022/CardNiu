@@ -13,6 +13,7 @@
 #import "GameData.h"
 #import "User.h"
 #import "GCDAsyncSocketHelper.h"
+#import "CCScrollView.h"
 
 @implementation FamilyPropertyScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
@@ -39,13 +40,104 @@
 		label.position =  ccp( size.width /2 , size.height/2 );
 		[self addChild: label];
         
-        _familyPropertyMenuItem = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"familyPropertyItemNomal.png"]
-                                                         selectedSprite:[CCSprite spriteWithSpriteFrameName:@"familyPropertyItemSelected.png"]
-                                                                 target:self
-                                                               selector:@selector(navigateToFamilyProperty:)];
+        /*---------familyPropertyToggle---------*/
+        _familyPropertyMenuItemNomal = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"familyPropertyItemNomal.png"] selectedSprite:nil];
+        
+        _familyPropertyMenuItemSelected = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"familyPropertyItemSelected.png"] selectedSprite:nil];
+        
+        _familyPropertyItemToggle = [CCMenuItemToggle itemWithTarget:self selector:@selector(navigateToFamilyProperty:) items:_familyPropertyMenuItemNomal,_familyPropertyMenuItemSelected, nil];
+        [_familyPropertyItemToggle setSelectedIndex:1];
+        
+        /*---------cardToggle-------------------*/
+        _cardMenuItemNomal = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"cardItemNomal.png"] selectedSprite:nil];
+        
+        _cardMenuItemSelected = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"cardItemSelected.png"] selectedSprite:nil];
+        
+        _cardItemToggle = [CCMenuItemToggle itemWithTarget:self selector:@selector(navigateToCard:) items:_cardMenuItemNomal,_cardMenuItemSelected, nil];
+        [_cardItemToggle setPosition:CGPointMake(100, 0)];
+        
+        
+        /*---------stateToggle-----------------*/
+        _stateMenuItemNomal = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"stateItemNomal.png"] selectedSprite:nil];
+        
+        _stateMenuItemSelected = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"stateItemSelected.png"] selectedSprite:nil];
+        
+        _stateItemToggle = [CCMenuItemToggle itemWithTarget:self selector:@selector(navigateToState:) items:_stateMenuItemNomal,_stateMenuItemSelected, nil];
+        [_stateItemToggle setPosition:CGPointMake(200, 0)];
+        
+        /*---------navigateMenu----------------*/
+        _navigateMenu = [CCMenu menuWithItems:_familyPropertyItemToggle,_cardItemToggle,_stateItemToggle, nil];
+        [self addChild:_navigateMenu];
+        [_navigateMenu setPosition:CGPointMake(100, 400)];
+        
+        _familyPropertyLayer = [[CCLayer alloc]init];
+        _cardLayer = [[CCLayer alloc]init];
+        _stateLayer = [[CCLayer alloc]init];
+        
+        CCLabelTTF *familyPropertyLabel = [CCLabelTTF labelWithString:@"familyPropertyContent" fontName:@"Marker Felt" fontSize:20];
+		familyPropertyLabel.position =  ccp( size.width /2 , size.height/2 );
+		[_familyPropertyLayer addChild: familyPropertyLabel];
+        
+        CCLabelTTF *cardLabel = [CCLabelTTF labelWithString:@"cardLayerContent" fontName:@"Marker Felt" fontSize:20];
+		cardLabel.position =  ccp( size.width /2 , size.height/2 );
+		[_cardLayer addChild: cardLabel];
+        
+        CCLabelTTF *stateLabel = [CCLabelTTF labelWithString:@"stateContent" fontName:@"Marker Felt" fontSize:20];
+		stateLabel.position =  ccp( size.width /2 , size.height/2 );
+		[_stateLayer addChild: stateLabel];
+        
+        _multiplexLayer = [CCLayerMultiplex layerWithLayers:_familyPropertyLayer,_cardLayer,_stateLayer, nil];
+//        [self addChild:_multiplexLayer];
+        [_multiplexLayer switchTo:0];
+        
+        CGSize size2 = CGSizeMake(0, 150);
+        CCScrollView *familyScrollView = [CCScrollView viewWithViewSize:size container:_multiplexLayer];
+        [familyScrollView setDirection:CCScrollViewDirectionVertical];
+        [self addChild:familyScrollView];
+//        [familyScrollView setPosition:CGPointMake(50, 150)];
     }
     LOG_FUN_DID;
     return self;
+}
+
+#pragma mark - navigate
+- (void)navigateToFamilyProperty:(id)sender
+{
+    CCLOG(@"navigateToFamilyProperty");
+    CCMenuItemToggle *menuItemToggle = (CCMenuItemToggle *)sender;
+    if(menuItemToggle.selectedItem == _familyPropertyMenuItemSelected){
+        [_cardItemToggle setSelectedIndex:0];
+        [_stateItemToggle setSelectedIndex:0];
+        [_multiplexLayer switchTo:0];
+    }else{
+         CCLOG(@"00");
+    }
+}
+
+- (void)navigateToCard:(id)sender
+{
+    CCLOG(@"navigateToCard");
+    CCMenuItemToggle *menuItemToggle = (CCMenuItemToggle *)sender;
+    if(menuItemToggle.selectedItem == _cardMenuItemSelected){
+        [_familyPropertyItemToggle setSelectedIndex:0];
+        [_stateItemToggle setSelectedIndex:0];
+        [_multiplexLayer switchTo:1];
+    }else{
+        CCLOG(@"00");
+    }
+}
+
+- (void)navigateToState:(id)sender
+{
+    CCLOG(@"navigateToState");
+    CCMenuItemToggle *menuItemToggle = (CCMenuItemToggle *)sender;
+    if(menuItemToggle.selectedItem == _stateMenuItemSelected){
+        [_familyPropertyItemToggle setSelectedIndex:0];
+        [_cardItemToggle setSelectedIndex:0];
+        [_multiplexLayer switchTo:2];
+    }else{
+        CCLOG(@"00");
+    }
 }
 
 #pragma mark - UISwipeGesture switch-scenes
@@ -148,6 +240,7 @@
     [_swipeRightGestureRecognizer release];
     _swipeRightGestureRecognizer = nil;
 
+    
 	[super dealloc];
     LOG_FUN_DID;
 }

@@ -61,6 +61,7 @@
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSString *zUserID = [dic objectForKey:@"zUserID"];
+    [[GameData sharedGameData]setZUserID:zUserID];
     return zUserID;
 }
 
@@ -70,6 +71,7 @@
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSString *zUserID = [dic objectForKey:@"zUserID"];
+    [[GameData sharedGameData]setZUserID:zUserID];
     return zUserID;
 }
 
@@ -122,6 +124,31 @@
     return dic;
 }
 
+//处理最后所有玩家的输赢情况
++ (void)processFinalWinLoseResult:(NSData *)data
+{
+    NSArray *betArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
+    for(int i = 0; i < [betArr count]; i++){
+        NSDictionary *singlePlayerFinalResult = [betArr objectAtIndex:i];
+        NSString *userID = [singlePlayerFinalResult objectForKey:@"userID"];
+        int winCoinTB = [[singlePlayerFinalResult objectForKey:@"winCoinTB"]intValue];
+        User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
+        [user setWinCoinTB:winCoinTB];
+    }
+}
+
++ (void)processUpdateUsersInfo:(NSData *)data
+{
+    NSArray *betArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
+    for(int i = 0; i < [betArr count]; i++){
+        NSDictionary *singlePlayerInfo = [betArr objectAtIndex:i];
+        NSString *userID = [singlePlayerInfo objectForKey:@"userID"];
+        int coinTB = [[singlePlayerInfo objectForKey:@"coinTB"]intValue];//更新玩家铜币
+        User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
+        [user setCoinTB:coinTB];
+    }
+}
+
 + (User *)user:(NSDictionary *)userDic
 {
     User *user = [User userWithUserID:[userDic objectForKey:@"userID"]
@@ -135,6 +162,7 @@
     user.tableID = [[userDic objectForKey:@"tableID"]intValue];
     user.chairID = [[userDic objectForKey:@"chairID"]intValue];
     user.posID = [User chairID2posID:user.chairID];
+    CCLOG(@"user userID:%@, posID:%d",user.userID,user.posID);
     return  user;
 }
 

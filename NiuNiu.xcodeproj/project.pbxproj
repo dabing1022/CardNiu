@@ -27,7 +27,6 @@
 		CE11B1791716D391002510CC /* transitionUp.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11B1751716D391002510CC /* transitionUp.png */; };
 		CE127BF3171ECB5A00E9B49C /* CmdLoginHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */; };
 		CE21CBCF17253B50005B1606 /* ReadingCardsLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE21CBCE17253B50005B1606 /* ReadingCardsLayer.m */; };
-		CE3FDF051711A3CB002C7076 /* CCScrollLayerTestLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */; };
 		CE3FDF061711A4D9002C7076 /* CCScrollLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3FDD2B17119642002C7076 /* CCScrollLayer.m */; };
 		CE3FDF091711A937002C7076 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE3FDF081711A937002C7076 /* Default-568h@2x.png */; };
 		CE66D7351711847500EA3569 /* CCAction.m in Sources */ = {isa = PBXBuildFile; fileRef = CE66D6411711847500EA3569 /* CCAction.m */; };
@@ -244,10 +243,8 @@
 		CE127BF2171ECB5A00E9B49C /* CmdLoginHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CmdLoginHandler.m; sourceTree = "<group>"; };
 		CE21CBCD17253B50005B1606 /* ReadingCardsLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadingCardsLayer.h; sourceTree = "<group>"; };
 		CE21CBCE17253B50005B1606 /* ReadingCardsLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReadingCardsLayer.m; sourceTree = "<group>"; };
-		CE3FDD2A17119642002C7076 /* CCScrollLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCScrollLayer.h; sourceTree = "<group>"; };
-		CE3FDD2B17119642002C7076 /* CCScrollLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCScrollLayer.m; sourceTree = "<group>"; };
-		CE3FDF031711A3CA002C7076 /* CCScrollLayerTestLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCScrollLayerTestLayer.h; sourceTree = "<group>"; };
-		CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCScrollLayerTestLayer.m; sourceTree = "<group>"; };
+		CE3FDD2A17119642002C7076 /* CCScrollLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CCScrollLayer.h; path = ../../CCScrollLayer.h; sourceTree = "<group>"; };
+		CE3FDD2B17119642002C7076 /* CCScrollLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CCScrollLayer.m; path = ../../CCScrollLayer.m; sourceTree = "<group>"; };
 		CE3FDF081711A937002C7076 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		CE66D6401711847500EA3569 /* CCAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCAction.h; sourceTree = "<group>"; };
 		CE66D6411711847500EA3569 /* CCAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCAction.m; sourceTree = "<group>"; };
@@ -1080,6 +1077,8 @@
 		CEDE957317127B63006BDF73 /* CCScrollView */ = {
 			isa = PBXGroup;
 			children = (
+				CE3FDD2A17119642002C7076 /* CCScrollLayer.h */,
+				CE3FDD2B17119642002C7076 /* CCScrollLayer.m */,
 				CEDE957417127B63006BDF73 /* CCScrollView.h */,
 				CEDE957517127B63006BDF73 /* CCScrollView.m */,
 			);
@@ -1218,8 +1217,6 @@
 				CEF00B3A1717DCB600CDC391 /* Data */,
 				CE11B13817165D6F002510CC /* Helper */,
 				CEEBC37F17141B15000A3CBD /* Scenes */,
-				CE3FDD2A17119642002C7076 /* CCScrollLayer.h */,
-				CE3FDD2B17119642002C7076 /* CCScrollLayer.m */,
 				CEE0205817114ECC00815A9D /* AppDelegate.h */,
 				CEE0205917114ECC00815A9D /* AppDelegate.m */,
 				CEEBC37517140461000A3CBD /* Game.h */,
@@ -1269,8 +1266,6 @@
 				CEE02073171167C600815A9D /* PawnShopScene.m */,
 				CEE0207D171170C800815A9D /* CardPlayingScene.h */,
 				CEE0207E171170C800815A9D /* CardPlayingScene.m */,
-				CE3FDF031711A3CA002C7076 /* CCScrollLayerTestLayer.h */,
-				CE3FDF041711A3CA002C7076 /* CCScrollLayerTestLayer.m */,
 				CEEBC38017141B77000A3CBD /* AvatarChooseScene.h */,
 				CEEBC38117141B77000A3CBD /* AvatarChooseScene.m */,
 				CEF00B3F1717EFEC00CDC391 /* RoleDiscriptionLayer.h */,
@@ -1508,7 +1503,6 @@
 				CE66D7991711847500EA3569 /* vec2.c in Sources */,
 				CE66D79A1711847500EA3569 /* vec3.c in Sources */,
 				CE66D79B1711847500EA3569 /* vec4.c in Sources */,
-				CE3FDF051711A3CB002C7076 /* CCScrollLayerTestLayer.m in Sources */,
 				CEDE958417127B63006BDF73 /* CCBAnimationManager.m in Sources */,
 				CEDE958517127B63006BDF73 /* CCBKeyframe.m in Sources */,
 				CEDE958617127B63006BDF73 /* CCBReader.m in Sources */,

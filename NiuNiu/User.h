@@ -50,6 +50,8 @@
     NSMutableArray *_sendToServerArr;
     //每一局玩家的牌型结果
     int _cardType;
+    //每一局玩家的输赢铜币量(可正可负)
+    int _winCoinTB;
 }
 
 @property(nonatomic, retain)NSString *userID;
@@ -71,6 +73,7 @@
 @property(nonatomic, retain)NSMutableArray *selectedCardsDataArr;
 @property(nonatomic, retain)NSMutableArray *sendToServerArr;
 @property(nonatomic, assign)int cardType;
+@property(nonatomic, assign)int winCoinTB;
 
 
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;

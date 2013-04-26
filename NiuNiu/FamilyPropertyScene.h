@@ -17,12 +17,23 @@
     UISwipeGestureRecognizer *_swipeRightGestureRecognizer;
     
     //家产按钮ITEM
-    CCMenuItemImage *_familyPropertyMenuItem;
+    CCMenuItemImage *_familyPropertyMenuItemNomal;
+    CCMenuItemImage *_familyPropertyMenuItemSelected;
+    CCMenuItemToggle *_familyPropertyItemToggle;
     //卡牌按鈕ITEM
-    CCMenuItemImage *_cardMenuItem;
+    CCMenuItemImage *_cardMenuItemNomal;
+    CCMenuItemImage *_cardMenuItemSelected;
+    CCMenuItemToggle *_cardItemToggle;
     //狀態按鈕ITEM
-    CCMenuItemImage *_stateMenuItem;
+    CCMenuItemImage *_stateMenuItemNomal;
+    CCMenuItemImage *_stateMenuItemSelected;
+    CCMenuItemToggle *_stateItemToggle;
     CCMenu *_navigateMenu;
+    
+    CCLayer *_familyPropertyLayer;
+    CCLayer *_cardLayer;
+    CCLayer *_stateLayer;
+    CCLayerMultiplex *_multiplexLayer;
 }
 
 

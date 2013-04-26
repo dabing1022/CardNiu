@@ -72,12 +72,20 @@
     _confirmMenu = [CCMenu menuWithItems:_confirmMenuItem, nil];
     [_confirmMenu setPosition:CGPointZero];
     [self addChild:_confirmMenu];
+    [_confirmMenu setVisible:NO];
 }
 
 - (void)sendUserDecision
 {
     NSNumber *manualLength = [NSNumber numberWithInt:[[[[GameData sharedGameData]player]selectedCardsDataArr]count]];
-    NSMutableArray *sendToServer = [[[GameData sharedGameData]player]sendToServerArr];
+    NSMutableArray *sendToServer;
+    if(!_isZhaDanOrWuHua && [manualLength intValue] == 0){//分析不是炸弹或者五花牛，并且玩家没有手动选择牌
+        sendToServer = _cardsDataArray;
+        [[[GameData sharedGameData]player]setCardType:NIU_0];
+        [[[GameData sharedGameData]player] setSendToServerArr:sendToServer];
+    }else{
+        sendToServer = [[[GameData sharedGameData]player]sendToServerArr];
+    }
     
     
     NSMutableArray *cardsArray = [[[NSMutableArray alloc]init]autorelease];
@@ -177,12 +185,17 @@
 {
     [self unschedule:@selector(analysisWholeCards)];
     NSDictionary *resultDic = [[CardsHelper sharedHelper]analysisWholeCards:_cardsDataArray];
+    NSMutableArray *selectedArr = [[[GameData sharedGameData]player]selectedCardsDataArr];
     int cardType = [[resultDic objectForKey:@"cardType"]intValue];
     NSArray *cardsIndex = [resultDic objectForKey:@"cardsIndex"];
     CCLOG(@"cardType is %d", cardType);
     if(cardType == ZHA_DAN || cardType == WU_HUA){
         [self showResultNiu:cardType];
         _isZhaDanOrWuHua = YES;
+        
+        for(int i = 0; i < [cardsIndex count]; i ++){
+            [selectedArr addObject:[_cardsDataArray objectAtIndex:i]];
+        }
         NSMutableArray *sendToServer = [[CardsHelper sharedHelper]sortCardsDataByCardsIndex:cardsIndex cardsDataArray:_cardsDataArray];
         [[[GameData sharedGameData]player]setSendToServerArr:sendToServer];
         [[[GameData sharedGameData]player]setCardType:cardType];
@@ -191,6 +204,7 @@
     }
     //进入玩家手动凑牛阶段
     _state = kState_CalCard;
+    [_confirmMenu setVisible:YES];
 }
 
 - (void)openTheFifthCard

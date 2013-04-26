@@ -53,6 +53,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         _allUserCardsArr = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
         _betResultDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
         _playerCardsArr = [[NSMutableArray alloc]initWithCapacity:5];
+        _playerResultNiuSymbolArr = [[NSMutableArray alloc]initWithCapacity:MAX_PLAYERS_NUM];
+        _playerWinLoseCoinTBArr = [[NSMutableArray alloc]initWithCapacity:MAX_PLAYERS_NUM];
                 
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
@@ -270,10 +272,18 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     CCLOG(@"------>分配进桌");
     [_activityIndicatorView stopAnimating];
-    NSArray *allPlayers = [[[GameData sharedGameData]userDic]allValues];
-    CCLOG(@"allplayers length:%d", [allPlayers count]);
-    for(User *user in allPlayers)
-    {
+//    NSArray *allPlayers = [[[GameData sharedGameData]userDic]allValues];
+//    CCLOG(@"allplayers length:%d", [allPlayers count]);
+//    for(User *user in allPlayers)
+//    {
+//        if(user.userID == [[GameData sharedGameData]player].userID) continue;
+//        AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
+//        [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
+//        [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
+//    }
+    NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
+    for(NSString *key in userDic){
+        User *user = [userDic objectForKey:key];
         if(user.userID == [[GameData sharedGameData]player].userID) continue;
         AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
         [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
@@ -586,8 +596,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 
 - (void)removePlayerCards
 {
-    for(int i = 0; i < 5; i++){
-        UserCard *card = (UserCard *)[_playerCardsArr objectAtIndex:i];
+    for(UserCard *card in _playerCardsArr){
         [self removeChild:card cleanup:YES];
     }
     [_playerCardsArr removeAllObjects];
@@ -672,12 +681,52 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     CCSprite *resultNiu = [CCSprite spriteWithSpriteFrameName:resName];
     [self addChild:resultNiu z:kTagResultNiuSymbol tag:kTagResultNiuSymbol];
     [resultNiu setPosition:CGPointMake(point.x + CARD_SPACE2, point.y + CARD_SPACE2 * 2)];
+    [_playerResultNiuSymbolArr addObject:resultNiu];
+}
+
+//显示最后所有玩家的输赢情况
+- (void)showFinalWinLoseResult
+{
+    NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
+    NSString *tb;
+    for(NSString *key in userDic){
+        User *user = [userDic objectForKey:key];
+        int winCoinTB = [user winCoinTB];
+        if(winCoinTB > 0)
+            tb = [NSString stringWithFormat:@"+%d",winCoinTB];
+        else
+            tb = [NSString stringWithFormat:@"%d", winCoinTB];
+        CCLabelTTF *winLoseCoinTB = [CCLabelTTF labelWithString:tb fontName:@"Arial" fontSize:20];
+        [self addChild:winLoseCoinTB z:kTagResultNiuSymbol tag:kTagResultNiuSymbol];
+        [winLoseCoinTB setPosition:[[_avatarPosArr objectAtIndex:user.posID] CGPointValue]];
+        [_playerWinLoseCoinTBArr addObject:winLoseCoinTB];
+    }
+}
+
+//更新所有玩家的金币UI信息
+- (void)updatePlayersCoin
+{
+    CCLOG(@"CardPlayingScene updatePlayersCoin");
+}
+
+- (void)clearUnusedStuff
+{
+    CCLOG(@"clearUnusedStuff");
+    //清除winLose金币
+    for(CCLabelTTF *winLoseCoinTB in _playerWinLoseCoinTBArr){
+        [self removeChild:winLoseCoinTB cleanup:YES];
+    }
+    [_playerWinLoseCoinTBArr removeAllObjects];
 }
 
 #pragma mark - dealloc
 - (void) dealloc
 {
     [_allUserCardsArr release];
+    [_betResultDic release];
+    [_playerCardsArr release];
+    [_playerResultNiuSymbolArr release];
+    [_playerWinLoseCoinTBArr release];
     
     [_avatarPosArr release];
     [_cardPosArr release];

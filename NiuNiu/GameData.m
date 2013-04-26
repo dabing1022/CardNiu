@@ -10,7 +10,7 @@
 #import "User.h"
 
 @implementation GameData
-@synthesize player=_player,userDic=_userDic;
+@synthesize player=_player,userDic=_userDic,zUserID=_zUserID;
 static GameData *_instance = nil;
 
 
@@ -30,13 +30,16 @@ static GameData *_instance = nil;
     {
         self.player = nil;
         self.userDic = [[NSMutableDictionary alloc]init];
+        self.zUserID = nil;
     }
     return self;
 }
 
 - (void)dealloc
 {
+    [_player release];
     [_userDic release];
+    [_zUserID release];
     _instance = nil;
     [super dealloc];
 }
