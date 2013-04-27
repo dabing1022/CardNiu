@@ -335,6 +335,10 @@ static GCDAsyncSocketHelper *_instance = nil;
             [CardPlayingHandler processUpdateUsersInfo:data];
             break;
         }
+        case CMD_OTHER_PLAYER_OUT:{
+            CCLOG(@"CMD_OTHER_PLAYER_OUT");
+            break;
+        }
         case CMD_ERROR:{
             CCLOG(@"CMD_ERROR");
             break;

@@ -90,11 +90,18 @@
 //        [self addChild:_multiplexLayer];
         [_multiplexLayer switchTo:0];
         
-        CGSize size2 = CGSizeMake(0, 150);
         CCScrollView *familyScrollView = [CCScrollView viewWithViewSize:size container:_multiplexLayer];
         [familyScrollView setDirection:CCScrollViewDirectionVertical];
         [self addChild:familyScrollView];
-//        [familyScrollView setPosition:CGPointMake(50, 150)];
+        
+        _flipSpriteTest = [CCSprite spriteWithSpriteFrameName:@"Card1_1.png"];
+        _flipSpriteTest2 = [CCSprite spriteWithSpriteFrameName:@"CardBack.png"];
+        
+        [self addChild:_flipSpriteTest];
+        [self addChild:_flipSpriteTest2];
+        [_flipSpriteTest setPosition:ccp(size.width/2,size.height/2)];
+        [_flipSpriteTest2 setPosition:ccp(size.width/2,size.height/2)];
+        
     }
     LOG_FUN_DID;
     return self;
@@ -105,39 +112,45 @@
 {
     CCLOG(@"navigateToFamilyProperty");
     CCMenuItemToggle *menuItemToggle = (CCMenuItemToggle *)sender;
-    if(menuItemToggle.selectedItem == _familyPropertyMenuItemSelected){
-        [_cardItemToggle setSelectedIndex:0];
-        [_stateItemToggle setSelectedIndex:0];
-        [_multiplexLayer switchTo:0];
-    }else{
-         CCLOG(@"00");
-    }
+    [menuItemToggle setIsEnabled:NO];
+    [menuItemToggle setSelectedIndex:1];
+    [_cardItemToggle setSelectedIndex:0];
+    [_cardItemToggle setIsEnabled:YES];
+    [_stateItemToggle setSelectedIndex:0];
+    [_stateItemToggle setIsEnabled:YES];
+    [_multiplexLayer switchTo:0];
 }
 
 - (void)navigateToCard:(id)sender
 {
     CCLOG(@"navigateToCard");
     CCMenuItemToggle *menuItemToggle = (CCMenuItemToggle *)sender;
-    if(menuItemToggle.selectedItem == _cardMenuItemSelected){
-        [_familyPropertyItemToggle setSelectedIndex:0];
-        [_stateItemToggle setSelectedIndex:0];
-        [_multiplexLayer switchTo:1];
-    }else{
-        CCLOG(@"00");
-    }
+    [menuItemToggle setIsEnabled:NO];
+    [menuItemToggle setSelectedIndex:1];
+    [_familyPropertyItemToggle setSelectedIndex:0];
+    [_familyPropertyItemToggle setIsEnabled:YES];
+    [_stateItemToggle setSelectedIndex:0];
+    [_stateItemToggle setIsEnabled:YES];
+    [_multiplexLayer switchTo:1];
+        
+    float d = 0.25f;
+    id a = [CCOrbitCamera actionWithDuration:d/2 radius:1 deltaRadius:0 angleZ:270 deltaAngleZ:90 angleX:0 deltaAngleX:0];
+    id b = [CCOrbitCamera actionWithDuration:d/2 radius:1 deltaRadius:0 angleZ:0 deltaAngleZ:90 angleX:0 deltaAngleX:0];
+    [_flipSpriteTest runAction:a];
+    [_flipSpriteTest2 runAction:b];
 }
 
 - (void)navigateToState:(id)sender
 {
     CCLOG(@"navigateToState");
     CCMenuItemToggle *menuItemToggle = (CCMenuItemToggle *)sender;
-    if(menuItemToggle.selectedItem == _stateMenuItemSelected){
-        [_familyPropertyItemToggle setSelectedIndex:0];
-        [_cardItemToggle setSelectedIndex:0];
-        [_multiplexLayer switchTo:2];
-    }else{
-        CCLOG(@"00");
-    }
+    [menuItemToggle setIsEnabled:NO];
+    [menuItemToggle setSelectedIndex:1];
+    [_familyPropertyItemToggle setSelectedIndex:0];
+    [_familyPropertyItemToggle setIsEnabled:YES];
+    [_cardItemToggle setSelectedIndex:0];
+    [_cardItemToggle setIsEnabled:YES];
+    [_multiplexLayer switchTo:2];
 }
 
 #pragma mark - UISwipeGesture switch-scenes

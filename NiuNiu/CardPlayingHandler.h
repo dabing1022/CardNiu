@@ -23,4 +23,5 @@
 + (NSDictionary *)processStartShowCards:(NSData *)data;
 + (void)processFinalWinLoseResult:(NSData *)data;
 + (void)processUpdateUsersInfo:(NSData *)data;
++ (void)processOtherPlayerOut:(NSData *)data;
 @end

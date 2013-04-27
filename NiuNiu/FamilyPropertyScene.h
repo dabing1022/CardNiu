@@ -34,6 +34,9 @@
     CCLayer *_cardLayer;
     CCLayer *_stateLayer;
     CCLayerMultiplex *_multiplexLayer;
+    
+    CCSprite *_flipSpriteTest;
+    CCSprite *_flipSpriteTest2;
 }
 
 

@@ -22,12 +22,14 @@
 #define CMD_START_READING_CARDS     2009//进入看牌阶段，接收5张牌具体数据
 #define CMD_START_SHOW_CARDS        2010//玩家确定显示亮牌
 #define CMD_FINAL_RESULT            2011//本轮玩家输赢情况
-#define CMD_UPDATE_USERS_INFO        2012//更新玩家信息(包括铜币等信息)
-
+#define CMD_UPDATE_USERS_INFO       2012//更新玩家信息(包括铜币等信息)
+#define CMD_CHANGE_TABLE            2013//向服务器请求换桌
+#define CMD_OTHER_PLAYER_OUT        2014//其他玩家离开桌子
 
 #define CMD_INFO  9998//服务器给客户端发送的提示
 #define CMD_ERROR 9999//出错
 #define INFO_WAITING_ASSIGN @"info001"//玩家切换到牌局场景后等待分配
+#define INFO_FORCED_CHANGE_TABLE @"info002"//玩家金币不足，被系统重新分配桌子
 
 /*--------------------FAMILY_SERVER通讯命令------------------------------------*/
 

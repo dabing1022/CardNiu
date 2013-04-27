@@ -48,10 +48,19 @@
     //每一局中玩家确认发送给服务器的牌
     //如牌数值数组为[2, 3, 4, 8, 10],玩家选择的为[4, 8, 3, 10],则发送给服务端的manualLength == 4, 数组为[4, 8, 3, 10, 2]
     NSMutableArray *_sendToServerArr;
+    //玩家摊的牌等同于发送给服务器的牌
+    NSMutableArray *_showCardsDataArr;
+    //玩家的5张背面牌
+    NSMutableArray *_user5cards;
     //每一局玩家的牌型结果
-    int _cardType;
+    int _cardType;//Server:cardSize
     //每一局玩家的输赢铜币量(可正可负)
     int _winCoinTB;
+    //能不能叫庄(在系统计算时间之内不能叫庄，针对的是此时进来的玩家)
+    BOOL _canGrabZ;
+    //能不能下注(在系统计算时间之内不能下注，针对的是此时进来的玩家)
+    BOOL _canBet;
+    int _betRatio;
 }
 
 @property(nonatomic, retain)NSString *userID;
@@ -72,8 +81,13 @@
 @property(nonatomic, retain)NSMutableArray *cardsDataArr;
 @property(nonatomic, retain)NSMutableArray *selectedCardsDataArr;
 @property(nonatomic, retain)NSMutableArray *sendToServerArr;
+@property(nonatomic, retain)NSMutableArray *user5cards;
 @property(nonatomic, assign)int cardType;
 @property(nonatomic, assign)int winCoinTB;
+@property(nonatomic, assign)BOOL canGrabZ;
+@property(nonatomic, assign)BOOL canBet;
+@property(nonatomic, assign)int betRatio;
+@property(nonatomic, retain)NSMutableArray *showCardsDataArr;
 
 
 + (id)userWithUserID:(NSString *)userID nickName:(NSString *)nickName userName:(NSString *)userName avatarID:(NSString *)avatarID roleID:(uint32_t)roleID coinYL:(uint32_t)coinYL coinTB:(uint32_t)coinTB;

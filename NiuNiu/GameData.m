@@ -35,6 +35,22 @@ static GameData *_instance = nil;
     return self;
 }
 
+- (void)addUserByUser:(User *)user
+{
+    [self.userDic setObject:user forKey:user.userID];
+}
+
+- (void)removeUserByUserID:(NSString *)userID
+{
+    [self.userDic removeObjectForKey:userID];
+}
+
+- (void)updateUserCoinTB:(NSString *)userID coinTB:(uint32_t)coinTB
+{
+    User *user = [_userDic objectForKey:userID];
+    [user setCoinTB:coinTB];
+}
+
 - (void)dealloc
 {
     [_player release];

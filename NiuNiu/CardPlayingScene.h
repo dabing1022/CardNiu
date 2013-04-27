@@ -16,6 +16,7 @@ enum{
     kTagZSymbol,
     kTagBetRatioMenu,
     kTagAllCards,
+    kTagChangeTable,
     kTagResultNiuSymbol,
     kTagReadingCardsLayer,
     kTagCountDownLabelTTF,
@@ -29,6 +30,13 @@ typedef enum
     kCDTimeBet=5,
     kCDTimeReadCards=25
 }countDownTime;
+
+typedef enum
+{
+    kEnterState_NOMAL,//能叫庄也能下注，则进来的阶段为抢庄阶段Tag1
+    kEnterState_HASNOT_BET,//不能叫庄但能下注，则进来的阶段为庄家已经确定后下注前进入
+    kEnterState_WATHCER//不能叫庄也不能下注，则进来的阶段为下注后进入,即为观察者
+}ENTER_STATE;
 
 
 //头像坐标位置
@@ -92,10 +100,12 @@ typedef enum
     CCMenuItemImage *_betRatioItem4;
     CCMenu *_betRatioMenu;
     
-    NSMutableArray *_allUserCardsArr;
-    NSMutableArray *_playerCardsArr;
-    NSMutableArray *_playerResultNiuSymbolArr;
-    NSMutableArray *_playerWinLoseCoinTBArr;
+    NSMutableArray *_allUserCardsArr;//所有玩家背面牌
+    NSMutableArray *_allUserCardsArr2;//所有玩家正面牌
+    NSMutableArray *_playerCardsArr;//玩家本人的5张卡牌
+    NSMutableArray *_playerResultNiuSymbolArr;//所有玩家牌型结果显示
+    NSMutableArray *_playerWinLoseCoinTBArr;//所有玩家输赢铜币显示
+    NSMutableDictionary *_betResultDic;//玩家下注结果显示字典表，键为userID
     
     CCSprite *_zSymbol;
     CCSprite *_countDown;
@@ -105,10 +115,11 @@ typedef enum
     int _countDownType;
     CCLabelTTF *_countDownLabelTTF;
     
-    //玩家下注结果显示字典表，键为userID
-    NSMutableDictionary *_betResultDic;
     
     CCLayer *_readingCardsLayer;
+    
+    CCMenuItemFont *_changeTableItemTTF;
+    CCMenu *_changeTableMenu;
 }
 
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeLeftGestureRecognizer;

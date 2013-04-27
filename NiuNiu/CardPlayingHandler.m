@@ -22,6 +22,13 @@
     [[GameData sharedGameData]player].roleTitle = [dic objectForKey:@"userTitle"];
     [[GameData sharedGameData]player].tableID = [[dic objectForKey:@"tableID"]intValue];
     [[GameData sharedGameData]player].chairID = [[dic objectForKey:@"chairID"]intValue];
+    [[GameData sharedGameData]player].canGrabZ = [[dic objectForKey:@"canGrabZ"]boolValue];
+    [[GameData sharedGameData]player].canBet = [[dic objectForKey:@"canBet"]boolValue];
+    [[GameData sharedGameData]player].showCardsDataArr = nil;
+    [[GameData sharedGameData]player].cardType = [[dic objectForKey:@"cardSize"]intValue];
+    
+    [[GameData sharedGameData]setZUserID:[dic objectForKey:@"zUserID"]];
+    
     [[GameData sharedGameData]player].posID = 2;
     
     NSArray *otherPlayers = (NSArray *)[dic objectForKey:@"otherPlayers"];
@@ -30,7 +37,7 @@
     for(NSDictionary *userDic in otherPlayers)
     {
         User *user = [self user:userDic];
-        [[[GameData sharedGameData]userDic]setObject:user forKey:user.userID];
+        [[GameData sharedGameData]addUserByUser:user];
     }
 }
 
@@ -39,7 +46,7 @@
 {
     NSDictionary *userDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     User *user = [self user:userDic];    
-    [[[GameData sharedGameData]userDic]setObject:user forKey:user.userID];
+    [[GameData sharedGameData]addUserByUser:user];
     return user;
 }
 
@@ -108,6 +115,10 @@
     NSMutableArray *cardsDataArr = [NSMutableArray arrayWithCapacity:[cardDataDicArr count]];
     for(int i = 0; i < [cardDataDicArr count]; i++){
         NSDictionary *singleCardDataDic = [cardDataDicArr objectAtIndex:i];
+        if((NSNull *)singleCardDataDic == [NSNull null]){
+            CCLOG(@"CardDataDicArr内部为null");
+            return nil;
+        }
         CardData *cardData = [[CardData alloc]init];
         cardData.color = [[singleCardDataDic objectForKey:@"color"]intValue];
         cardData.value = [[singleCardDataDic objectForKey:@"value"]intValue];
@@ -143,10 +154,17 @@
     for(int i = 0; i < [betArr count]; i++){
         NSDictionary *singlePlayerInfo = [betArr objectAtIndex:i];
         NSString *userID = [singlePlayerInfo objectForKey:@"userID"];
-        int coinTB = [[singlePlayerInfo objectForKey:@"coinTB"]intValue];//更新玩家铜币
-        User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
-        [user setCoinTB:coinTB];
+        int coinTB = [[singlePlayerInfo objectForKey:@"coinTB"]intValue];
+        //更新玩家铜币
+        [[GameData sharedGameData]updateUserCoinTB:userID coinTB:coinTB];
     }
+}
+
++ (void)processOtherPlayerOut:(NSData *)data
+{
+    NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    NSString *userID = [dic objectForKey:@"userID"];
+    [[GameData sharedGameData]removeUserByUserID:userID];
 }
 
 + (User *)user:(NSDictionary *)userDic
@@ -161,6 +179,11 @@
     user.roleTitle = [userDic objectForKey:@"userTitle"];
     user.tableID = [[userDic objectForKey:@"tableID"]intValue];
     user.chairID = [[userDic objectForKey:@"chairID"]intValue];
+    user.canGrabZ = [[userDic objectForKey:@"canGrabZ"]boolValue];
+    user.canBet = [[userDic objectForKey:@"canBet"]boolValue];
+    user.showCardsDataArr = [self cardDataDicArr2cardsDataArr:[userDic objectForKey:@"showCards"]];
+    user.cardType = [[userDic objectForKey:@"cardSize"]intValue];
+    
     user.posID = [User chairID2posID:user.chairID];
     CCLOG(@"user userID:%@, posID:%d",user.userID,user.posID);
     return  user;
