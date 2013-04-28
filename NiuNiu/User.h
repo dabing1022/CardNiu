@@ -51,7 +51,9 @@
     //玩家摊的牌等同于发送给服务器的牌
     NSMutableArray *_showCardsDataArr;
     //玩家的5张背面牌
-    NSMutableArray *_user5cards;
+    NSMutableArray *_user5backCards;
+    //玩家的5张正面牌
+    NSMutableArray *_user5faceCards;
     //每一局玩家的牌型结果
     int _cardType;//Server:cardSize
     //每一局玩家的输赢铜币量(可正可负)
@@ -81,7 +83,8 @@
 @property(nonatomic, retain)NSMutableArray *cardsDataArr;
 @property(nonatomic, retain)NSMutableArray *selectedCardsDataArr;
 @property(nonatomic, retain)NSMutableArray *sendToServerArr;
-@property(nonatomic, retain)NSMutableArray *user5cards;
+@property(nonatomic, retain)NSMutableArray *user5backCards;
+@property(nonatomic, retain)NSMutableArray *user5faceCards;
 @property(nonatomic, assign)int cardType;
 @property(nonatomic, assign)int winCoinTB;
 @property(nonatomic, assign)BOOL canGrabZ;

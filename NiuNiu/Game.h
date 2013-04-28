@@ -4,7 +4,8 @@
 
 /*--------------------LOGIN_SERVER通讯命令------------------------------------*/
 //用户通过GC验证后登录
-#define CMD_LOGIN 1001
+#define CMD_HEART_BEAT              1000//心跳包
+#define CMD_LOGIN                   1001
 
 
 
@@ -25,6 +26,7 @@
 #define CMD_UPDATE_USERS_INFO       2012//更新玩家信息(包括铜币等信息)
 #define CMD_CHANGE_TABLE            2013//向服务器请求换桌
 #define CMD_OTHER_PLAYER_OUT        2014//其他玩家离开桌子
+#define CMD_QUIT_CARD_GAME          2015//退出牌局游戏
 
 #define CMD_INFO  9998//服务器给客户端发送的提示
 #define CMD_ERROR 9999//出错

@@ -337,6 +337,8 @@ static GCDAsyncSocketHelper *_instance = nil;
         }
         case CMD_OTHER_PLAYER_OUT:{
             CCLOG(@"CMD_OTHER_PLAYER_OUT");
+            User *user = [CardPlayingHandler processOtherPlayerOut:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerOut:) withObject:user];
             break;
         }
         case CMD_ERROR:{

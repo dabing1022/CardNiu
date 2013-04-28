@@ -74,9 +74,18 @@
         _cardLayer = [[CCLayer alloc]init];
         _stateLayer = [[CCLayer alloc]init];
         
-        CCLabelTTF *familyPropertyLabel = [CCLabelTTF labelWithString:@"familyPropertyContent" fontName:@"Marker Felt" fontSize:20];
-		familyPropertyLabel.position =  ccp( size.width /2 , size.height/2 );
-		[_familyPropertyLayer addChild: familyPropertyLabel];
+        CCSprite *bar1 = [CCSprite spriteWithSpriteFrameName:@"familyPropertyBarBg.png"];
+        [bar1 setPosition:CGPointMake(size.width/2,size.height/2)];
+        CCSprite *bar2 = [CCSprite spriteWithSpriteFrameName:@"familyPropertyBarBg.png"];
+        [bar2 setPosition:CGPointMake(size.width/2,size.height/2 - 50)];
+        CCSprite *bar3 = [CCSprite spriteWithSpriteFrameName:@"familyPropertyBarBg.png"];
+        [bar3 setPosition:CGPointMake(size.width/2,size.height/2 - 100)];
+        CCSprite *bar4 = [CCSprite spriteWithSpriteFrameName:@"familyPropertyBarBg.png"];
+        [bar4 setPosition:CGPointMake(size.width/2,size.height/2 - 150)];
+        [_familyPropertyLayer addChild:bar1];
+        [_familyPropertyLayer addChild:bar2];
+        [_familyPropertyLayer addChild:bar3];
+        [_familyPropertyLayer addChild:bar4];
         
         CCLabelTTF *cardLabel = [CCLabelTTF labelWithString:@"cardLayerContent" fontName:@"Marker Felt" fontSize:20];
 		cardLabel.position =  ccp( size.width /2 , size.height/2 );
@@ -87,12 +96,14 @@
 		[_stateLayer addChild: stateLabel];
         
         _multiplexLayer = [CCLayerMultiplex layerWithLayers:_familyPropertyLayer,_cardLayer,_stateLayer, nil];
-//        [self addChild:_multiplexLayer];
         [_multiplexLayer switchTo:0];
         
         CCScrollView *familyScrollView = [CCScrollView viewWithViewSize:size container:_multiplexLayer];
         [familyScrollView setDirection:CCScrollViewDirectionVertical];
         [self addChild:familyScrollView];
+        [familyScrollView setPosition:CGPointMake(0, 100)];
+        [familyScrollView setContentOffset:CGPointMake(0, 0)];
+        [familyScrollView setContentSize:CGSizeMake(size.width, 100)];
         
         _flipSpriteTest = [CCSprite spriteWithSpriteFrameName:@"Card1_1.png"];
         _flipSpriteTest2 = [CCSprite spriteWithSpriteFrameName:@"CardBack.png"];

@@ -160,11 +160,13 @@
     }
 }
 
-+ (void)processOtherPlayerOut:(NSData *)data
++ (User *)processOtherPlayerOut:(NSData *)data
 {
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSString *userID = [dic objectForKey:@"userID"];
+    User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
     [[GameData sharedGameData]removeUserByUserID:userID];
+    return user;
 }
 
 + (User *)user:(NSDictionary *)userDic
