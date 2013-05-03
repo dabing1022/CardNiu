@@ -152,7 +152,17 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [_changeTableMenu setPosition:CGPointMake(200, 150)];
 }
 
-
+- (void)drawPlayersAvatarInfoBox
+{
+    NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
+    for(NSString *key in userDic){
+        User *user = [userDic objectForKey:key];
+        if(user.userID == [[GameData sharedGameData]player].userID) continue;
+        AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
+        [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
+        [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
+    }
+}
 
 #pragma mark - UISwipeGesture switch-scenes
 - (void)switchSceneToFamilyProperty:(id)sender
@@ -298,7 +308,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     if(playerSelf.canGrabZ && playerSelf.canBet){
         //能叫庄也能下注，则进来的阶段为抢庄阶段
         CCLOG(@"玩家进来时刻为：抢庄阶段进入");
-        [self initEnterViewWithState:kEnterState_NOMAL];
+        [self initEnterViewWithState:kEnterState_GRABZ];
     }else if(!playerSelf.canGrabZ && playerSelf.canBet){
         //不能叫庄但能下注，则进来的阶段为庄家已经确定后下注前进入
         CCLOG(@"玩家进来时刻为：庄家已经确定后下注前进入");
@@ -313,26 +323,21 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)initEnterViewWithState:(int)state
 {
     switch (state) {
-        case kEnterState_NOMAL:{
-            NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
-            for(NSString *key in userDic){
-                User *user = [userDic objectForKey:key];
-                if(user.userID == [[GameData sharedGameData]player].userID) continue;
-                AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
-                [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
-                [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
-            }
+        case kEnterState_GRABZ:{
+            [self drawPlayersAvatarInfoBox];
+            if([[[[GameData sharedGameData]userDic]allKeys]count] > 2)
+                [self grabZ:nil];
             break;
         }
         case kEnterState_HASNOT_BET:{
-            [self initEnterViewWithState:kEnterState_NOMAL];
+            [self drawPlayersAvatarInfoBox];
             [self grabResult:[[GameData sharedGameData] zUserID]];
             [self playSendCardsAnimation:NO];
             [self showPlayersBetRatio];
             break;
         }
         case kEnterState_WATCHER:{
-            [self initEnterViewWithState:kEnterState_NOMAL];
+            [self drawPlayersAvatarInfoBox];
             [self grabResult:[[GameData sharedGameData] zUserID]];
             [self showPlayersBetRatio];
             [self showPlayersFinalCards];
@@ -596,6 +601,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 //开始下注
 - (void)startBet:(NSArray *)betArr
 {
+    [_menuGrabZ setVisible:NO];
     for(int i = 0;i < 4;i++)
     {
         NSDictionary *aBetBoxInfoDic = (NSDictionary *)[betArr objectAtIndex:i];
@@ -694,7 +700,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 //处理其他玩家下注结果
 - (void)showPlayerBetResult:(NSDictionary *)betResult
 {
-    
     int ratio = [[betResult objectForKey:@"ratio"]intValue];
     NSString *userID = [betResult objectForKey:@"userID"];
     if([userID isEqualToString:[[GameData sharedGameData]player].userID])

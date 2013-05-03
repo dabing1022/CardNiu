@@ -34,7 +34,7 @@ typedef enum
 
 typedef enum
 {
-    kEnterState_NOMAL,//能叫庄也能下注，则进来的阶段为抢庄阶段Tag1
+    kEnterState_GRABZ,//能叫庄也能下注，则进来的阶段为抢庄阶段
     kEnterState_HASNOT_BET,//不能叫庄但能下注，则进来的阶段为庄家已经确定后下注前进入
     kEnterState_WATCHER//不能叫庄也不能下注，则进来的阶段为下注后进入,即为观察者
 }ENTER_STATE;
@@ -45,7 +45,7 @@ typedef enum
 #define AVARTAR_POS_ID1 CGPointMake(55, 220)
 #define AVARTAR_POS_ID2 CGPointMake(55, 86)
 #define AVARTAR_POS_ID3 CGPointMake(264, 170)
-#define AVARTAR_POS_ID4 CGPointMake(55, 310)
+#define AVARTAR_POS_ID4 CGPointMake(264, 310)
 #define AVARTAR_POS_ID5 CGPointMake(170, 432)
 
 //首张牌坐标位置
@@ -67,7 +67,7 @@ typedef enum
 #define BET_BOX_FLYTO_POS_ID1 CGPointMake(55, 220)
 #define BET_BOX_FLYTO_POS_ID2 CGPointMake(55, 86)
 #define BET_BOX_FLYTO_POS_ID3 CGPointMake(264, 170)
-#define BET_BOX_FLYTO_POS_ID4 CGPointMake(55, 310)
+#define BET_BOX_FLYTO_POS_ID4 CGPointMake(264, 310)
 #define BET_BOX_FLYTO_POS_ID5 CGPointMake(170, 432)
 
 

@@ -333,6 +333,7 @@ static GCDAsyncSocketHelper *_instance = nil;
         case CMD_UPDATE_USERS_INFO:{
             CCLOG(@"CMD_UPDATE_USER_INFO");
             [CardPlayingHandler processUpdateUsersInfo:data];
+            //to be done -->update ui players info
             break;
         }
         case CMD_OTHER_PLAYER_OUT:{

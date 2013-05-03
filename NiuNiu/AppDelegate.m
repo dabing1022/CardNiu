@@ -167,6 +167,7 @@
 // getting a call, pause the game
 -(void) applicationWillResignActive:(UIApplication *)application
 {
+    CCLOG(@"程式暂停");
 	if( [navController_ visibleViewController] == director_ )
 		[director_ pause];
 }
@@ -174,6 +175,7 @@
 // call got rejected
 -(void) applicationDidBecomeActive:(UIApplication *)application
 {
+    CCLOG(@"程式激活");
 	if( [navController_ visibleViewController] == director_ )
 		[director_ resume];
     CCLOG(@"<%@>", NSStringFromSelector(_cmd));
@@ -181,7 +183,8 @@
 
 -(void) applicationDidEnterBackground:(UIApplication*)application
 {
-	if( [navController_ visibleViewController] == director_ )
+    CCLOG(@"程式进入后台");
+    if( [navController_ visibleViewController] == director_ )
 		[director_ stopAnimation];
     /*
      Invalidate Game Center GKAuthentication and save game state, so the game doesn't start until the GKAuthentication
@@ -192,6 +195,7 @@
 
 -(void) applicationWillEnterForeground:(UIApplication*)application
 {
+    CCLOG(@"程式进入前台");
 	if( [navController_ visibleViewController] == director_ )
 		[director_ startAnimation];
 }
@@ -199,6 +203,7 @@
 // application will be killed
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    CCLOG(@"程式意外终止");
 	CC_DIRECTOR_END();
 }
 

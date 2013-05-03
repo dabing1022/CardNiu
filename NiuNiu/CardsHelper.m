@@ -3,7 +3,7 @@
 //  NiuNiu
 //
 //  Created by childhood on 13-4-23.
-//
+//  
 //
 
 #import "CardsHelper.h"
@@ -67,7 +67,10 @@ static CardsHelper *_instance = nil;
     NSArray *index;
     NSDictionary *resultDic;
     if(selectedLength == 3 && selectedSum % 10 == 0){
-        cardType = [NSNumber numberWithInt:leftValue];
+        if(leftValue == 0)
+            cardType = [NSNumber numberWithInt:NIU_NIU];
+        else
+            cardType = [NSNumber numberWithInt:leftValue];
     }else{
         cardType = [NSNumber numberWithInt:NIU_0];
     }
