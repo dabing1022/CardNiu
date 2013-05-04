@@ -12,6 +12,8 @@
 #import "IntroLayer.h"
 #import "Game.h"
 #import "IP_AddressHelper.h"
+#import "GameData.h"
+#import "User.h"
 
 @implementation AppController
 

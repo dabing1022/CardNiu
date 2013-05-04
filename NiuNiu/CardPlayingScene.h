@@ -83,6 +83,8 @@ typedef enum
 //卡牌飞行速度
 #define CARD_SPEED 600
 
+
+#define DEBUG_CONSOLE 1
 @class ProfilePanel;
 @interface CardPlayingScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
@@ -122,10 +124,15 @@ typedef enum
     
     CCMenuItemFont *_changeTableItemTTF;
     CCMenu *_changeTableMenu;
+    
+#ifdef DEBUG_CONSOLE
+    CCLabelTTF *debugConsole;
+#endif
 }
 
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeLeftGestureRecognizer;
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeRightGestureRecognizer;
+@property(nonatomic, retain) CCMenu *betRatioMenu;
 +(CCScene *) scene;
 
 
