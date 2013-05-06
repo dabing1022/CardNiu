@@ -28,6 +28,7 @@ typedef enum
     NSMutableArray *_userCardsArray;
     int _state;
     UserCard *_fifthCard;
+    BOOL _fifthCardsOpened;
     
     CCSprite *_resultNiu;
     CCMenuItemImage *_confirmMenuItem;

@@ -34,6 +34,8 @@
         _userCardsArray = [NSMutableArray arrayWithCapacity:5];
         [_userCardsArray retain];
         
+        _fifthCardsOpened = NO;
+        
         [self drawUserCards];
         [self drawResultNiu:0];
         [self drawConfirmMenu];
@@ -209,6 +211,7 @@
 
 - (void)openTheFifthCard
 {
+    _fifthCardsOpened = YES;
     CardData *cardData = [_cardsDataArray objectAtIndex:4];
     [_fifthCard setFrontFace:cardData];
     
@@ -270,7 +273,7 @@
 {
     CCLOG(@"ccTouchEnded");
     if(_state == kState_TheFifthCard){
-        if([self containsTouchLocation:touch node:_fifthCard]){
+        if([self containsTouchLocation:touch node:_fifthCard] && !_fifthCardsOpened){
             [self openTheFifthCard];
         }
     }else if(_state == kState_CalCard && !_isZhaDanOrWuHua){

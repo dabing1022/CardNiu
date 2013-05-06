@@ -57,7 +57,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         _avatarDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
         _playerCardsArr = [[NSMutableArray alloc]initWithCapacity:5];
         _playerResultNiuSymbolDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
-        _playerWinLoseCoinTBArr = [[NSMutableArray alloc]initWithCapacity:MAX_PLAYERS_NUM];
+        _playerWinLoseCoinTBDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
                 
 		CCLabelTTF *label = [CCLabelTTF labelWithString:@"牌局" fontName:@"Marker Felt" fontSize:64];
 		CGSize size = [[CCDirector sharedDirector] winSize];
@@ -161,10 +161,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
     for(NSString *key in userDic){
         User *user = [userDic objectForKey:key];
-        if(user.userID == [[GameData sharedGameData]player].userID) continue;
+        if([user.userID isEqualToString:[[GameData sharedGameData]player].userID]) continue;
         AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
         [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
         [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
+        [_avatarDic setObject:playerBox forKey:user.userID];
     }
 }
 
@@ -302,6 +303,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:[[GameData sharedGameData]player]];
     [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
     [playerBox setPosition:AVARTAR_POS_ID2];
+    [_avatarDic setObject:playerBox forKey:[[GameData sharedGameData]player].userID];
+    
     _activityIndicatorView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     [[[CCDirector sharedDirector] view] addSubview:_activityIndicatorView];
     CGSize size = [[CCDirector sharedDirector] winSize];
@@ -405,6 +408,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)otherPlayerIn:(User *)user
 {
     CCLOG(@"------>有其他玩家进入");
+    CCLOG(@"------>进入的玩家的userID为：%@", user.userID);
     AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:user];
     [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
     [playerBox setPosition:[[_avatarPosArr objectAtIndex:user.posID]CGPointValue]];
@@ -415,10 +419,12 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)otherPlayerOut:(User *)user
 {
     CCLOG(@"------>有其他玩家离开");
+    CCLOG(@"------>离开的玩家的userID为：%@", user.userID);
     //清除玩家头像信息
     AvatarInfoBox *playerBox = [_avatarDic objectForKey:user.userID];
     [self removeChild:playerBox cleanup:YES];
     [_avatarDic removeObjectForKey:user.userID];
+    CCLOG(@"清除离开玩家头像完毕");
     
     //清除玩家下注信息(如果有的话)
     CCSprite *betBox = [_betResultDic objectForKey:user.userID];
@@ -440,6 +446,14 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self removeChild:resultNiu cleanup:YES];
         [_playerResultNiuSymbolDic removeObjectForKey:user.userID];
     }
+    
+    //清除winLose金币(如果有的话)
+    CCLabelTTF *winLoseCoinTB = [_playerWinLoseCoinTBDic objectForKey:user.userID];
+    if(winLoseCoinTB){
+        [self removeChild:winLoseCoinTB cleanup:YES];
+        [_playerWinLoseCoinTBDic removeObjectForKey:user.userID];
+    }
+
 }
 
 //查看玩家具体信息
@@ -461,7 +475,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self countDownBeginWith:kCDTimeGrabZ];
     }else{//庄家已经存在
         CCLOG(@"庄家已经存在，不用抢庄");
-        [self fobiddenLeavingOut];
     }
     [self playSendCardsAnimation:YES];
     [debugConsole setString:@"grabz"];
@@ -505,7 +518,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self unschedule:@selector(countDownWithGrabZType:)];
         CCLOG(@"GrabZ TIME UP!");
         if(_menuGrabZ.visible){
-            [_menuGrabZ setVisible:NO];    
+            [_menuGrabZ setVisible:NO];
+            [self fobiddenLeavingOut];
         }
     }
 }
@@ -612,6 +626,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     id flyTo = [CCMoveTo actionWithDuration:0.5 position:targetPos];
     [_zSymbol runAction:flyTo];
     
+    [_menuGrabZ setVisible:NO];
     [self countDownBeginWith:kCDTimeBet];
 }
 
@@ -669,13 +684,13 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_GRAB_RESULT contentDic:dic];
     [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:0 socketType:CARD_SOCKET];
     [_menuGrabZ setVisible:NO];
+    [self fobiddenLeavingOut];
 }
 
 - (void)sendServerWithBetRatio:(int)ratio
 {
     [self fobiddenLeavingOut];
     [_betRatioMenu removeFromParentAndCleanup:YES];
-    [self fobiddenLeavingOut];
     
     CCSprite *betBox = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioNomal%d.png",ratio]];
     [self addChild:betBox z:kTagBetRatioMenu];
@@ -912,7 +927,12 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         CCLabelTTF *winLoseCoinTB = [CCLabelTTF labelWithString:tb fontName:@"Arial" fontSize:20];
         [self addChild:winLoseCoinTB z:kTagResultNiuSymbol tag:kTagResultNiuSymbol];
         [winLoseCoinTB setPosition:[[_avatarPosArr objectAtIndex:user.posID] CGPointValue]];
-        [_playerWinLoseCoinTBArr addObject:winLoseCoinTB];
+        [_playerWinLoseCoinTBDic setObject:winLoseCoinTB forKey:user.userID];
+    }
+    
+    //如果玩家本人是庄家，此时不允许换桌或者离开
+    if([[[[GameData sharedGameData]player]userID] isEqualToString:[[GameData sharedGameData]zUserID]]){
+        [self fobiddenLeavingOut];
     }
 }
 
@@ -920,6 +940,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)updatePlayersCoin
 {
     CCLOG(@"CardPlayingScene updatePlayersCoin");
+    for(NSString *key in [[GameData sharedGameData]userDic]){
+        User *user = [[[GameData sharedGameData]userDic]objectForKey:key];
+        AvatarInfoBox *avatarInfoBox = [_avatarDic objectForKey:key];
+        [avatarInfoBox updateCoinTB:user.coinTB];
+    }
 }
 
 - (void)clearForRestart
@@ -929,12 +954,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [self removeChild:_zSymbol cleanup:YES];
     
     //清除winLose金币
-    if([_playerWinLoseCoinTBArr count] > 0){
-        for(CCLabelTTF *winLoseCoinTB in _playerWinLoseCoinTBArr){
-            [self removeChild:winLoseCoinTB cleanup:YES];
-        }
-        [_playerWinLoseCoinTBArr removeAllObjects];
+    for(NSString *key in _playerWinLoseCoinTBDic){
+        CCLabelTTF *winLoseCoinTB = [_playerWinLoseCoinTBDic objectForKey:key];
+        [self removeChild:winLoseCoinTB cleanup:YES];
     }
+    [_playerWinLoseCoinTBDic removeAllObjects];
     
     if([_allUserCardsArr count] > 0){
         for(UserCard *card in _allUserCardsArr){
@@ -958,7 +982,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     for(NSString *key in _playerResultNiuSymbolDic){
         CCSprite *resultNiu = [_playerResultNiuSymbolDic objectForKey:key];
         [self removeChild:resultNiu cleanup:YES];
-        CCLOG(@"移除%@的牌型结果", key);
     }
     [_playerResultNiuSymbolDic removeAllObjects];
     
@@ -1002,7 +1025,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [_avatarDic release];
     [_playerResultNiuSymbolDic release];
     [_playerCardsArr release];
-    [_playerWinLoseCoinTBArr release];
+    [_playerWinLoseCoinTBDic release];
     
     [_betRatioMenu release];
     

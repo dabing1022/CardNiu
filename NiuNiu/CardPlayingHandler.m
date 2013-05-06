@@ -138,9 +138,9 @@
 //处理最后所有玩家的输赢情况
 + (void)processFinalWinLoseResult:(NSData *)data
 {
-    NSArray *betArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
-    for(int i = 0; i < [betArr count]; i++){
-        NSDictionary *singlePlayerFinalResult = [betArr objectAtIndex:i];
+    NSArray *usersInfoArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
+    for(int i = 0; i < [usersInfoArr count]; i++){
+        NSDictionary *singlePlayerFinalResult = [usersInfoArr objectAtIndex:i];
         NSString *userID = [singlePlayerFinalResult objectForKey:@"userID"];
         int winCoinTB = [[singlePlayerFinalResult objectForKey:@"winCoinTB"]intValue];
         User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
@@ -150,12 +150,11 @@
 
 + (void)processUpdateUsersInfo:(NSData *)data
 {
-    NSArray *betArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
-    for(int i = 0; i < [betArr count]; i++){
-        NSDictionary *singlePlayerInfo = [betArr objectAtIndex:i];
+    NSArray *usersInfoArr = [[GCDAsyncSocketHelper sharedHelper]analysisDataToArray:data];
+    for(int i = 0; i < [usersInfoArr count]; i++){
+        NSDictionary *singlePlayerInfo = [usersInfoArr objectAtIndex:i];
         NSString *userID = [singlePlayerInfo objectForKey:@"userID"];
         int coinTB = [[singlePlayerInfo objectForKey:@"coinTB"]intValue];
-        //更新玩家铜币
         [[GameData sharedGameData]updateUserCoinTB:userID coinTB:coinTB];
     }
 }

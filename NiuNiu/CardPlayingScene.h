@@ -106,7 +106,7 @@ typedef enum
     NSMutableArray *_allUserCardsArr;//所有玩家背面牌
     NSMutableArray *_allUserCardsArr2;//所有玩家正面牌
     NSMutableArray *_playerCardsArr;//玩家本人的5张卡牌
-    NSMutableArray *_playerWinLoseCoinTBArr;//所有玩家输赢铜币显示
+    NSMutableDictionary *_playerWinLoseCoinTBDic;//所有玩家输赢铜币显示
     NSMutableDictionary *_betResultDic;//玩家下注结果显示字典表，键为userID
     NSMutableDictionary *_avatarDic;//玩家头像字典表，键为userID
     NSMutableDictionary *_playerResultNiuSymbolDic;//所有玩家牌型结果显示,键为userID

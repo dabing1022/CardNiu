@@ -25,10 +25,15 @@
         _avatarSpr = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"avatar%@.png",user.avatarID]];
         [self addChild:_avatarSpr z:0 tag:kTagAvatarSpr];
         _coinTB = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d",user.coinTB] fontName:@"Arial" fontSize:24];
-        _coinTB.position = ccp(80, 8);
+        _coinTB.position = ccp(50, 8);
         [self addChild:_coinTB z:1 tag:kTagCoinTB];
     }
     return self;
+}
+
+- (void)updateCoinTB:(int)coinTB
+{
+    [_coinTB setString:[NSString stringWithFormat:@"%d",coinTB]];
 }
 
 - (void)onEnter

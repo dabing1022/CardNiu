@@ -214,6 +214,28 @@ static GCDAsyncSocketHelper *_instance = nil;
     return contentArr;
 }
 
+- (NSData *)judgeRemainData:(NSData *)data
+{
+    int currLen = [self analysisDataLen:data] + LEN_SIZE;
+    int totalLen = data.length;
+    if(totalLen > currLen){
+        Byte remainByte[totalLen - currLen];
+        [data getBytes:remainByte range:NSMakeRange(currLen, totalLen - currLen)];
+        NSData *remainData = [NSData dataWithBytes:remainByte length:totalLen - currLen];
+        CCLOG(@"剩余包数据-->包命令cmd %d", [self analysisDataCMD:remainData]);
+        return remainData;
+    }
+    CCLOG(@"没有剩余包数据");
+    return nil;
+}
+
+- (void)analysisRemainData:(NSData *)data socket:(GCDAsyncSocket *)sock
+{
+    NSData *remainData = [self judgeRemainData:data];
+    if(remainData){
+        [self socket:sock didReadData:remainData withTag:0];
+    }
+}
 
 #pragma mark - socket delegate
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
@@ -333,7 +355,7 @@ static GCDAsyncSocketHelper *_instance = nil;
         case CMD_UPDATE_USERS_INFO:{
             CCLOG(@"CMD_UPDATE_USER_INFO");
             [CardPlayingHandler processUpdateUsersInfo:data];
-            //to be done -->update ui players info
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(updatePlayersCoin) withObject:nil];
             break;
         }
         case CMD_OTHER_PLAYER_OUT:{
@@ -350,9 +372,11 @@ static GCDAsyncSocketHelper *_instance = nil;
             CCLOG(@"PLEASE CHECK THE CMD!");
             break;
     }
-    [self readDataWithTimeout:-1 tag:0 socketType:LOGIN_SOCKET];
-    [self readDataWithTimeout:-1 tag:0 socketType:FAMILY_SOCKET];
-    [self readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
+    [self analysisRemainData:data socket:sock];
+    [sock readDataWithTimeout:-1 tag:0];
+//    [self readDataWithTimeout:-1 tag:0 socketType:LOGIN_SOCKET];
+//    [self readDataWithTimeout:-1 tag:0 socketType:FAMILY_SOCKET];
+//    [self readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
 }
 
 #pragma mark - 返回主线程更新UI

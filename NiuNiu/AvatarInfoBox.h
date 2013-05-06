@@ -26,5 +26,5 @@ enum{
 
 + (id)infoBoxWithUserData:(User *)user;
 - (id)initInfoBoxWithUserData:(User *)user;
-
+- (void)updateCoinTB:(int)coinTB;
 @end
