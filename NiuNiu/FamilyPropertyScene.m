@@ -112,7 +112,6 @@
         [self addChild:_flipSpriteTest2];
         [_flipSpriteTest setPosition:ccp(size.width/2,size.height/2)];
         [_flipSpriteTest2 setPosition:ccp(size.width/2,size.height/2)];
-        
     }
     LOG_FUN_DID;
     return self;

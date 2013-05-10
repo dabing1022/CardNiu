@@ -50,10 +50,8 @@
     NSMutableArray *_sendToServerArr;
     //玩家摊的牌等同于发送给服务器的牌
     NSMutableArray *_showCardsDataArr;
-    //玩家的5张背面牌
-    NSMutableArray *_user5backCards;
-    //玩家的5张正面牌
-    NSMutableArray *_user5faceCards;
+    //玩家的5张牌
+    NSMutableArray *_user5cards;
     //每一局玩家的牌型结果
     int _cardType;//Server:cardSize
     //每一局玩家的输赢铜币量(可正可负)
@@ -63,6 +61,7 @@
     //能不能下注(在系统计算时间之内不能下注，针对的是此时进来的玩家)
     BOOL _canBet;
     int _betRatio;
+    BOOL _offline;//是否掉线
 }
 
 @property(nonatomic, retain)NSString *userID;
@@ -83,11 +82,11 @@
 @property(nonatomic, retain)NSMutableArray *cardsDataArr;
 @property(nonatomic, retain)NSMutableArray *selectedCardsDataArr;
 @property(nonatomic, retain)NSMutableArray *sendToServerArr;
-@property(nonatomic, retain)NSMutableArray *user5backCards;
-@property(nonatomic, retain)NSMutableArray *user5faceCards;
+@property(nonatomic, retain)NSMutableArray *user5cards;
 @property(nonatomic, assign)int cardType;
 @property(nonatomic, assign)int winCoinTB;
 @property(nonatomic, assign)BOOL canGrabZ;
+@property(nonatomic, assign)BOOL offline;
 @property(nonatomic, assign)BOOL canBet;
 @property(nonatomic, assign)int betRatio;
 @property(nonatomic, retain)NSMutableArray *showCardsDataArr;

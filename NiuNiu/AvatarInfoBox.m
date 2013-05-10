@@ -23,12 +23,23 @@
     {
         _user = [user retain];
         _avatarSpr = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"avatar%@.png",user.avatarID]];
-        [self addChild:_avatarSpr z:0 tag:kTagAvatarSpr];
+        [self addChild:_avatarSpr z:kTagAvatarSpr tag:kTagAvatarSpr];
+        
         _coinTB = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d",user.coinTB] fontName:@"Arial" fontSize:24];
         _coinTB.position = ccp(50, 8);
-        [self addChild:_coinTB z:1 tag:kTagCoinTB];
+        [self addChild:_coinTB z:kTagCoinTB tag:kTagCoinTB];
+        
+        _offlineSpr = [CCSprite spriteWithSpriteFrameName:@"offline.png"];
+        [self addChild:_offlineSpr z:kTagOffline tag:kTagOffline];
+        [_offlineSpr setPosition:CGPointMake(10, 20)];
+        [_offlineSpr setVisible:NO];
     }
     return self;
+}
+
+- (void)showOfflineStatus:(BOOL)show
+{
+    [_offlineSpr setVisible:show];
 }
 
 - (void)updateCoinTB:(int)coinTB

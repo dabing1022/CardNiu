@@ -25,5 +25,6 @@
 - (void)addUserByUser:(User *)user;
 - (void)removeUserByUserID:(NSString *)userID;
 - (void)updateUserCoinTB:(NSString *)userID coinTB:(uint32_t)coinTB;
+- (void)removeUserFromUserDicExceptMe;
 
 @end

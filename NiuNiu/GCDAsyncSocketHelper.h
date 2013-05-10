@@ -38,10 +38,12 @@
 - (void) connectLoginServer;
 - (void) connectFamilyServer;
 - (void) connectCardServer;
+- (void) connectServer:(GCDAsyncSocket *)sock;
 
 - (void) disconnectLoginServer;
 - (void) disconnectFamilyServer;
 - (void) disconnectCardServer;
+- (void) disconnectServer:(GCDAsyncSocket *)sock;
 
 - (NSData *) wrapPacketWithCmd:(NSUInteger)cmd contentDic:(NSDictionary *)contentDic;
 - (void)writeData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag socketType:(int)type;

@@ -15,6 +15,7 @@
 
 + (void)processLoginData:(NSData *)data
 {
+    if([[GameData sharedGameData]player]) return;
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     
     User *player = [User userWithUserID:[dic objectForKey:@"userID"]
@@ -44,7 +45,7 @@
     CCLOG(@"FAMILY_IP:%@",[GCDAsyncSocketHelper sharedHelper].FAMILY_IP);
     CCLOG(@"FAMILY_PORT:%d",[GCDAsyncSocketHelper sharedHelper].FAMILY_PORT);
     //连接家产服务器
-    [[GCDAsyncSocketHelper sharedHelper]disconnectLoginServer];
+    //[[GCDAsyncSocketHelper sharedHelper]disconnectLoginServer];
     if(![[GCDAsyncSocketHelper sharedHelper]familySocket])
         [[GCDAsyncSocketHelper sharedHelper]connectFamilyServer];
     

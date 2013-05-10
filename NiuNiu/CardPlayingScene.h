@@ -20,7 +20,8 @@ enum{
     kTagResultNiuSymbol,
     kTagReadingCardsLayer,
     kTagCountDownLabelTTF,
-    kTagCurtain
+    kTagCurtain,
+    kTagPopUpView
 };
 
 //倒计时时间长度
@@ -86,12 +87,18 @@ typedef enum
 
 #define DEBUG_CONSOLE 1
 @class ProfilePanel;
+@class AvatarInfoBox;
+@class PopUpTipView;
 @interface CardPlayingScene : CCLayer <UIGestureRecognizerDelegate,CurtainTransitionDelegate,UIAlertViewDelegate>
 {
     //加入手势滑动切换场景
     UISwipeGestureRecognizer *_swipeLeftGestureRecognizer;
     UISwipeGestureRecognizer *_swipeRightGestureRecognizer;
-    UIActivityIndicatorView *_activityIndicatorView;
+
+    //提示浮层
+    PopUpTipView *_popUpTipView;
+    
+    AvatarInfoBox *_playerInfoBox;
     
     CCMenuItemImage *_menuItemGrabZ;
     CCMenuItemImage *_menuItemNotGrabZ;
@@ -104,8 +111,6 @@ typedef enum
     CCMenu *_betRatioMenu;
     
     NSMutableArray *_allUserCardsArr;//所有玩家背面牌
-    NSMutableArray *_allUserCardsArr2;//所有玩家正面牌
-    NSMutableArray *_playerCardsArr;//玩家本人的5张卡牌
     NSMutableDictionary *_playerWinLoseCoinTBDic;//所有玩家输赢铜币显示
     NSMutableDictionary *_betResultDic;//玩家下注结果显示字典表，键为userID
     NSMutableDictionary *_avatarDic;//玩家头像字典表，键为userID
@@ -121,6 +126,10 @@ typedef enum
     
     
     CCLayer *_readingCardsLayer;
+    BOOL _isThinkingBet;
+    BOOL _isClosing5cards;
+    BOOL _isOpening5cards;
+    BOOL _isReading5cards;
     
     CCMenuItemFont *_changeTableItemTTF;
     CCMenu *_changeTableMenu;
@@ -133,7 +142,8 @@ typedef enum
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeLeftGestureRecognizer;
 @property(nonatomic, retain) UISwipeGestureRecognizer *swipeRightGestureRecognizer;
 @property(nonatomic, retain) CCMenu *betRatioMenu;
+@property(nonatomic, retain) PopUpTipView *popUpTipView;
 +(CCScene *) scene;
-
+- (void)showPopTipViewWithTipType:(int)type;
 
 @end

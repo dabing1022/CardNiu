@@ -5,7 +5,7 @@
 /*--------------------LOGIN_SERVER通讯命令------------------------------------*/
 //用户通过GC验证后登录
 #define CMD_HEART_BEAT              1000//心跳包
-#define CMD_LOGIN                   1001
+#define CMD_LOGIN                   1001//玩家登录
 
 
 
@@ -27,11 +27,15 @@
 #define CMD_CHANGE_TABLE            2013//向服务器请求换桌
 #define CMD_OTHER_PLAYER_OUT        2014//其他玩家离开桌子
 #define CMD_QUIT_CARD_GAME          2015//退出牌局游戏
+#define CMD_OTHER_PLAYER_OFFLINE    2016//玩家离线
+#define CMD_OTHER_PLAYER_ONLINE     2017//玩家恢复在线
+#define CMD_RECONNECT_CARD_SERVER   2018//断线重连牌局服务器
 
-#define CMD_INFO  9998//服务器给客户端发送的提示
-#define CMD_ERROR 9999//出错
-#define INFO_WAITING_ASSIGN @"info001"//玩家切换到牌局场景后等待分配
-#define INFO_FORCED_CHANGE_TABLE @"info002"//玩家金币不足，被系统重新分配桌子
+
+#define CMD_INFO                    9998//服务器给客户端发送的提示
+#define CMD_ERROR                   9999//出错
+#define INFO_WAITING_ASSIGN         @"info001"//玩家切换到牌局场景后等待分配
+#define INFO_FORCED_CHANGE_TABLE    @"info002"//玩家金币不足，被系统重新分配桌子
 
 /*--------------------FAMILY_SERVER通讯命令------------------------------------*/
 

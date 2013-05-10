@@ -168,6 +168,34 @@
     return user;
 }
 
++ (void)processForcedChangeTable
+{
+    [[GameData sharedGameData]removeUserFromUserDicExceptMe];
+}
+
++ (User *)processOtherPlayerOffline:(NSData *)data
+{
+    NSDictionary *offlineUserDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    NSString *userID = [offlineUserDic objectForKey:@"userID"];
+    User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
+    [user setOffline:YES];
+    return user;
+}
+
++ (User *)processOtherPlayerOnline:(NSData *)data
+{
+    NSDictionary *onlineUserDic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
+    NSString *userID = [onlineUserDic objectForKey:@"userID"];
+    User *user = [[[GameData sharedGameData]userDic]objectForKey:userID];
+    [user setOffline:NO];
+    return user;
+}
+
++ (void)processReconnectCardServer:(NSData *)data
+{
+    [self processEnterDeskData:data];
+}
+
 + (User *)user:(NSDictionary *)userDic
 {
     User *user = [User userWithUserID:[userDic objectForKey:@"userID"]

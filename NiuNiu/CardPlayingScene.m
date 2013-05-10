@@ -19,11 +19,13 @@
 #import "ReadingCardsLayer.h"
 #import "CardsHelper.h"
 #import "CardPlayingHandler.h"
+#import "PopUpTipView.h"
 
 
 @implementation CardPlayingScene
 @synthesize swipeLeftGestureRecognizer=_swipeLeftGestureRecognizer;
 @synthesize swipeRightGestureRecognizer=_swipeRightGestureRecognizer;
+@synthesize popUpTipView=_popUpTipView;
 @synthesize betRatioMenu=_betRatioMenu;
 
 static NSArray *_avatarPosArr;
@@ -52,10 +54,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [[GCDAsyncSocketHelper sharedHelper]readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];        
         
         _allUserCardsArr = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
-        _allUserCardsArr2 = [[NSMutableArray alloc]initWithCapacity:TOTAL_CARD_NUM];
         _betResultDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
         _avatarDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
-        _playerCardsArr = [[NSMutableArray alloc]initWithCapacity:5];
         _playerResultNiuSymbolDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
         _playerWinLoseCoinTBDic = [[NSMutableDictionary alloc]initWithCapacity:MAX_PLAYERS_NUM];
                 
@@ -109,6 +109,14 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         
         //添加观察者-亮牌
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(finalShowCards:) name:@"startShowCardsResult" object:nil];
+        
+        _playerInfoBox = nil;
+        self.popUpTipView = nil;
+        
+        _isThinkingBet = NO;
+        _isClosing5cards = NO;
+        _isOpening5cards = NO;
+        _isReading5cards = NO;
     }
     LOG_FUN_DID;
     return self;
@@ -154,6 +162,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     _changeTableMenu = [CCMenu menuWithItems:_changeTableItemTTF, nil];
     [self addChild:_changeTableMenu z:kTagChangeTable tag:kTagChangeTable];
     [_changeTableMenu setPosition:CGPointMake(200, 150)];
+    [_changeTableMenu setVisible:NO];
 }
 
 - (void)drawPlayersAvatarInfoBox
@@ -221,6 +230,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 
 - (void)openCurtain
 {
+    [self removePopUpTipView];
     CGSize size = [[CCDirector sharedDirector] winSize];
     CCSprite *transitionUpSpr = [CCSprite spriteWithFile:@"transitionUp.png"];
     [self addChild:transitionUpSpr z:kTagCurtain tag:kTagCurtain];
@@ -240,6 +250,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 #pragma mark - onEnter onExit
 - (void)onEnter
 {
+    [self showPopTipViewWithTipType:kTipType_CONNECT_CARD_SERVER];
+    
     if([[GCDAsyncSocketHelper sharedHelper]cardSocket].isDisconnected)
     {
         CGSize size = [[CCDirector sharedDirector] winSize];
@@ -254,8 +266,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     }else{
         [self openCurtain];
         CCLOG(@"openCurtain");
-        //10s发送一次心跳包
-        [self schedule:@selector(sendHeartBeat:) interval:10];
     }
     self.swipeLeftGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
                                                                                 action:@selector(switchSceneToPawnShop:)];
@@ -275,8 +285,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeLeftGestureRecognizer];
     [[[CCDirector sharedDirector] view] removeGestureRecognizer:_swipeRightGestureRecognizer];
-    [_activityIndicatorView stopAnimating];
-    [_activityIndicatorView removeFromSuperview];
+    [self removePopUpTipView];
     
     //移除观察者
     [[NSNotificationCenter defaultCenter]removeObserver:self name:@"startShowCardsResult" object:nil];
@@ -300,25 +309,46 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 //等待分配进桌
 - (void)waitingAssign
 {
-    AvatarInfoBox *playerBox = [AvatarInfoBox infoBoxWithUserData:[[GameData sharedGameData]player]];
-    [self addChild:playerBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
-    [playerBox setPosition:AVARTAR_POS_ID2];
-    [_avatarDic setObject:playerBox forKey:[[GameData sharedGameData]player].userID];
+    if(!_playerInfoBox){
+        _playerInfoBox = [AvatarInfoBox infoBoxWithUserData:[[GameData sharedGameData]player]];
+        [self addChild:_playerInfoBox z:kTagAvatarInfoBox tag:kTagAvatarInfoBox];
+        [_playerInfoBox setPosition:AVARTAR_POS_ID2];
+        [_avatarDic setObject:_playerInfoBox forKey:[[GameData sharedGameData]player].userID];        
+    }
+
+    [self showPopTipViewWithTipType:kTipType_WAIT_FOR_ASSIGN_IN_DESK];
     
-    _activityIndicatorView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [[[CCDirector sharedDirector] view] addSubview:_activityIndicatorView];
-    CGSize size = [[CCDirector sharedDirector] winSize];
-    _activityIndicatorView.center = ccp(size.width/2, size.height/2);
-    [_activityIndicatorView startAnimating];
     CCLOG(@"------>正在分配玩家，请稍后...");
     [debugConsole setString:@"正在分配玩家，请稍候"];
+    //10s发送一次心跳包
+    [self schedule:@selector(sendHeartBeat:) interval:7];
+}
+
+//当用户金币不足或者掉线重连上把结束的时候被强制换桌
+- (void)forcedChangeTable
+{
+    CCLOG(@"被强制换桌");
+    [self showPopTipViewWithTipType:kTipType_WAIT_FOR_ASSIGN_IN_DESK];
+    [self removeOtherPlayerAvatarInfoBoxExceptMe];
+    [self clearForRestart];
+}
+
+- (void)removeOtherPlayerAvatarInfoBoxExceptMe
+{
+    for(NSString *key in [[GameData sharedGameData]userDic]){
+        if([key isEqualToString:[[[GameData sharedGameData]player]userID]])
+            continue;
+        [self removeChild:[_avatarDic objectForKey:key] cleanup:YES];
+        [_avatarDic removeObjectForKey:key];
+    }
 }
 
 //分配进桌
 - (void)assignInDesk
 {
     CCLOG(@"------>分配进桌");
-    [_activityIndicatorView stopAnimating];
+    [self removePopUpTipView];
+    [_changeTableMenu setVisible:YES];
     
     User *playerSelf = [[GameData sharedGameData]player];
     if(playerSelf.canGrabZ && playerSelf.canBet){
@@ -329,7 +359,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         //不能叫庄但能下注，则进来的阶段为庄家已经确定后下注前进入
         CCLOG(@"玩家进来时刻为：庄家已经确定后下注前进入");
         [self initEnterViewWithState:kEnterState_HASNOT_BET];
-    }else if(!playerSelf.canGrabZ && playerSelf.canBet){
+    }else if(!playerSelf.canGrabZ && !playerSelf.canBet){
         //不能叫庄也不能下注，则进来的阶段为下注后进入
         CCLOG(@"玩家进来时刻为：下注后进入");
         [self initEnterViewWithState:kEnterState_WATCHER];
@@ -357,6 +387,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
             [self drawPlayersAvatarInfoBox];
             [self grabResult:[[GameData sharedGameData] zUserID]];
             [self showPlayersBetRatio];
+            [self playSendCardsAnimation:NO];
             [self showPlayersFinalCards];
             break;
         }
@@ -381,20 +412,9 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     }
 }
 
-//显示已经亮牌玩家的牌
+//显示未亮牌和亮的牌
 - (void)showPlayersFinalCards
-{
-    for (int i = 0; i < TOTAL_CARD_NUM; i++) {
-        UserCard *card = [UserCard cardWithBack];
-        [self addChild:card];
-        int index = i % MAX_PLAYERS_NUM;
-        int turn = i / MAX_PLAYERS_NUM;
-        CGPoint firstCardPos = [[_cardPosArr objectAtIndex:index]CGPointValue];
-        CGPoint targetCardPos = CGPointMake(firstCardPos.x+turn*CARD_SPACE0, firstCardPos.y);
-        [card setPosition:targetCardPos];
-        [_allUserCardsArr addObject:card];
-    }
-
+{  
     NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
     for(NSString *key in userDic){
         User *user = [userDic objectForKey:key];
@@ -434,12 +454,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     }
     
     //清除玩家摊的牌和牌型结果(如果有的话)
-    if([user.user5faceCards count] == 5){
-        //摊的5张牌
-        for(UserCard *card in user.user5faceCards){
+    if([[user.user5cards objectAtIndex:0]isFront]){
+        for(UserCard *card in user.user5cards){
             [self removeChild:card cleanup:YES];
         }
-        [user.user5faceCards removeAllObjects];
+        [user.user5cards removeAllObjects];
         
         //牌型结果
         CCSprite *resultNiu = [_playerResultNiuSymbolDic objectForKey:user.userID];
@@ -454,6 +473,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [_playerWinLoseCoinTBDic removeObjectForKey:user.userID];
     }
 
+    //只剩玩家自己
+    if([[[GameData sharedGameData]userDic]count] == 1){
+        [self clearForRestart];
+        [self allowLeavingOut];
+    }
 }
 
 //查看玩家具体信息
@@ -506,6 +530,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
             NSAssert(NO, @"无效倒计时类型");
             break;
     }
+    _countDownType = countDownTime;
 }
 
 - (void)countDownWithGrabZType:(ccTime)dt
@@ -532,8 +557,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     if(_timeLeft < 0){
         [_countDownLabelTTF setVisible:NO];
         [self unschedule:@selector(countDownWithBetType:)];
-        if([_betRatioMenu parent])
-            [_betRatioMenu removeFromParentAndCleanup:YES];
+        [self removeBetRatioMenu];
         CCLOG(@"Bet TIME UP!");
     }
 }
@@ -547,15 +571,10 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [_countDownLabelTTF setVisible:NO];
         [self unschedule:@selector(countDownWithReadCardsType:)];
         CCLOG(@"ReadCards TIME UP!");
-        if([self getChildByTag:kTagReadingCardsLayer]){
-            CCLOG(@"CardPlayingScene removeChildByTag");
-            [self removeChildByTag:kTagReadingCardsLayer cleanup:YES];
-            [self showResultNiuWithType:NIU_0 cardsDataSendToServer:[[[GameData sharedGameData]player]cardsDataArr] user:[[GameData sharedGameData]player]];
-        }
+        [self removeReadingCardLayer];
     }
 }
 
-#pragma mark - sendCards
 //播放发牌动画
 - (void)playSendCardsAnimation:(BOOL)animate
 {
@@ -572,28 +591,33 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [pool release];
     }else{
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-        for (int i = 0; i < TOTAL_CARD_NUM; i++) {
-            UserCard *card = [UserCard cardWithBack];
-            [self addChild:card];
-            int index = i % MAX_PLAYERS_NUM;
-            int turn = i / MAX_PLAYERS_NUM;
-            CGPoint firstCardPos = [[_cardPosArr objectAtIndex:index]CGPointValue];
-            CGPoint targetCardPos = CGPointMake(firstCardPos.x+turn*CARD_SPACE0, firstCardPos.y);
-            [card setPosition:targetCardPos];
-            [_allUserCardsArr addObject:card];
-        }
+        [self drawAllPlayersBackCards];
         [pool release];
     }
     
-//    NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
-//    for(NSString *key in userDic){
-//        User *user = [userDic objectForKey:key];
-//        int i = (user.posID + 6 - 2) % 6;
-//        for(; i < TOTAL_CARD_NUM; i += 6){
-//            UserCard *userCard = [_allUserCardsArr objectAtIndex:i];
-//            [user.user5backCards addObject:userCard];
-//        }
-//    }
+    NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
+    for(NSString *key in userDic){
+        User *user = [userDic objectForKey:key];
+        int i = (user.posID + 6 - 2) % 6;
+        for(; i < TOTAL_CARD_NUM; i += 6){
+            UserCard *userCard = [_allUserCardsArr objectAtIndex:i];
+            [user.user5cards addObject:userCard];
+        }
+    }
+}
+
+- (void)drawAllPlayersBackCards
+{
+    for (int i = 0; i < TOTAL_CARD_NUM; i++) {
+        UserCard *card = [UserCard cardWithBack];
+        [self addChild:card];
+        int index = i % MAX_PLAYERS_NUM;
+        int turn = i / MAX_PLAYERS_NUM;
+        CGPoint firstCardPos = [[_cardPosArr objectAtIndex:index]CGPointValue];
+        CGPoint targetCardPos = CGPointMake(firstCardPos.x+turn*CARD_SPACE0, firstCardPos.y);
+        [card setPosition:targetCardPos];
+        [_allUserCardsArr addObject:card];
+    }
 }
 
 - (void)sendCardsWithAnimation
@@ -634,6 +658,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)startBet:(NSArray *)betArr
 {
     [_menuGrabZ setVisible:NO];
+    if(_isThinkingBet)  return;
     for(int i = 0;i < 4;i++)
     {
         NSDictionary *aBetBoxInfoDic = (NSDictionary *)[betArr objectAtIndex:i];
@@ -675,6 +700,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [_betRatioMenu setPosition:CGPointZero];
     [_betRatioMenu setScale:0.8];
     [self addChild:_betRatioMenu z:kTagBetRatioMenu tag:kTagBetRatioMenu];
+    
+    _isThinkingBet = YES;
     [debugConsole setString:@"startBet"];
 }
 
@@ -690,7 +717,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)sendServerWithBetRatio:(int)ratio
 {
     [self fobiddenLeavingOut];
-    [_betRatioMenu removeFromParentAndCleanup:YES];
+    [self removeBetRatioMenu];
     
     CCSprite *betBox = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioNomal%d.png",ratio]];
     [self addChild:betBox z:kTagBetRatioMenu];
@@ -716,6 +743,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     NSDictionary *dic = [NSDictionary dictionaryWithObject:[[GameData sharedGameData] player].userID forKey:@"userID"];
     NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_QUIT_CARD_GAME contentDic:dic];
     [[GCDAsyncSocketHelper sharedHelper]writeData:data withTimeout:-1 tag:CMD_QUIT_CARD_GAME socketType:CARD_SOCKET];
+    [[GCDAsyncSocketHelper sharedHelper]disconnectCardServer];
 }
 
 - (void)sendServerWithHeartBeat
@@ -735,6 +763,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     int ratio = [[betResult objectForKey:@"ratio"]intValue];
     NSString *userID = [betResult objectForKey:@"userID"];
+    //用于home键游戏进入后台再次唤醒
+    if([userID isEqualToString:[[[GameData sharedGameData]player]userID]]){
+        if([self getChildByTag:kTagBetRatioMenu])
+            [self removeBetRatioMenu];
+    }
     CCSprite *betBox = [CCSprite spriteWithSpriteFrameName:[NSString stringWithFormat:@"betRatioNomal%d.png",ratio]];
     [self addChild:betBox z:kTagBetRatioMenu];
     
@@ -750,14 +783,10 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)startReadingCards:(NSArray *)cardArray
 {
     CCLOG(@"startReadingCards");
+    if(_isClosing5cards || _isOpening5cards || _isReading5cards)    return;
     [self countDownBeginWith:kCDTimeReadCards];
-    
-    for(int i = 0; i < [_allUserCardsArr count]; i++){
-        if(i % MAX_PLAYERS_NUM == 0){//将第0、6、12、18、24张牌放入_playerCardsArr数组
-            [_playerCardsArr addObject:[_allUserCardsArr objectAtIndex:i]];
-        }
-    }
      
+    _isClosing5cards = YES;
     [self closeThenOpenCards:cardArray];
     [debugConsole setString:[NSString stringWithFormat:@"开始看牌"]];
 }
@@ -769,23 +798,27 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     CCLOG(@"closeThenOpenCards");
     CGPoint closePos = [[_cardPosArr objectAtIndex:0]CGPointValue];
     //收拢牌
-    for(UserCard *card in _playerCardsArr){
+    NSMutableArray *playerCardsArr = [[[GameData sharedGameData]player]user5cards];
+    for(UserCard *card in playerCardsArr){
         id moveToClosePos = [CCMoveTo actionWithDuration:0.5 position:closePos];
         id easeOut = [CCEaseInOut  actionWithAction:moveToClosePos rate:2];
         [card runAction:easeOut];
     }
     //打开牌
     [self scheduleOnce:@selector(open5cards) delay:0.8];
+    _isClosing5cards = NO;
 }
 
 - (void)open5cards
 {
     [self unschedule:@selector(open5cards)];
+    _isOpening5cards = YES;
     NSMutableArray *cardDataArr = [[GameData sharedGameData]player].cardsDataArr;
     CGPoint openPos = [[_cardPosArr objectAtIndex:0]CGPointValue];
+    NSMutableArray *playerCardsArr = [[[GameData sharedGameData]player]user5cards];
     for(int i = 0; i < 5; i++)
     {
-        UserCard *card = (UserCard *)[_playerCardsArr objectAtIndex:i];
+        UserCard *card = (UserCard *)[playerCardsArr objectAtIndex:i];
         CardData *cardData = [cardDataArr objectAtIndex:i];
         id moveToOpenPos = [CCMoveTo actionWithDuration:0.5 position:CGPointMake(openPos.x + i * 50, openPos.y)];
         id easeOut = [CCEaseOut actionWithAction:moveToOpenPos rate:2];
@@ -795,26 +828,27 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [card runAction:easeOut];
     }
     
-    [self scheduleOnce:@selector(addReadingCardsLayer) delay:2];
+    [self scheduleOnce:@selector(addReadingCardsLayer) delay:1];
+    _isOpening5cards = NO;
 }
 
 //读牌层
 - (void)addReadingCardsLayer
 {
     [self unschedule:@selector(addReadingCardsLayer)];
-    [self removePlayerCards];
+    [self hidePlayerCards:YES];
+    _isReading5cards = YES;
     
     _readingCardsLayer = [ReadingCardsLayer layerWithCardsArray:[[GameData sharedGameData]player].cardsDataArr];
     [self addChild:_readingCardsLayer z:kTagReadingCardsLayer tag:kTagReadingCardsLayer];    
 }
 
-- (void)removePlayerCards
+- (void)hidePlayerCards:(BOOL)hide
 {
-    for(UserCard *card in _playerCardsArr){
-        [self removeChild:card cleanup:YES];
+    NSMutableArray *playerCardsArr = [[[GameData sharedGameData]player]user5cards];
+    for(UserCard *card in playerCardsArr){
+        [card setVisible:!hide];
     }
-    [_playerCardsArr removeAllObjects];
-    CCLOG(@"_playerCardsArr length:%d",[_playerCardsArr count]);
 }
 
 //玩家自己亮牌
@@ -844,17 +878,20 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     if(sendToServerArray == nil)    return;
     CGPoint firstCardPos = [[_cardPosArr objectAtIndex:((user.posID+6-2)%6)]CGPointValue];
+    NSMutableArray *user5cards = user.user5cards;
+    CCLOG(@"user5cards count:%d", [user5cards count]);
+    if([user.userID isEqualToString:[[[GameData sharedGameData]player]userID]]){
+        [self hidePlayerCards:NO];
+    }
     CGPoint cardPos;
     switch (type) {
         case NIU_0:
         case WU_HUA:{
             for(int i = 0; i < 5; i++){
                 cardPos = CGPointMake(firstCardPos.x + CARD_SPACE2 * i, firstCardPos.y);
-                UserCard *card = [UserCard cardWithCardData:[sendToServerArray objectAtIndex:i]];
+                UserCard *card = [user5cards objectAtIndex:i];
                 [card setPosition:cardPos];
-                [self addChild:card z:kTagAllCards tag:kTagAllCards];
-                [_allUserCardsArr2 addObject:card];
-                [user.user5faceCards addObject:card];
+                [card setFrontFace:[sendToServerArray objectAtIndex:i]];
             }
             break;
         }
@@ -868,16 +905,14 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         case NIU_8:
         case NIU_9:
         case NIU_NIU:{
-            for(int i = 0; i < 5; i++){  
+            for(int i = 0; i < 5; i++){
                 if(i < 3)
                     cardPos = CGPointMake(firstCardPos.x + CARD_SPACE2 * i, firstCardPos.y);
                 else
                     cardPos = CGPointMake(firstCardPos.x + CARD_SPACE2 * i + CARD_SPACE2, firstCardPos.y);
-                UserCard *card = [UserCard cardWithCardData:[sendToServerArray objectAtIndex:i]];
+                UserCard *card = [user5cards objectAtIndex:i];
                 [card setPosition:cardPos];
-                [self addChild:card z:kTagAllCards tag:kTagAllCards];
-                [_allUserCardsArr2 addObject:card];
-                [user.user5faceCards addObject:card];
+                [card setFrontFace:[sendToServerArray objectAtIndex:i]];
             }
             break;
         }
@@ -887,11 +922,9 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
                     cardPos = CGPointMake(firstCardPos.x + CARD_SPACE2 * i + CARD_SPACE2, firstCardPos.y);
                 else
                     cardPos = CGPointMake(firstCardPos.x + CARD_SPACE2 * i, firstCardPos.y);
-                UserCard *card = [UserCard cardWithCardData:[sendToServerArray objectAtIndex:i]];
+                UserCard *card = [user5cards objectAtIndex:i];
                 [card setPosition:cardPos];
-                [self addChild:card z:kTagAllCards tag:kTagAllCards];
-                [_allUserCardsArr2 addObject:card];
-                [user.user5faceCards addObject:card];
+                [card setFrontFace:[sendToServerArray objectAtIndex:i]];
             }
             break;
         }
@@ -914,6 +947,9 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [self countDownBeginWith:kCDTimeStop];
     //此时可以换桌、划屏离场
     [self allowLeavingOut];
+    
+    //用于home键游戏进入后台再次唤醒
+    [self removeReadingCardLayer];
     
     NSMutableDictionary *userDic = [[GameData sharedGameData]userDic];
     NSString *tb;
@@ -947,11 +983,68 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     }
 }
 
+//有玩家掉线
+- (void)otherPlayerOffline:(User *)user
+{
+    AvatarInfoBox *avatarInfoBox = [_avatarDic objectForKey:user.userID];
+    [avatarInfoBox showOfflineStatus:YES];
+}
+
+//掉线玩家恢复在线
+- (void)otherPlayerOnline:(User *)user
+{
+    AvatarInfoBox *avatarInfoBox = [_avatarDic objectForKey:user.userID];
+    [avatarInfoBox showOfflineStatus:NO];
+}
+
+- (void)showPopTipViewWithTipType:(int)type
+{
+    self.popUpTipView = [PopUpTipView viewWithType:type];
+    [self addChild:self.popUpTipView z:kTagPopUpView tag:kTagPopUpView];
+}
+
+- (void)removePopUpTipView
+{
+    if([self getChildByTag:kTagPopUpView])
+        [self removeChildByTag:kTagPopUpView cleanup:YES];
+}
+
+- (void)reconnectCardServer
+{
+    CCLOG(@"重新连接卡牌服务器，数据界面同步中");
+    [self removePopUpTipView];
+    [self clearForRestart];
+    [self removeOtherPlayerAvatarInfoBoxExceptMe];
+
+    [self drawPlayersAvatarInfoBox];//玩家头像
+    [self grabResult:[[GameData sharedGameData] zUserID]];//显示庄
+    [self showPlayersBetRatio];//显示注
+    
+    User *playerSelf = [[GameData sharedGameData]player];
+    if([playerSelf showCardsDataArr]){
+        if([[[[GameData sharedGameData]player]user5cards]count] == 0)
+            [self playSendCardsAnimation:NO];//显示背面牌
+        [self showPlayersFinalCards];
+    }else{
+        if(!playerSelf.canGrabZ && playerSelf.canBet){
+            //不能叫庄但能下注，则断线重连进来的阶段为庄家已经确定后下注前进入
+            CCLOG(@"玩家断线重连进来时刻为：庄家已经确定后下注前进入");
+        }else if(!playerSelf.canGrabZ && !playerSelf.canBet){
+            //不能叫庄也不能下注，则断线重连进来的阶段为下注后进入    
+            CCLOG(@"玩家断线重连进来时刻为：下注后进入");
+            if([[[[GameData sharedGameData]player]user5cards]count] == 0)
+                [self playSendCardsAnimation:NO];//显示背面牌
+            [self showPlayersFinalCards];
+        }
+    }    
+}
+
 - (void)clearForRestart
 {
     CCLOG(@"clearForRestart");
     //清除庄
-    [self removeChild:_zSymbol cleanup:YES];
+    if([self getChildByTag:kTagZSymbol])
+        [self removeChild:_zSymbol cleanup:YES];
     
     //清除winLose金币
     for(NSString *key in _playerWinLoseCoinTBDic){
@@ -966,19 +1059,14 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         }
         [_allUserCardsArr removeAllObjects];
     }
-    
-    if([_allUserCardsArr2 count] > 0){
-        for(UserCard *card in _allUserCardsArr2){
-            [self removeChild:card cleanup:YES];
-        }
-        [_allUserCardsArr2 removeAllObjects];
-    }
+    CCLOG(@"111111");
     
     for(NSString *key in [[GameData sharedGameData]userDic]){
         User *user = [[[GameData sharedGameData]userDic]objectForKey:key];
-        [user.user5faceCards removeAllObjects];
+        if([user.user5cards count] > 0)
+            [user.user5cards removeAllObjects];
     }
-    
+    CCLOG(@"22222");
     for(NSString *key in _playerResultNiuSymbolDic){
         CCSprite *resultNiu = [_playerResultNiuSymbolDic objectForKey:key];
         [self removeChild:resultNiu cleanup:YES];
@@ -990,15 +1078,26 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self removeChild:betBox cleanup:YES];
     }
     [_betResultDic removeAllObjects];
+     
+    if([self getChildByTag:kTagReadingCardsLayer])
+        [self removeChild:_readingCardsLayer cleanup:YES];
     
     [self clearPlayerData];
 }
 
 - (void)clearPlayerData
 {
-    [[[[GameData sharedGameData]player]cardsDataArr]removeAllObjects];
-    [[[[GameData sharedGameData]player]selectedCardsDataArr]removeAllObjects];
-    [[[[GameData sharedGameData]player]sendToServerArr]removeAllObjects];
+    if([[[[GameData sharedGameData]player]cardsDataArr]count] > 0)
+        [[[[GameData sharedGameData]player]cardsDataArr]removeAllObjects];
+    if([[[[GameData sharedGameData]player]selectedCardsDataArr]count] > 0)
+        [[[[GameData sharedGameData]player]selectedCardsDataArr]removeAllObjects];
+    if([[[[GameData sharedGameData]player]sendToServerArr]count] > 0)
+        [[[[GameData sharedGameData]player]sendToServerArr]removeAllObjects];
+    
+    _isThinkingBet = NO;
+    _isClosing5cards = NO;
+    _isOpening5cards = NO;
+    _isReading5cards = NO;
 }
 
 //禁止离场
@@ -1016,15 +1115,29 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
 }
 
+#pragma mark - home键进入后台再次唤醒
+- (void)removeBetRatioMenu
+{
+    if([_betRatioMenu parent])
+        [_betRatioMenu removeFromParentAndCleanup:YES];
+}
+
+- (void)removeReadingCardLayer
+{
+    if([self getChildByTag:kTagReadingCardsLayer]){
+        CCLOG(@"CardPlayingScene removeChildByTag");
+        [self removeChildByTag:kTagReadingCardsLayer cleanup:YES];
+        [self showResultNiuWithType:NIU_0 cardsDataSendToServer:[[[GameData sharedGameData]player]cardsDataArr] user:[[GameData sharedGameData]player]];
+    }
+}
+
 #pragma mark - dealloc
 - (void) dealloc
 {
     [_allUserCardsArr release];
-    [_allUserCardsArr2 release];
     [_betResultDic release];
     [_avatarDic release];
     [_playerResultNiuSymbolDic release];
-    [_playerCardsArr release];
     [_playerWinLoseCoinTBDic release];
     
     [_betRatioMenu release];
@@ -1038,8 +1151,8 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     _swipeLeftGestureRecognizer = nil;
     [_swipeRightGestureRecognizer release];
     _swipeRightGestureRecognizer = nil;
-    [_activityIndicatorView release];
-    _activityIndicatorView = nil;
+    [_popUpTipView release];
+    _popUpTipView = nil;
     
 	[super dealloc];
 }

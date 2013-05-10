@@ -45,6 +45,15 @@ static GameData *_instance = nil;
     [self.userDic removeObjectForKey:userID];
 }
 
+- (void)removeUserFromUserDicExceptMe
+{
+    for(NSString *key in _userDic){
+        if([key isEqualToString:[[[GameData sharedGameData]player]userID]])
+            continue;
+        [self removeUserByUserID:key];
+    }
+}
+
 - (void)updateUserCoinTB:(NSString *)userID coinTB:(uint32_t)coinTB
 {
     User *user = [_userDic objectForKey:userID];

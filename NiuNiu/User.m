@@ -15,9 +15,9 @@
 @synthesize nickName=_nickName,userName=_userName;
 @synthesize coinYL=_coinYL,coinTB=_coinTB,familyPropertyValue=_familyPropertyValue;
 @synthesize cardTitle=_cardTitle,familyPropertyTitle=_familyPropertyTitle,gamblerTitle=_gamblerTitle,roleTitle=_roleTitle;
-@synthesize cardsDataArr=_cardsDataArr,selectedCardsDataArr=_selectedCardsDataArr,sendToServerArr=_sendToServerArr,user5backCards=_user5backCards,user5faceCards=_user5faceCards;
+@synthesize cardsDataArr=_cardsDataArr,selectedCardsDataArr=_selectedCardsDataArr,sendToServerArr=_sendToServerArr,user5cards=_user5cards;
 @synthesize cardType=_cardType,winCoinTB=_winCoinTB,betRatio=_betRatio;
-@synthesize canGrabZ=_canGrabZ,canBet=_canBet;
+@synthesize canGrabZ=_canGrabZ,canBet=_canBet,offline=_offline;
 @synthesize showCardsDataArr=_showCardsDataArr;
 
 #pragma mark - init
@@ -41,8 +41,7 @@
         
         self.selectedCardsDataArr = [NSMutableArray arrayWithCapacity:5];
         self.sendToServerArr = [NSMutableArray arrayWithCapacity:5];
-        self.user5backCards = [NSMutableArray arrayWithCapacity:5];
-        self.user5faceCards = [NSMutableArray arrayWithCapacity:5];
+        self.user5cards = [NSMutableArray arrayWithCapacity:5];
     }
     return self;
 }
@@ -67,8 +66,7 @@
     [_selectedCardsDataArr release];
     [_sendToServerArr release];
     [_showCardsDataArr release];
-    [_user5backCards release];
-    [_user5faceCards release];
+    [_user5cards release];
     [super dealloc];
 }
 @end

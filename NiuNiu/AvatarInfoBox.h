@@ -12,7 +12,8 @@
 
 enum{
     kTagAvatarSpr,
-    kTagCoinTB
+    kTagCoinTB,
+    kTagOffline
 };
 
 @interface AvatarInfoBox : CCSprite<CCTargetedTouchDelegate>
@@ -22,9 +23,14 @@ enum{
     //铜币
     CCLabelTTF *_coinTB;
     User *_user;
+    
+    //掉线相关
+    CCSprite *_offlineSpr;
+    BOOL _offline;
 }
 
 + (id)infoBoxWithUserData:(User *)user;
 - (id)initInfoBoxWithUserData:(User *)user;
 - (void)updateCoinTB:(int)coinTB;
+- (void)showOfflineStatus:(BOOL)show;
 @end

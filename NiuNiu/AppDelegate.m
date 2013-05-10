@@ -14,6 +14,8 @@
 #import "IP_AddressHelper.h"
 #import "GameData.h"
 #import "User.h"
+#import "CardPlayingScene.h"
+#import "PopUpTipView.h"
 
 @implementation AppController
 
@@ -64,7 +66,8 @@
                 
                 //init socketHelper
                 socketHelper = [GCDAsyncSocketHelper sharedHelper];
-                [socketHelper connectLoginServer];
+                if(![[socketHelper loginSocket]isConnected])
+                    [socketHelper connectLoginServer];
                 //获取本机IP地址
                 NSString *ipAddress = [IP_AddressHelper getIPAddress];
                 CCLOG(@"IP: %@", ipAddress);
@@ -181,6 +184,12 @@
 	if( [navController_ visibleViewController] == director_ )
 		[director_ resume];
     CCLOG(@"<%@>", NSStringFromSelector(_cmd));
+    
+    CCNode *currentScene = [[[CCDirector sharedDirector]runningScene] getChildByTag:0];
+    if([currentScene isKindOfClass:[CardPlayingScene class]] && [[[GCDAsyncSocketHelper sharedHelper]cardSocket]isDisconnected]
+       && [currentScene respondsToSelector:@selector(showPopTipViewWithTipType:)]){
+        [(CardPlayingScene *)currentScene showPopTipViewWithTipType:kTipType_RECONNECT_CARD_SERVER];
+    }
 }
 
 -(void) applicationDidEnterBackground:(UIApplication*)application

@@ -84,7 +84,7 @@
     if(!_isZhaDanOrWuHua && [manualLength intValue] == 0){//分析不是炸弹或者五花牛，并且玩家没有手动选择牌
         sendToServer = _cardsDataArray;
         [[[GameData sharedGameData]player]setCardType:NIU_0];
-        [[[GameData sharedGameData]player] setSendToServerArr:sendToServer];
+        [[[GameData sharedGameData]player]setSendToServerArr:sendToServer];
     }else{
         sendToServer = [[[GameData sharedGameData]player]sendToServerArr];
     }
@@ -104,10 +104,10 @@
     NSData *data = [[GCDAsyncSocketHelper sharedHelper]wrapPacketWithCmd:CMD_START_SHOW_CARDS contentDic:dic];
     [[GCDAsyncSocketHelper sharedHelper] writeData:data withTimeout:-1 tag:CMD_START_SHOW_CARDS socketType:CARD_SOCKET];
     
-    [self removeFromParentAndCleanup:YES];
-    
     //通知CardPlayingScene开始亮牌
     [[NSNotificationCenter defaultCenter]postNotificationName:@"startShowCardsResult" object:nil];
+    
+    [self removeFromParentAndCleanup:YES];
 }
 
 //绘制下方的5张牌

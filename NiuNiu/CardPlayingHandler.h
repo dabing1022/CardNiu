@@ -24,4 +24,8 @@
 + (void)processFinalWinLoseResult:(NSData *)data;
 + (void)processUpdateUsersInfo:(NSData *)data;
 + (User *)processOtherPlayerOut:(NSData *)data;
++ (void)processForcedChangeTable;
++ (User *)processOtherPlayerOffline:(NSData *)data;
++ (User *)processOtherPlayerOnline:(NSData *)data;
++ (void)processReconnectCardServer:(NSData *)data;
 @end

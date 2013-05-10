@@ -10,6 +10,8 @@
 #import "CJSONSerializer.h"
 #import "CJSONDeserializer.h"
 #import "Game.h"
+#import "GameData.h"
+#import "User.h"
 #import "CmdLoginHandler.h"
 #import "CardPlayingHandler.h"
 #import "CardPlayingScene.h"
@@ -56,6 +58,7 @@ static GCDAsyncSocketHelper *_instance = nil;
 #pragma mark - 连接服务器
 - (void)connectLoginServer
 {
+    CCLOG(@"连接登录服务器中......");
     NSError *error = nil;
     if(![loginSocket connectToHost:LOGIN_HOST onPort:LOGIN_PORT error:&error])
     {
@@ -65,10 +68,11 @@ static GCDAsyncSocketHelper *_instance = nil;
 
 - (void)connectFamilyServer
 {
+    CCLOG(@"连接家产服务器中......");
     familySocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
-    if(![familySocket connectToHost:[GCDAsyncSocketHelper sharedHelper].FAMILY_IP
-                             onPort:[GCDAsyncSocketHelper sharedHelper].FAMILY_PORT error:&error])
+    if(![familySocket connectToHost:FAMILY_IP
+                             onPort:FAMILY_PORT error:&error])
     {
         CCLOG(@"连接家产服务器出现问题，请检查%@", error);
     }
@@ -76,12 +80,41 @@ static GCDAsyncSocketHelper *_instance = nil;
 
 - (void)connectCardServer
 {
+    CCLOG(@"连接卡牌服务器中......");
     cardSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
-    if(![cardSocket connectToHost:[GCDAsyncSocketHelper sharedHelper].CARD_IP
-                           onPort:[GCDAsyncSocketHelper sharedHelper].CARD_PORT error:&error])
+    if(![cardSocket connectToHost:CARD_IP
+                           onPort:CARD_PORT
+                      withTimeout:2
+                            error:&error])
     {
         CCLOG(@"连接牌局服务器出现问题，请检查%@", error);
+    }
+}
+
+- (void)connectServer:(GCDAsyncSocket *)sock
+{
+    if(sock == loginSocket){
+        [self connectLoginServer];
+    }else if(sock == familySocket){
+        [self connectFamilyServer];
+    }else if(sock == cardSocket){
+        [self connectCardServer];
+    }
+}
+
+- (void)reconnectServer:(GCDAsyncSocket *)sock
+{
+    if(sock == loginSocket){
+        CCLOG(@"重新连接登录服务器中...");
+        [self connectLoginServer];
+    }else if(sock == familySocket){
+        CCLOG(@"重新连接家产服务器中...");
+        [self connectFamilyServer];
+    }else if(sock == cardSocket){
+        CCLOG(@"重新连接卡牌服务器中...");
+        [self connectCardServer];
+        [self sendCardServerReconnectMsg];
     }
 }
 
@@ -108,6 +141,14 @@ static GCDAsyncSocketHelper *_instance = nil;
     [cardSocket disconnect];
     [cardSocket release];
     cardSocket = nil;
+}
+
+- (void)disconnectServer:(GCDAsyncSocket *)sock
+{
+    [sock setDelegate:nil delegateQueue:NULL];
+    [sock disconnect];
+    [sock release];
+    sock = nil;
 }
 
 #pragma mark - 读写数据
@@ -240,22 +281,25 @@ static GCDAsyncSocketHelper *_instance = nil;
 #pragma mark - socket delegate
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
-    CCLOG(@"AsyncSocket didConnectToHost: %@, port: %d", host, port);
-    CCLOG(@"connect success!");
+    CCLOG(@"服务器IP: %@, 端口: %d", host, port);
+    CCLOG(@"连接服务器成功!");
 }
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)error
 {
-    [self disconnectLoginServer];
-    [self disconnectFamilyServer];
-    [self disconnectCardServer];
     CCLOG(@"连接失败！");
+    //isDisconnected
+    //isConnected
+    if(sock){
+        [self disconnectServer:sock];
+        [self reconnectServer:sock];        
+    }
     
-    UIView *view = [[CCDirector sharedDirector]view];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"警告" message:@"网络连接失败!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    [view addSubview:alertView];
-    [alertView show];
-    [alertView release];
+//    UIView *view = [[CCDirector sharedDirector]view];
+//    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"警告" message:@"网络连接失败!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+//    [view addSubview:alertView];
+//    [alertView show];
+//    [alertView release];
 }
 
 - (void) alertView:(UIAlertView *)alert clickedButtonAtIndex:(NSInteger)buttonIndex{
@@ -264,6 +308,16 @@ static GCDAsyncSocketHelper *_instance = nil;
     } else {
         CCLOG(@"点击取消");
     }
+}
+
+#pragma mark - send Server
+- (void)sendCardServerReconnectMsg
+{
+    CCLOG(@"向卡牌服务端发送重连消息");
+    NSDictionary *dic = [NSDictionary dictionaryWithObject:[[GameData sharedGameData] player].userID forKey:@"userID"];
+    NSData *data = [self wrapPacketWithCmd:CMD_RECONNECT_CARD_SERVER contentDic:dic];
+    [self writeData:data withTimeout:-1 tag:CMD_RECONNECT_CARD_SERVER socketType:CARD_SOCKET];
+    [self readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
 }
 
 - (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
@@ -289,6 +343,10 @@ static GCDAsyncSocketHelper *_instance = nil;
             NSString *info = [[self analysisDataToString:data]retain];
             if([info isEqualToString:INFO_WAITING_ASSIGN]){
                 [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(waitingAssign) withObject:nil];
+            }else if([info isEqualToString:INFO_FORCED_CHANGE_TABLE]){
+                CCLOG(@"金币不足或者掉线重连刚好上把结束，被重新分配桌子");
+                [CardPlayingHandler processForcedChangeTable];
+                [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(forcedChangeTable) withObject:nil];
             }
             [info release];
             break;
@@ -364,8 +422,24 @@ static GCDAsyncSocketHelper *_instance = nil;
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerOut:) withObject:user];
             break;
         }
+        case CMD_OTHER_PLAYER_OFFLINE:{
+            CCLOG(@"CMD_OTHER_PLAYER_OFFLINE");
+            User *user = [CardPlayingHandler processOtherPlayerOffline:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerOffline:) withObject:user];
+        }
+        case CMD_OTHER_PLAYER_ONLINE:{
+            CCLOG(@"CMD_OTHER_PLAYER_ONLINE");
+            User *user = [CardPlayingHandler processOtherPlayerOnline:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerOnline:) withObject:user];
+        }
         case CMD_ERROR:{
             CCLOG(@"CMD_ERROR");
+            break;
+        }
+        case CMD_RECONNECT_CARD_SERVER:{
+            CCLOG(@"CMD_RECONCECT_CARD_SERVER");
+            [CardPlayingHandler processReconnectCardServer:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(reconnectCardServer) withObject:nil];
             break;
         }
         default:
@@ -374,9 +448,6 @@ static GCDAsyncSocketHelper *_instance = nil;
     }
     [self analysisRemainData:data socket:sock];
     [sock readDataWithTimeout:-1 tag:0];
-//    [self readDataWithTimeout:-1 tag:0 socketType:LOGIN_SOCKET];
-//    [self readDataWithTimeout:-1 tag:0 socketType:FAMILY_SOCKET];
-//    [self readDataWithTimeout:-1 tag:0 socketType:CARD_SOCKET];
 }
 
 #pragma mark - 返回主线程更新UI
