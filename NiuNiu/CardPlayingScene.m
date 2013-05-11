@@ -103,20 +103,11 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
                                                          [NSValue valueWithCGPoint:BET_BOX_FLYTO_POS_ID5], nil];
         [_betBoxesFlyToPosArr retain];
 
-        
-        //清空玩家本人上把的牌数据
-        [self clearPlayerData];
-        
         //添加观察者-亮牌
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(finalShowCards:) name:@"startShowCardsResult" object:nil];
         
         _playerInfoBox = nil;
         self.popUpTipView = nil;
-        
-        _isThinkingBet = NO;
-        _isClosing5cards = NO;
-        _isOpening5cards = NO;
-        _isReading5cards = NO;
     }
     LOG_FUN_DID;
     return self;
@@ -328,6 +319,9 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 - (void)forcedChangeTable
 {
     CCLOG(@"被强制换桌");
+    [self unscheduleAllSelectors];
+    //10s发送一次心跳包
+    [self schedule:@selector(sendHeartBeat:) interval:7];
     [self showPopTipViewWithTipType:kTipType_WAIT_FOR_ASSIGN_IN_DESK];
     [self removeOtherPlayerAvatarInfoBoxExceptMe];
     [self clearForRestart];
@@ -341,6 +335,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self removeChild:[_avatarDic objectForKey:key] cleanup:YES];
         [_avatarDic removeObjectForKey:key];
     }
+    [CardPlayingHandler processForcedChangeTable];
 }
 
 //分配进桌
@@ -786,7 +781,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     if(_isClosing5cards || _isOpening5cards || _isReading5cards)    return;
     [self countDownBeginWith:kCDTimeReadCards];
      
-    _isClosing5cards = YES;
     [self closeThenOpenCards:cardArray];
     [debugConsole setString:[NSString stringWithFormat:@"开始看牌"]];
 }
@@ -798,6 +792,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     CCLOG(@"closeThenOpenCards");
     CGPoint closePos = [[_cardPosArr objectAtIndex:0]CGPointValue];
     //收拢牌
+    _isClosing5cards = YES;
     NSMutableArray *playerCardsArr = [[[GameData sharedGameData]player]user5cards];
     for(UserCard *card in playerCardsArr){
         id moveToClosePos = [CCMoveTo actionWithDuration:0.5 position:closePos];
@@ -811,6 +806,7 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 
 - (void)open5cards
 {
+    CCLOG(@"open5cards");
     [self unschedule:@selector(open5cards)];
     _isOpening5cards = YES;
     NSMutableArray *cardDataArr = [[GameData sharedGameData]player].cardsDataArr;
@@ -945,8 +941,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
 {
     //停止倒计时
     [self countDownBeginWith:kCDTimeStop];
-    //此时可以换桌、划屏离场
-    [self allowLeavingOut];
     
     //用于home键游戏进入后台再次唤醒
     [self removeReadingCardLayer];
@@ -964,11 +958,6 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self addChild:winLoseCoinTB z:kTagResultNiuSymbol tag:kTagResultNiuSymbol];
         [winLoseCoinTB setPosition:[[_avatarPosArr objectAtIndex:user.posID] CGPointValue]];
         [_playerWinLoseCoinTBDic setObject:winLoseCoinTB forKey:user.userID];
-    }
-    
-    //如果玩家本人是庄家，此时不允许换桌或者离开
-    if([[[[GameData sharedGameData]player]userID] isEqualToString:[[GameData sharedGameData]zUserID]]){
-        [self fobiddenLeavingOut];
     }
 }
 
@@ -1072,28 +1061,34 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
         [self removeChild:resultNiu cleanup:YES];
     }
     [_playerResultNiuSymbolDic removeAllObjects];
-    
+    CCLOG(@"333333");
     for(NSString *key in _betResultDic){
         CCSprite *betBox = [_betResultDic objectForKey:key];
         [self removeChild:betBox cleanup:YES];
     }
     [_betResultDic removeAllObjects];
-     
+    CCLOG(@"444444");
     if([self getChildByTag:kTagReadingCardsLayer])
         [self removeChild:_readingCardsLayer cleanup:YES];
-    
+    CCLOG(@"555555");
     [self clearPlayerData];
 }
 
 - (void)clearPlayerData
 {
-    if([[[[GameData sharedGameData]player]cardsDataArr]count] > 0)
+    if([[[[GameData sharedGameData]player]cardsDataArr]count] > 0){
         [[[[GameData sharedGameData]player]cardsDataArr]removeAllObjects];
-    if([[[[GameData sharedGameData]player]selectedCardsDataArr]count] > 0)
+        CCLOG(@"66666");
+    }
+    if([[[[GameData sharedGameData]player]selectedCardsDataArr]count] > 0){
         [[[[GameData sharedGameData]player]selectedCardsDataArr]removeAllObjects];
-    if([[[[GameData sharedGameData]player]sendToServerArr]count] > 0)
+        CCLOG(@"77777");
+    }
+    if([[[[GameData sharedGameData]player]sendToServerArr]count] > 0){
         [[[[GameData sharedGameData]player]sendToServerArr]removeAllObjects];
-    
+        CCLOG(@"88888");
+    }
+
     _isThinkingBet = NO;
     _isClosing5cards = NO;
     _isOpening5cards = NO;
@@ -1113,6 +1108,19 @@ static NSArray *_betBoxesFlyToPosArr;//下注后飘向的显示位置
     [_changeTableMenu setVisible:YES];
     [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeLeftGestureRecognizer];
     [[[CCDirector sharedDirector] view] addGestureRecognizer:self.swipeRightGestureRecognizer];
+}
+
+- (void)confirmNextZuser:(NSString *)nextZuserID
+{
+    if([nextZuserID length] == 0){//下一把需要重新抢庄定庄家
+        //此时可以换桌、划屏离场
+        [self allowLeavingOut];
+    }else{//下一把庄家已经确定(连任情况)
+        //如果玩家本人是庄家，此时不允许换桌或者离开
+        if([[[[GameData sharedGameData]player]userID] isEqualToString:nextZuserID]){
+            [self fobiddenLeavingOut];
+        }
+    }
 }
 
 #pragma mark - home键进入后台再次唤醒

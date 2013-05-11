@@ -30,6 +30,7 @@
 #define CMD_OTHER_PLAYER_OFFLINE    2016//玩家离线
 #define CMD_OTHER_PLAYER_ONLINE     2017//玩家恢复在线
 #define CMD_RECONNECT_CARD_SERVER   2018//断线重连牌局服务器
+#define CMD_NEXT_ROUND_Z            2019//下一把庄家
 
 
 #define CMD_INFO                    9998//服务器给客户端发送的提示

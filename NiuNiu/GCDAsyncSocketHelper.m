@@ -345,7 +345,6 @@ static GCDAsyncSocketHelper *_instance = nil;
                 [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(waitingAssign) withObject:nil];
             }else if([info isEqualToString:INFO_FORCED_CHANGE_TABLE]){
                 CCLOG(@"金币不足或者掉线重连刚好上把结束，被重新分配桌子");
-                [CardPlayingHandler processForcedChangeTable];
                 [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(forcedChangeTable) withObject:nil];
             }
             [info release];
@@ -426,11 +425,13 @@ static GCDAsyncSocketHelper *_instance = nil;
             CCLOG(@"CMD_OTHER_PLAYER_OFFLINE");
             User *user = [CardPlayingHandler processOtherPlayerOffline:data];
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerOffline:) withObject:user];
+            break;
         }
         case CMD_OTHER_PLAYER_ONLINE:{
             CCLOG(@"CMD_OTHER_PLAYER_ONLINE");
             User *user = [CardPlayingHandler processOtherPlayerOnline:data];
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(otherPlayerOnline:) withObject:user];
+            break;
         }
         case CMD_ERROR:{
             CCLOG(@"CMD_ERROR");
@@ -440,6 +441,12 @@ static GCDAsyncSocketHelper *_instance = nil;
             CCLOG(@"CMD_RECONCECT_CARD_SERVER");
             [CardPlayingHandler processReconnectCardServer:data];
             [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(reconnectCardServer) withObject:nil];
+            break;
+        }
+        case CMD_NEXT_ROUND_Z:{
+            CCLOG(@"CMD_NEXT_ROUND_Z");
+            NSString *nextZuserID = [CardPlayingHandler processGrabZ:data];
+            [self dispatchAsyncWithClass:[CardPlayingScene class] selector:@selector(confirmNextZuser:) withObject:nextZuserID];
             break;
         }
         default:

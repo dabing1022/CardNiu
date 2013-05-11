@@ -176,7 +176,6 @@
 		CEE01EDB17114EC900815A9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE01EDA17114EC900815A9D /* Foundation.framework */; };
 		CEE01EDD17114EC900815A9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE01EDC17114EC900815A9D /* CoreGraphics.framework */; };
 		CEE01EDF17114EC900815A9D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE01EDE17114EC900815A9D /* GameKit.framework */; };
-		CEE01EE317114EC900815A9D /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EE217114EC900815A9D /* Default.png */; };
 		CEE01EE517114EC900815A9D /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EE417114EC900815A9D /* Default-Landscape~ipad.png */; };
 		CEE01EE717114EC900815A9D /* fps_images.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EE617114EC900815A9D /* fps_images.png */; };
 		CEE01EE917114EC900815A9D /* fps_images-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EE817114EC900815A9D /* fps_images-hd.png */; };
@@ -186,7 +185,6 @@
 		CEE01EF117114EC900815A9D /* Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EF017114EC900815A9D /* Icon-Small.png */; };
 		CEE01EF317114EC900815A9D /* Icon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EF217114EC900815A9D /* Icon-Small@2x.png */; };
 		CEE01EF517114EC900815A9D /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EF417114EC900815A9D /* Icon.png */; };
-		CEE01EF717114EC900815A9D /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EF617114EC900815A9D /* Icon@2x.png */; };
 		CEE01EFA17114EC900815A9D /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = CEE01EF917114EC900815A9D /* iTunesArtwork */; };
 		CEE0205717114ECC00815A9D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE0205617114ECC00815A9D /* main.m */; };
 		CEE0205A17114ECC00815A9D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE0205917114ECC00815A9D /* AppDelegate.m */; };
@@ -1356,7 +1354,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEE01EE317114EC900815A9D /* Default.png in Resources */,
 				CEE01EE517114EC900815A9D /* Default-Landscape~ipad.png in Resources */,
 				CEE01EE717114EC900815A9D /* fps_images.png in Resources */,
 				CEE01EE917114EC900815A9D /* fps_images-hd.png in Resources */,
@@ -1366,7 +1363,6 @@
 				CEE01EF117114EC900815A9D /* Icon-Small.png in Resources */,
 				CEE01EF317114EC900815A9D /* Icon-Small@2x.png in Resources */,
 				CEE01EF517114EC900815A9D /* Icon.png in Resources */,
-				CEE01EF717114EC900815A9D /* Icon@2x.png in Resources */,
 				CEE01EFA17114EC900815A9D /* iTunesArtwork in Resources */,
 				CEE0207C17116FA400815A9D /* back.png in Resources */,
 				CE66D78E1711847500EA3569 /* ChangeLog in Resources */,

@@ -28,4 +28,5 @@
 + (User *)processOtherPlayerOffline:(NSData *)data;
 + (User *)processOtherPlayerOnline:(NSData *)data;
 + (void)processReconnectCardServer:(NSData *)data;
++ (NSString *)processNextRoundZ:(NSData *)data;
 @end

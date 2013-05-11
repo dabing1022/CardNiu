@@ -39,6 +39,7 @@
         self.coinYL = coinYL;
         self.coinTB = coinTB;
         
+        self.cardsDataArr = nil;
         self.selectedCardsDataArr = [NSMutableArray arrayWithCapacity:5];
         self.sendToServerArr = [NSMutableArray arrayWithCapacity:5];
         self.user5cards = [NSMutableArray arrayWithCapacity:5];

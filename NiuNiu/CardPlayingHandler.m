@@ -102,7 +102,7 @@
     NSDictionary *dic = [[GCDAsyncSocketHelper sharedHelper]analysisDataToDictionary:data];
     NSArray *cardDataDicArr = (NSArray *)[dic objectForKey:@"cards"];
     NSMutableArray *cardsDataArr = [self cardDataDicArr2cardsDataArr:cardDataDicArr];
-    [[GameData sharedGameData]player].cardsDataArr = cardsDataArr;
+    [[[GameData sharedGameData]player]setCardsDataArr:cardsDataArr];
     return cardsDataArr;
 }
 
@@ -194,6 +194,12 @@
 + (void)processReconnectCardServer:(NSData *)data
 {
     [self processEnterDeskData:data];
+}
+
++ (NSString *)processNextRoundZ:(NSData *)data
+{
+    NSString *nextZuserID = [[GCDAsyncSocketHelper sharedHelper]analysisDataToString:data];
+    return nextZuserID;
 }
 
 + (User *)user:(NSDictionary *)userDic
